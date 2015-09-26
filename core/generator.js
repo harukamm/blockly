@@ -64,6 +64,21 @@ Blockly.Generator.prototype.INFINITE_LOOP_TRAP = null;
 Blockly.Generator.prototype.STATEMENT_PREFIX = null;
 
 /**
+ * String to be used as left parenthesis.
+ * Most languages use '(' but some (eg. Latex) may need to override this.
+ * @type {?string}
+ */
+Blockly.Generator.prototype.leftParen = "(";
+
+/**
+ * String to be used as right parenthesis.
+ * Most languages use ')' but some (eg. Latex) may need to override this.
+ * @type {?string}
+ */
+Blockly.Generator.prototype.rightParen = ")";
+
+
+/**
  * Generate code for all blocks in the workspace to the specified language.
  * @param {Blockly.Workspace} workspace Workspace to generate code from.
  * @return {string} Generated code.
@@ -220,9 +235,7 @@ Blockly.Generator.prototype.valueToCode = function(block, name, order) {
       // The operators outside this code are stonger than the operators
       // inside this code.  To prevent the code from being pulled apart,
       // wrap the code in parentheses.
-      // Technically, this should be handled on a language-by-language basis.
-      // However all known (sane) languages use parentheses for grouping.
-      code = '(' + code + ')';
+      code = this.leftParen + code + this.rightParen;
     }
   }
   return code;

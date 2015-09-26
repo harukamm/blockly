@@ -376,10 +376,11 @@ Blockly.Connection.prototype.moveBy = function(dx, dy) {
 Blockly.Connection.prototype.highlight = function() {
   var steps;
   if (this.type == Blockly.INPUT_VALUE || this.type == Blockly.OUTPUT_VALUE) {
-    var tabWidth = this.sourceBlock_.RTL ? -Blockly.BlockSvg.TAB_WIDTH :
+    steps = 'm 0,0 ' + Blockly.BlockSvg.getConnectorPathForType( this.check_ ) + 'v 5';
+/*    var tabWidth = this.sourceBlock_.RTL ? -Blockly.BlockSvg.TAB_WIDTH :
         Blockly.BlockSvg.TAB_WIDTH;
     steps = 'm 0,0 v 5 c 0,10 ' + -tabWidth + ',-8 ' + -tabWidth + ',7.5 s ' +
-            tabWidth + ',-2.5 ' + tabWidth + ',7.5 v 5';
+            tabWidth + ',-2.5 ' + tabWidth + ',7.5 v 5'; */
   } else {
     if (this.sourceBlock_.RTL) {
       steps = 'm 20,0 h -5 ' + Blockly.BlockSvg.NOTCH_PATH_RIGHT + ' h -5';
