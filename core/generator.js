@@ -66,16 +66,23 @@ Blockly.Generator.prototype.STATEMENT_PREFIX = null;
 /**
  * String to be used as left parenthesis.
  * Most languages use '(' but some (eg. Latex) may need to override this.
- * @type {?string}
+ * @type {string}
  */
 Blockly.Generator.prototype.leftParen = "(";
 
 /**
  * String to be used as right parenthesis.
  * Most languages use ')' but some (eg. Latex) may need to override this.
- * @type {?string}
+ * @type {string}
  */
 Blockly.Generator.prototype.rightParen = ")";
+
+/**
+ * String to be used as line break.
+ * Most languages use '\n' but some (eg. Latex) may need to override this.
+ * @type {string}
+ */
+Blockly.Generator.prototype.lineSeparator = "\n";
 
 
 /**
@@ -108,7 +115,7 @@ Blockly.Generator.prototype.workspaceToCode = function(workspace) {
       code.push(line);
     }
   }
-  code = code.join('\n');  // Blank line between each section.
+  code = code.join(this.lineSeparator);  // Blank line between each section.
   code = this.finish(code);
   // Final scrubbing of whitespace.
   code = code.replace(/^\s+\n/, '');
