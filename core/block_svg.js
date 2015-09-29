@@ -537,7 +537,7 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
     }
 
     // Option to make block inline.
-    if (!this.collapsed_) {
+    if (!this.collapsed_ && this.workspace.options.toggleInline) {
       for (var i = 1; i < this.inputList.length; i++) {
         if (this.inputList[i - 1].type != Blockly.NEXT_STATEMENT &&
             this.inputList[i].type != Blockly.NEXT_STATEMENT) {

@@ -142,6 +142,10 @@ Blockly.parseOptions_ = function(options) {
   if (hasCss === undefined) {
     hasCss = true;
   }
+  var hasToggleInline = options['toggleInline'];
+  if( hasToggleInline === undefined ) {
+    hasToggleInline = true;
+  }
   // See grid documentation at:
   // https://developers.google.com/blockly/installation/grid
   var grid = options['grid'] || {};
@@ -234,6 +238,7 @@ Blockly.parseOptions_ = function(options) {
     collapse: hasCollapse,
     comments: hasComments,
     disable: hasDisable,
+    toggleInline: hasToggleInline,
     readOnly: readOnly,
     maxBlocks: options['maxBlocks'] || Infinity,
     pathToMedia: pathToMedia,
