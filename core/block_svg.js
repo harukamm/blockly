@@ -900,48 +900,27 @@ Blockly.BlockSvg.TAB_PATH_DOWN_PUZZLE_HIGHLIGHT_RTL = 'v 6.5 m -' +
     (Blockly.BlockSvg.TAB_WIDTH * 0.05) + ',10 ' +
     (Blockly.BlockSvg.TAB_WIDTH * 0.3) + ',9.5 m ' +
     (Blockly.BlockSvg.TAB_WIDTH * 0.67) + ',-1.9 v 1.4';
-/**
- * SVG path for drawing a horizontal angled tab from top to bottom.
- * @const
- */
-Blockly.BlockSvg.TAB_PATH_DOWN_ANGLE = 'v 5 l -' + Blockly.BlockSvg.TAB_WIDTH + ',' + 7.5 +
-    ' l ' + Blockly.BlockSvg.TAB_WIDTH + ',' + 7.5;
 
 /**
- * SVG path for drawing a horizontal round-shaped tab from top to bottom.
- * @const
- */
-Blockly.BlockSvg.TAB_PATH_DOWN_ROUND = 'v 5 a ' + Blockly.BlockSvg.TAB_WIDTH + ' ' + 7.5 +
-    ' 0 0 0 0 ' + 1.75*Blockly.BlockSvg.TAB_WIDTH;
-
-/**
- * SVG path for drawing a horizontal brace-shaped tab from top to bottom.
- * @const
- */
-/*Blockly.BlockSvg.TAB_PATH_DOWN_BRACE = 'v 2.5 c -5,0 -2,9 -10,10 c 8,1 5,10 10,10'; */
-Blockly.BlockSvg.TAB_PATH_DOWN_BRACE = 'v 5 c -' + (0.5*Blockly.BlockSvg.TAB_WIDTH) + ',0' + 
-    ' -' + (0.2*Blockly.BlockSvg.TAB_WIDTH) + ',' + (0.9*7.5) +
-    ' -' + (0.75*Blockly.BlockSvg.TAB_WIDTH) + ',' + 7.5 +
-    ' c ' + (0.55*Blockly.BlockSvg.TAB_WIDTH) + ',' + (0.1*7.5) +
-    ' ' + (0.5*0.75*Blockly.BlockSvg.TAB_WIDTH) + ',' + (7.5) +  /* Not sure this is quite symmetric? */
-    ' ' + (0.75*Blockly.BlockSvg.TAB_WIDTH) + ',' + (7.5);
-
-/**
- * Get the appropriate path for a given type.
- * @param {Array.<string>} Array of types accepted by the connector
+ * Get an SVG path for rendering a connector.
+ * By default, all connectors are rendered as a puzzle piece,
+ * but individual implementations may override this.
+ * @param {!Blockly.Connection} Connector to be rendered
  * @return {string} SVG path for drawing connector shape
  */
-Blockly.BlockSvg.getConnectorPathForType = function(typeArray) {
-  if( typeArray && typeArray.length == 1 ) {
-    switch( typeArray[0] ) {
-      case "Number": return( Blockly.BlockSvg.TAB_PATH_DOWN_ROUND );
-      case "Boolean": return( Blockly.BlockSvg.TAB_PATH_DOWN_ANGLE );
-      case "Set": return( Blockly.BlockSvg.TAB_PATH_DOWN_BRACE );
-      default: return( Blockly.BlockSvg.TAB_PATH_DOWN_PUZZLE );
-    }
-  } else {
-    return( Blockly.BlockSvg.TAB_PATH_DOWN_PUZZLE );
-  }
+Blockly.BlockSvg.getConnectorPath = function(connector) {
+  return( Blockly.BlockSvg.TAB_PATH_DOWN_PUZZLE );
+}
+
+/**
+ * Get an SVG path for rendering a connector's highlight in RTL.
+ * By default, all connectors are rendered as a puzzle piece,
+ * but individual implementations may override this.
+ * @param {!Blockly.Connection} Connector to be rendered
+ * @return {string} SVG path for drawing connector shape
+ */
+Blockly.BlockSvg.getConnectorPathHighlightRTL = function(connector) {
+  return( Blockly.BlockSvg.TAB_PATH_DOWN_PUZZLE_HIGHLIGHT_RTL );
 }
 
 /**
@@ -1887,7 +1866,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
                            ',' + (cursorY + Blockly.BlockSvg.INLINE_PADDING_Y));
           inlineSteps.push('h', Blockly.BlockSvg.TAB_WIDTH - 2 -
                            input.renderWidth);
-          inlineSteps.push(Blockly.BlockSvg.getConnectorPathForType(input.connection.check_));
+          inlineSteps.push(Blockly.BlockSvg.getConnectorPath(input.connection));
           inlineSteps.push('v', input.renderHeight + 1 -
                                 Blockly.BlockSvg.TAB_HEIGHT);
           inlineSteps.push('h', input.renderWidth + 2 -
@@ -1899,8 +1878,8 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
                 (cursorX - Blockly.BlockSvg.SEP_SPACE_X - 2.5 +
                  Blockly.BlockSvg.TAB_WIDTH - input.renderWidth) + ',' +
                 (cursorY + Blockly.BlockSvg.INLINE_PADDING_Y + 0.5));
-/*            highlightInlineSteps.push(
-                Blockly.BlockSvg.TAB_PATH_DOWN_HIGHLIGHT_RTL);*/ /* Not yet implemented for shaped connectors */
+            highlightInlineSteps.push(
+                Blockly.BlockSvg.getConnectorPathHighlightRTL(input.connection));
             highlightInlineSteps.push('v',
                 input.renderHeight - Blockly.BlockSvg.TAB_HEIGHT + 2.5);
             highlightInlineSteps.push('h',
@@ -1963,12 +1942,13 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
         }
       }
       this.renderFields_(input.fieldRow, fieldX, fieldY);
-      steps.push(Blockly.BlockSvg.getConnectorPathForType(input.connection.check_));
+      steps.push(Blockly.BlockSvg.getConnectorPath(input.connection));
       var v = row.height - Blockly.BlockSvg.TAB_HEIGHT;
       steps.push('v', v);
       if (this.RTL) {
         // Highlight around back of tab.
-        highlightSteps.push(Blockly.BlockSvg.TAB_PATH_DOWN_HIGHLIGHT_RTL);  /* Note: shaped connectors not implemented for RTL */
+        highlightSteps.push(
+          Blockly.BlockSvg.getConnectorPathHighlightRTL(input.connection));
         highlightSteps.push('v', v + 0.5);
       } else {
         // Short highlight glint at bottom of tab.
@@ -2157,9 +2137,8 @@ Blockly.BlockSvg.prototype.renderDrawLeft_ =
     // Create output connection.
     this.outputConnection.moveTo(connectionsXY.x, connectionsXY.y);
     // This connection will be tightened when the parent renders.
-//    steps.push('v0v0v0 V', Blockly.BlockSvg.TAB_HEIGHT);
     steps.push( 'V 0' );
-    steps.push( Blockly.BlockSvg.getConnectorPathForType(this.outputConnection.check_) );
+    steps.push( Blockly.BlockSvg.getConnectorPath(this.outputConnection) );
 /*    steps.push('c 0,-10 -' + Blockly.BlockSvg.TAB_WIDTH + ',8 -' +
         Blockly.BlockSvg.TAB_WIDTH + ',-7.5 s ' + Blockly.BlockSvg.TAB_WIDTH +
         ',2.5 ' + Blockly.BlockSvg.TAB_WIDTH + ',-7.5');
