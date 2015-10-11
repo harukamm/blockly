@@ -207,12 +207,8 @@ Blockly.BlockSvg.terminateDrag_ = function() {
       delete selected.draggedBubbles_;
       selected.setDragging_(false);
       selected.render();
-      if (selected.workspace &&
-          selected.workspace.options.gridOptions &&
-          selected.workspace.options.gridOptions['snap']) {
-        goog.Timer.callOnce(
-            selected.snapToGrid_, Blockly.BUMP_DELAY / 2, selected);
-      }
+      goog.Timer.callOnce(
+          selected.snapToGrid, Blockly.BUMP_DELAY / 2, selected);
       goog.Timer.callOnce(
           selected.bumpNeighbours_, Blockly.BUMP_DELAY, selected);
       // Fire an event to allow scrollbars to resize.
@@ -286,9 +282,8 @@ Blockly.BlockSvg.prototype.moveBy = function(dx, dy) {
 
 /**
  * Snap this block to the nearest grid point.
- * @private
  */
-Blockly.BlockSvg.prototype.snapToGrid_ = function() {
+Blockly.BlockSvg.prototype.snapToGrid = function() {
   if (!this.workspace) {
     return;  // Deleted block.
   }
@@ -300,6 +295,10 @@ Blockly.BlockSvg.prototype.snapToGrid_ = function() {
   }
   if (this.isInFlyout) {
     return;  // Don't move blocks around in a flyout.
+  }
+  if (!this.workspace.options.gridOptions ||
+      !this.workspace.options.gridOptions['snap']) {
+    return;  // Config says no snapping.
   }
   var spacing = this.workspace.options.gridOptions['spacing'];
   var half = spacing / 2;
@@ -790,6 +789,19 @@ Blockly.BlockSvg.prototype.setMovable = function(movable) {
 };
 
 /**
+ * Set whether this block is editable or not.
+ * @param {boolean} movable True if editable.
+ */
+Blockly.BlockSvg.prototype.setEditable = function(editable) {
+  Blockly.BlockSvg.superClass_.setEditable.call(this, editable);
+  if (this.rendered) {
+    for (var i = 0; i < this.icons_.length; i++) {
+      this.icons_[i].updateEditable();
+    }
+  }
+};
+
+/**
  * Return the root node of the SVG or null if none exists.
  * @return {Element} The root SVG node (probably a group).
  */
@@ -838,6 +850,28 @@ Blockly.BlockSvg.NOTCH_WIDTH = 30;
  * @const
  */
 Blockly.BlockSvg.CORNER_RADIUS = 8;
+/**
+ * Do blocks with no previous or output connections have a 'hat' on top?
+ * @const
+ */
+Blockly.BlockSvg.START_HAT = false;
+/**
+ * Path of the top hat's curve.
+ * @const
+ */
+Blockly.BlockSvg.START_HAT_PATH = 'c 30,-15 70,-15 100,0';
+/**
+ * Path of the top hat's curve's highlight in LTR.
+ * @const
+ */
+Blockly.BlockSvg.START_HAT_HIGHLIGHT_LTR =
+    'c 17.8,-9.2 45.3,-14.9 75,-8.7 M 100.5,0.5';
+/**
+ * Path of the top hat's curve's highlight in RTL.
+ * @const
+ */
+Blockly.BlockSvg.START_HAT_HIGHLIGHT_RTL =
+    'm 25,-8.7 c 29.7,-6.2 57.2,-0.5 75,8.7';
 /**
  * Distance from shape edge to intersect with a curved corner at 45 degrees.
  * Applies to highlighting on around the inside of a curve.
@@ -1038,8 +1072,6 @@ Blockly.BlockSvg.prototype.dispose = function(healStack, animate,
   if (Blockly.ContextMenu.currentBlock == this) {
     Blockly.ContextMenu.hide();
   }
-  // Bring block to the top of the workspace.
-  this.unplug(healStack, false);
 
   if (animate && this.rendered) {
     this.disposeUiEffect();
@@ -1247,10 +1279,18 @@ Blockly.BlockSvg.prototype.updateColour = function() {
   }
   var hexColour = Blockly.makeColour(this.getColour());
   var rgb = goog.color.hexToRgb(hexColour);
-  var rgbLight = goog.color.lighten(rgb, 0.3);
-  var rgbDark = goog.color.darken(rgb, 0.2);
-  this.svgPathLight_.setAttribute('stroke', goog.color.rgbArrayToHex(rgbLight));
-  this.svgPathDark_.setAttribute('fill', goog.color.rgbArrayToHex(rgbDark));
+  if (this.isShadow()) {
+    rgb = goog.color.lighten(rgb, 0.6);
+    hexColour = goog.color.rgbArrayToHex(rgb);
+    this.svgPathLight_.style.display = 'none';
+    this.svgPathDark_.setAttribute('fill', hexColour);
+  } else {
+    this.svgPathLight_.style.display = '';
+    var hexLight = goog.color.rgbArrayToHex(goog.color.lighten(rgb, 0.3));
+    var hexDark = goog.color.rgbArrayToHex(goog.color.darken(rgb, 0.2));
+    this.svgPathLight_.setAttribute('stroke', hexLight);
+    this.svgPathDark_.setAttribute('fill', hexDark);
+  }
   this.svgPath_.setAttribute('fill', hexColour);
 
   var icons = this.getIcons();
@@ -1276,7 +1316,8 @@ Blockly.BlockSvg.prototype.updateDisabled = function() {
     if (!hasClass) {
       Blockly.addClass_(/** @type {!Element} */ (this.svgGroup_),
                         'blocklyDisabled');
-      this.svgPath_.setAttribute('fill', 'url(#blocklyDisabledPattern)');
+      this.svgPath_.setAttribute('fill',
+          'url(#' + this.workspace.options.disabledPatternId + ')');
     }
   } else {
     if (hasClass) {
@@ -1712,6 +1753,7 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
  * @private
  */
 Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
+  this.startHat_ = false;
   // Should the top and bottom left corners be rounded or square?
   if (this.outputConnection) {
     this.squareTopLeftCorner_ = true;
@@ -1725,6 +1767,11 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
       if (prevBlock && prevBlock.getNextBlock() == this) {
         this.squareTopLeftCorner_ = true;
        }
+    } else if (Blockly.BlockSvg.START_HAT) {
+      // No output or previous connection.
+      this.squareTopLeftCorner_ = true;
+      this.startHat_ = true;
+      inputRows.rightEdge = Math.max(inputRows.rightEdge, 100);
     }
     var nextBlock = this.getNextBlock();
     if (nextBlock) {
@@ -1779,6 +1826,12 @@ Blockly.BlockSvg.prototype.renderDrawTop_ =
   if (this.squareTopLeftCorner_) {
     steps.push('m 0,0');
     highlightSteps.push('m 0.5,0.5');
+    if (this.startHat_) {
+      steps.push(Blockly.BlockSvg.START_HAT_PATH);
+      highlightSteps.push(this.RTL ?
+          Blockly.BlockSvg.START_HAT_HIGHLIGHT_RTL :
+          Blockly.BlockSvg.START_HAT_HIGHLIGHT_LTR);
+    }
   } else {
     steps.push(Blockly.BlockSvg.TOP_LEFT_CORNER_START);
     highlightSteps.push(this.RTL ?
