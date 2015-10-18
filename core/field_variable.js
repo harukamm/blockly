@@ -38,14 +38,18 @@ goog.require('goog.string');
  *     a unique variable name will be generated.
  * @param {Function=} opt_changeHandler A function that is executed when a new
  *     option is selected.  Its sole argument is the new option value.
+ * @param {string=} opt_type Type of the variable. Only variables of the same
+ *     type will be shown in the dropdown. If null, variables of all types
+ *     are shown.
  * @extends {Blockly.FieldDropdown}
  * @constructor
  */
-Blockly.FieldVariable = function(varname, opt_changeHandler) {
+Blockly.FieldVariable = function(varname, opt_changeHandler, opt_type) {
   Blockly.FieldVariable.superClass_.constructor.call(this,
       Blockly.FieldVariable.dropdownCreate, null);
   this.setChangeHandler(opt_changeHandler);
   this.setValue(varname || '');
+  this.type_ = opt_type;
 };
 goog.inherits(Blockly.FieldVariable, Blockly.FieldDropdown);
 
@@ -127,7 +131,7 @@ Blockly.FieldVariable.prototype.setValue = function(text) {
 Blockly.FieldVariable.dropdownCreate = function() {
   if (this.sourceBlock_ && this.sourceBlock_.workspace) {
     var variableList =
-        Blockly.Variables.allVariables(this.sourceBlock_.workspace);
+        Blockly.Variables.scopeVariables(this.sourceBlock_, this.type_);
   } else {
     var variableList = [];
   }
