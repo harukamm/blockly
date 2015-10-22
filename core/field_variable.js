@@ -131,7 +131,7 @@ Blockly.FieldVariable.prototype.setValue = function(text) {
 Blockly.FieldVariable.dropdownCreate = function() {
   if (this.sourceBlock_ && this.sourceBlock_.workspace) {
     var variableList =
-        Blockly.Variables.scopeVariables(this.sourceBlock_, this.type_);
+        Blockly.Variables.allVariables(this.sourceBlock_.workspace, this.type_);
   } else {
     var variableList = [];
   }
