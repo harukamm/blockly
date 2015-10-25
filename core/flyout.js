@@ -149,9 +149,11 @@ Blockly.Flyout.prototype.init = function(targetWorkspace) {
 
   Array.prototype.push.apply(this.eventWrappers_,
       Blockly.bindEvent_(this.svgGroup_, 'wheel', this, this.wheel_));
-  Array.prototype.push.apply(this.eventWrappers_,
-      Blockly.bindEvent_(this.targetWorkspace_.getCanvas(),
-      'blocklyWorkspaceChange', this, this.filterForCapacity_));
+  if (!this.autoClose) {
+    Array.prototype.push.apply(this.eventWrappers_,
+        Blockly.bindEvent_(this.targetWorkspace_.getCanvas(),
+        'blocklyWorkspaceChange', this, this.filterForCapacity_));
+  }
   // Dragging the flyout up and down.
   Array.prototype.push.apply(this.eventWrappers_,
       Blockly.bindEvent_(this.svgGroup_, 'mousedown', this, this.onMouseDown_));
@@ -652,6 +654,9 @@ Blockly.Flyout.prototype.createBlockFunc_ = function(originBlock) {
     // Scale the scroll (getSvgXY_ did not do this).
     xyNew.x += workspace.scrollX / workspace.scale - workspace.scrollX;
     xyNew.y += workspace.scrollY / workspace.scale - workspace.scrollY;
+    if (workspace.toolbox_ && !workspace.scrollbar) {
+      xyNew.x += workspace.toolbox_.width / workspace.scale;
+    }
     block.moveBy(xyOld.x - xyNew.x, xyOld.y - xyNew.y);
     if (flyout.autoClose) {
       flyout.hide();
@@ -673,8 +678,9 @@ Blockly.Flyout.prototype.filterForCapacity_ = function() {
   var blocks = this.workspace_.getTopBlocks(false);
   for (var i = 0, block; block = blocks[i]; i++) {
     var allBlocks = block.getDescendants();
-    var disabled = allBlocks.length > remainingCapacity;
-    block.setDisabled(disabled);
+    if (allBlocks.length > remainingCapacity) {
+      block.setDisabled(true);
+    }
   }
 };
 
