@@ -243,7 +243,7 @@ Blockly.Scrollbar.prototype.resize = function(opt_metrics) {
       // Only show the scrollbar if needed.
       // Ideally this would also apply to scrollbar pairs, but that's a bigger
       // headache (due to interactions with the corner square).
-      this.setVisible(outerLength < hostMetrics.contentHeight);
+      this.setVisible(outerLength < hostMetrics.contentWidth);
     }
     this.ratio_ = outerLength / hostMetrics.contentWidth;
     if (this.ratio_ === -Infinity || this.ratio_ === Infinity ||
@@ -369,7 +369,7 @@ Blockly.Scrollbar.prototype.onMouseDownBar_ = function(e) {
     e.stopPropagation();
     return;
   }
-  var mouseXY = Blockly.mouseToSvg(e, this.workspace_.options.svg);
+  var mouseXY = Blockly.mouseToSvg(e, this.workspace_.getParentSvg());
   var mouseLocation = this.horizontal_ ? mouseXY.x : mouseXY.y;
 
   var knobXY = Blockly.getSvgXY_(this.svgKnob_, this.workspace_);
