@@ -759,9 +759,26 @@ Blockly.Block.prototype.setOutput = function(newBoolean, opt_check) {
   }
 };
 
-// Sorin
 Blockly.Block.prototype.setOutputTypeExpr = function(typeExpr) {
   this.outputConnection.setTypeExpr(typeExpr);
+}
+
+Blockly.Block.prototype.setColourByType = function(typeExpr) {
+  if( !typeExpr && this.outputConnection && this.outputConnection.typeExpr ) typeExpr = this.outputConnection.typeExpr;
+  var colour;
+  if( typeExpr ) {
+    if( typeExpr.isTypeVar() ) {
+      colour = Blockly.BlockSvg.ABSTRACT_COLOUR;
+    }
+    else if( !(colour = Blockly.BlockSvg.getShapeForType( typeExpr.name ).blockColour) ) {
+      colour = 180;  /* A default colour */
+    }
+  } else {
+    colour = 180;
+  }
+  this.setColour( colour );
+  return( colour );
+  /* TODO: Provide some way to manually override colours? Eg allow slightly different shade for quantifiers */
 }
 
 /**

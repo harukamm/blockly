@@ -259,7 +259,10 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
           block.typeParams[f] = block.typeParams[f].apply(unifyResult);
         }
       }
-
+      if( block.outputConnection && block.outputConnection.typeExpr ) {
+        /* Update colour of blocks in case their output type has changed */
+        block.setColourByType( block.outputConnection.typeExpr );
+      }
       block.render();
     }
 
@@ -506,7 +509,7 @@ Blockly.Connection.prototype.renderTypeVarHighlights = function() {
 }
 
 /**
- * Adds color if this is a type varible connection
+ * Adds color if this is a type variable connection
  * Sorin
  */
 Blockly.Connection.prototype.addColor = function() {
@@ -743,25 +746,25 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   }
 
   /* Check if polymorphic types match */
+  var unifyResult = true;
   if (this.typeExpr && otherConnection.typeExpr) {
-    var unifyResult = this.typeExpr.unify(otherConnection.typeExpr);
-    return (unifyResult !== false);
+    unifyResult = this.typeExpr.unify(otherConnection.typeExpr);
   }
-  if (!this.typeExpr && otherConnection.typeExpr) {
+  else if (!this.typeExpr && otherConnection.typeExpr) {
     return false;
   }
-  if (this.typeExpr && !otherConnection.typeExpr) {
+  else if (this.typeExpr && !otherConnection.typeExpr) {
     return false;
   }
 
   if (!this.check_ || !otherConnection.check_) {
     // One or both sides are promiscuous enough that anything will fit.
-    return true;
+    return unifyResult;
   }
   // Find any intersection in the check lists.
   for (var i = 0; i < this.check_.length; i++) {
     if (otherConnection.check_.indexOf(this.check_[i]) != -1) {
-      return true;
+      return unifyResult;
     }
   }
   // No intersection.
@@ -1168,7 +1171,7 @@ Blockly.TypeVar.getUnusedTypeVar = function() {
       return new Blockly.TypeExpr(name);
     }
   }
-  throw 'Ran out of type varables!';
+  throw 'Ran out of type variables!';
 }
 
 Blockly.TypeVar.triggerGarbageCollection = function () {

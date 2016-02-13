@@ -1098,14 +1098,14 @@ Blockly.BlockSvg.typeVarShapes_ = {
     down: 'l 0,5 a 6,6,0,0,0,0,12 l 0,3',
     up: 'l 0,-3 a 6,6,0,0,1,0,-12 l 0,-5',
     height: 20,
-    colour: Blockly.BlockSvg.NUMBER_COLOUR
+    blockColour: Blockly.BlockSvg.NUMBER_COLOUR
   },
 
   Boolean : {
     down: 'l 0,5 -8,7.5 8,7.5',
     up: 'l -8,-7.5 8,-7.5 0,-5',
     height: 20,
-    colour: Blockly.BlockSvg.BOOLEAN_COLOUR
+    blockColour: Blockly.BlockSvg.BOOLEAN_COLOUR
   },
 
   Set : {
@@ -1117,14 +1117,14 @@ Blockly.BlockSvg.typeVarShapes_ = {
       'c 4.4,-1.25 2,-8 6,-8 ' + 
       'l 0,-4',
     height: 20,
-    colour: Blockly.BlockSvg.SET_COLOUR
+    blockColour: Blockly.BlockSvg.SET_COLOUR
   },
   
   Vector: {
     down: 'l 0,2 v 5 h -3 v -5 l -5 10 l 5 10 v -5 h 3 v 5 l 0,2',
     up: 'l 0,-2 v -5 h -3 v 5 l -5 -10 l 5 -10 v 5 h 3 v -5 l 0,-2',
     height: 24,
-    colour: Blockly.BlockSvg.VECTOR_COLOUR
+    blockColour: Blockly.BlockSvg.VECTOR_COLOUR
   },
 
   typeVar : { 
@@ -1132,7 +1132,7 @@ Blockly.BlockSvg.typeVarShapes_ = {
     up: 'l 0,-5 -8,0 0,-15 8,0 0,-5',
     highlight: 'm 0,5 l -8,0 0,15 8,0 m 0,5',
     height: 25,
-    colour: Blockly.BlockSvg.ABSTRACT_COLOUR
+    blockColour: Blockly.BlockSvg.ABSTRACT_COLOUR
   },
 
   original : {
@@ -1146,8 +1146,13 @@ Blockly.BlockSvg.typeVarShapes_ = {
     Blockly.BlockSvg.TAB_WIDTH + ',-7.5 s ' + Blockly.BlockSvg.TAB_WIDTH +
     ',2.5 ' + Blockly.BlockSvg.TAB_WIDTH + ',-7.5',
 
-    height: 20
+    height: 20,
+    blockColour: 180
   }
+}
+
+Blockly.BlockSvg.getShapeForType = function(name) {
+  return( Blockly.BlockSvg.typeVarShapes_[name] ? Blockly.BlockSvg.typeVarShapes_[name] : Blockly.BlockSvg.typeVarShapes_["original"] );
 }
 
 Blockly.BlockSvg.typeVarHighlights = function(typeExpr) {
@@ -1165,7 +1170,7 @@ Blockly.BlockSvg.typeVarHighlights_ = function(typeExpr, y, typeVarHighlights) {
         path: "m 0," + y + " " + Blockly.BlockSvg.typeVarShapes_["typeVar"]["highlight"]
       });
     } else if (typeExpr.children.length != 0) {
-      var offsetsY = Blockly.BlockSvg.typeVarShapes_[name].offsetsY(typeExpr);
+      var offsetsY = Blockly.BlockSvg.getShapeForType(name).offsetsY(typeExpr);
       for (var i = 0; i < typeExpr.children.length; i++) {
         Blockly.BlockSvg.typeVarHighlights_(typeExpr.children[i], 
                                             y + offsetsY[i],
@@ -1188,8 +1193,9 @@ Blockly.BlockSvg.getTypeName = function(typeExpr) {
 }
 
 Blockly.BlockSvg.getTypeExprHeight = function(typeExpr) {
+  if( !typeExpr ) return( Blockly.BlockSvg.TAB_HEIGHT );
   var typeName = Blockly.BlockSvg.getTypeName(typeExpr);
-  var data = Blockly.BlockSvg.typeVarShapes_[typeName].height;
+  var data = Blockly.BlockSvg.getShapeForType(typeName).height;
   if (typeof(data) === 'number') {
     return data;
   } else {
@@ -1199,7 +1205,7 @@ Blockly.BlockSvg.getTypeExprHeight = function(typeExpr) {
 
 Blockly.BlockSvg.renderTypeExpr = function(typeExpr, steps, updown) {
   var typeName = Blockly.BlockSvg.getTypeName(typeExpr);
-  var data = Blockly.BlockSvg.typeVarShapes_[typeName][updown];
+  var data = Blockly.BlockSvg.getShapeForType(typeName)[updown];
   if (typeof(data) === 'string') {
     steps.push(data);
   } else {
@@ -2197,9 +2203,9 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
           inlineSteps.push('h', Blockly.BlockSvg.TAB_WIDTH - 2 -
                            input.renderWidth);
           inlineSteps.push(Blockly.BlockSvg.getDownPath(input.connection));
-          Blockly.BlockSvg.TAB_HEIGHT = Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);
+          var tabHeight = Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);
           inlineSteps.push('v', input.renderHeight + 1 -
-                                Blockly.BlockSvg.TAB_HEIGHT);
+                                tabHeight);
           inlineSteps.push('h', input.renderWidth + 2 -
                            Blockly.BlockSvg.TAB_WIDTH);
           inlineSteps.push('z');
@@ -2276,8 +2282,8 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
       }
       this.renderFields_(input.fieldRow, fieldX, fieldY);
       steps.push(Blockly.BlockSvg.getDownPath(input.connection));
-      Blockly.BlockSvg.TAB_HEIGHT = Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);
-      var v = row.height - Blockly.BlockSvg.TAB_HEIGHT;
+      var tabHeight = Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);
+      var v = row.height - tabHeight;
       steps.push('v', v);
       if (this.RTL) {
         // Highlight around back of tab.
@@ -2481,8 +2487,8 @@ Blockly.BlockSvg.prototype.renderDrawLeft_ =
     // Create output connection.
     this.outputConnection.moveTo(connectionsXY.x, connectionsXY.y);
     // This connection will be tightened when the parent renders.
-    Blockly.BlockSvg.TAB_HEIGHT = Blockly.BlockSvg.getTypeExprHeight(this.outputConnection.typeExpr);
-    steps.push('V', Blockly.BlockSvg.TAB_HEIGHT);
+    var tabHeight = Blockly.BlockSvg.getTypeExprHeight(this.outputConnection.typeExpr);
+    steps.push('V', tabHeight);
     steps.push(Blockly.BlockSvg.getUpPath(this.outputConnection));
     if (this.RTL) {
       highlightSteps.push('M', (Blockly.BlockSvg.TAB_WIDTH * -0.25) + ',8.4');
