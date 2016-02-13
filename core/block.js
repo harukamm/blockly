@@ -205,6 +205,10 @@ Blockly.Block.prototype.dispose = function(healStack) {
   // Remove from block database.
   delete Blockly.Block.BlockDB_[this.id];
   Blockly.Events.enable();
+  
+
+  // Trigger garbage collection for type variables
+  Blockly.TypeVar.triggerGarbageCollection();
 };
 
 /**
@@ -754,6 +758,11 @@ Blockly.Block.prototype.setOutput = function(newBoolean, opt_check) {
     this.bumpNeighbours_();
   }
 };
+
+// Sorin
+Blockly.Block.prototype.setOutputTypeExpr = function(typeExpr) {
+  this.outputConnection.setTypeExpr(typeExpr);
+}
 
 /**
  * Set whether value inputs are arranged horizontally or vertically.
