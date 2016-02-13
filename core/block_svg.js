@@ -978,6 +978,13 @@ Blockly.BlockSvg.JAGGED_TEETH_HEIGHT = 20;
  */
 Blockly.BlockSvg.JAGGED_TEETH_WIDTH = 15;
 
+/** Define some colours for block types */
+Blockly.BlockSvg.NUMBER_COLOUR = 230;
+Blockly.BlockSvg.BOOLEAN_COLOUR = 120;
+Blockly.BlockSvg.SET_COLOUR = 45;
+Blockly.BlockSvg.VECTOR_COLOUR = 300;
+Blockly.BlockSvg.ABSTRACT_COLOUR = "#888888";
+
 /** Define connector shapes for various types
  */
 Blockly.BlockSvg.typeVarShapes_ = {
@@ -1086,12 +1093,46 @@ Blockly.BlockSvg.typeVarShapes_ = {
     up: 'l -8,-7.5 8,-7.5 0,-5',
     height: 20
   },
+  
+  Number : { 
+    down: 'l 0,5 a 6,6,0,0,0,0,12 l 0,3',
+    up: 'l 0,-3 a 6,6,0,0,1,0,-12 l 0,-5',
+    height: 20,
+    colour: Blockly.BlockSvg.NUMBER_COLOUR
+  },
+
+  Boolean : {
+    down: 'l 0,5 -8,7.5 8,7.5',
+    up: 'l -8,-7.5 8,-7.5 0,-5',
+    height: 20,
+    colour: Blockly.BlockSvg.BOOLEAN_COLOUR
+  },
+
+  Set : {
+    down: 'l 0,4 ' + 
+      'c -4,0 -1.6,6.75 -6,8 ' +
+      'c 4.4,1.25 2,8 6,8',  //       'c 4.4,0.75 3,7.5 6,8',
+    up:
+      'c -4,0 -1.6,-6.75 -6,-8 ' +
+      'c 4.4,-1.25 2,-8 6,-8 ' + 
+      'l 0,-4',
+    height: 20,
+    colour: Blockly.BlockSvg.SET_COLOUR
+  },
+  
+  Vector: {
+    down: 'l 0,2 v 5 h -3 v -5 l -5 10 l 5 10 v -5 h 3 v 5 l 0,2',
+    up: 'l 0,-2 v -5 h -3 v 5 l -5 -10 l 5 -10 v 5 h 3 v -5 l 0,-2',
+    height: 24,
+    colour: Blockly.BlockSvg.VECTOR_COLOUR
+  },
 
   typeVar : { 
     down: 'l 0,5 -8,0 0,15 8,0 0,5',
     up: 'l 0,-5 -8,0 0,-15 8,0 0,-5',
-    highlight: 'm 0,5 l -8,0 0,15 8,0',
-    height: 25
+    highlight: 'm 0,5 l -8,0 0,15 8,0 m 0,5',
+    height: 25,
+    colour: Blockly.BlockSvg.ABSTRACT_COLOUR
   },
 
   original : {
