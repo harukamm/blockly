@@ -760,6 +760,7 @@ Blockly.Block.prototype.setOutput = function(newBoolean, opt_check) {
 };
 
 Blockly.Block.prototype.setOutputTypeExpr = function(typeExpr) {
+  if( !this.outputConnection ) this.setOutput( true );  /* Should call setOutput() first, but just in case... */
   this.outputConnection.setTypeExpr(typeExpr);
 }
 
