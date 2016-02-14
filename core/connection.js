@@ -780,9 +780,13 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
  */
 Blockly.Connection.prototype.setCheck = function(check) {
   if (check) {
-    // Ensure that check is in an array.
     if (!goog.isArray(check)) {
+      /* Passed a single type. Set TypeExpr to specific type. */
+      this.setTypeExpr( new Blockly.TypeExpr( check ) );
       check = [check];
+    } else {
+      /* Passed an array. Set TypeExpr to a type variable. */
+      this.setTypeExpr( Blockly.TypeVar.getUnusedTypeVar() );
     }
     this.check_ = check;
     // The new value type may not be compatible with the existing connection.
@@ -794,6 +798,7 @@ Blockly.Connection.prototype.setCheck = function(check) {
     }
   } else {
     this.check_ = null;
+    this.setTypeExpr( Blockly.TypeVar.getUnusedTypeVar() );
   }
   return this;
 };
