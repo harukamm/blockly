@@ -439,6 +439,35 @@ Blockly.BlockSvg.prototype.tab = function(start, forward) {
   }
 };
 
+/** Start dragging a block.
+ * @param {!Event|!Object} e Mouse down event or object with .x, .y properties
+ * @private
+ */
+Blockly.BlockSvg.prototype.startDrag_ = function(e) {
+  Blockly.removeAllRanges();
+  Blockly.Css.setCursor(Blockly.Css.Cursor.CLOSED);
+
+  this.dragStartXY_ = this.getRelativeToSurfaceXY();
+  this.workspace.startDrag(e, this.dragStartXY_.x, this.dragStartXY_.y);
+
+  Blockly.dragMode_ = 1;
+  Blockly.BlockSvg.onMouseUpWrapper_ = Blockly.bindEvent_(document,
+      'mouseup', this, this.onMouseUp_);
+  Blockly.BlockSvg.onMouseMoveWrapper_ = Blockly.bindEvent_(document,
+      'mousemove', this, this.onMouseMove_);
+  // Build a list of bubbles that need to be moved and where they started.
+  this.draggedBubbles_ = [];
+  var descendants = this.getDescendants();
+  for (var i = 0, descendant; descendant = descendants[i]; i++) {
+    var icons = descendant.getIcons();
+    for (var j = 0; j < icons.length; j++) {
+      var data = icons[j].getIconLocation();
+      data.bubble = icons[j];
+      this.draggedBubbles_.push(data);
+    }
+  }
+}
+
 /**
  * Handle a mouse-down on an SVG block.
  * @param {!Event} e Mouse down event.
@@ -466,28 +495,7 @@ Blockly.BlockSvg.prototype.onMouseDown_ = function(e) {
     return;
   } else {
     // Left-click (or middle click)
-    Blockly.removeAllRanges();
-    Blockly.Css.setCursor(Blockly.Css.Cursor.CLOSED);
-
-    this.dragStartXY_ = this.getRelativeToSurfaceXY();
-    this.workspace.startDrag(e, this.dragStartXY_.x, this.dragStartXY_.y);
-
-    Blockly.dragMode_ = 1;
-    Blockly.BlockSvg.onMouseUpWrapper_ = Blockly.bindEvent_(document,
-        'mouseup', this, this.onMouseUp_);
-    Blockly.BlockSvg.onMouseMoveWrapper_ = Blockly.bindEvent_(document,
-        'mousemove', this, this.onMouseMove_);
-    // Build a list of bubbles that need to be moved and where they started.
-    this.draggedBubbles_ = [];
-    var descendants = this.getDescendants();
-    for (var i = 0, descendant; descendant = descendants[i]; i++) {
-      var icons = descendant.getIcons();
-      for (var j = 0; j < icons.length; j++) {
-        var data = icons[j].getIconLocation();
-        data.bubble = icons[j];
-        this.draggedBubbles_.push(data);
-      }
-    }
+    this.startDrag_(e);
   }
   // This event has been handled.  No need to bubble up to the document.
   e.stopPropagation();

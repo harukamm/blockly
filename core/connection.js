@@ -363,7 +363,7 @@ Blockly.Connection.prototype.disconnect = function() {
   otherConnection.targetConnection = null;
   this.targetConnection = null;
 
-  // Rerender the parent so that it may reflow.
+  // Rerender the parent so that it may reflow, and restore type variable connections
   var parentBlock, childBlock, parentConnection;
   if (this.isSuperior()) {
     // Superior block.
@@ -391,13 +391,51 @@ Blockly.Connection.prototype.disconnect = function() {
     blockShadow.initSvg();
     blockShadow.render(false);
   }
-  if (parentBlock.rendered) {
-    parentBlock.render();
+  // Reconstruct parent and child blocks to restore type variables 
+  if( parentBlock.workspace ) {  // workspace is non-null for user-initiated disconnections
+      // Find top-level ancestor block
+    var rootBlock = parentBlock.getRootBlock();
+    var workspace = rootBlock.workspace;
+    // Export top-level ancestor to xml
+    var rootDom = Blockly.Xml.blockToDom( rootBlock );
+    // Save block position
+    var pos = rootBlock.getRelativeToSurfaceXY();
+    // Delete old block
+    parentBlock.dispose();
+    // Re-add block to recompute connection types
+    var newRootBlock = Blockly.Xml.domToBlock( workspace, rootDom );
+    newRootBlock.moveBy(workspace.RTL ? workspace.getWidth() - pos.x : pos.x, pos.y);
   }
-  if (childBlock.rendered) {
-    childBlock.updateDisabled();
-    childBlock.render();
-  }
+  // We can't regenerate the child block yet until we have finished disconnecting it. Defer it until later.
+  setTimeout(function() {
+      // Reconstruct parent and child blocks to restore type variables 
+      if( childBlock.workspace ) {
+        var dragging = (Blockly.selected == childBlock);
+        var workspace = childBlock.workspace;
+        // Export child block to xml
+        var childDom = Blockly.Xml.blockToDom( childBlock );
+        // Save block position
+        var pos = childBlock.getRelativeToSurfaceXY();
+        // Delete old block
+        childBlock.dispose();
+        // Re-add block to recompute connection types
+        var newChildBlock = Blockly.Xml.domToBlock( workspace, childDom );
+        newChildBlock.moveBy(workspace.RTL ? workspace.getWidth() - pos.x : pos.x, pos.y);
+        
+        // Resume dragging the cloned block
+        if( dragging ) {
+          newChildBlock.select();
+          newChildBlock.startDrag_(workspace.dragStartEvent_);
+        }
+      }
+    }, 1);
+//  if (parentBlock.rendered) {
+//    parentBlock.render();
+//  }
+//  if (childBlock.rendered) {
+//    childBlock.updateDisabled();
+//    childBlock.render();
+//  }
 };
 
 /**

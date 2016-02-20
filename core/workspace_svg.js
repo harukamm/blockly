@@ -631,6 +631,7 @@ Blockly.WorkspaceSvg.prototype.startDrag = function(e, x, y) {
   point.y /= this.scale;
   this.dragDeltaX_ = x - point.x;
   this.dragDeltaY_ = y - point.y;
+  this.dragStartEvent_ = e;
 };
 
 /**
