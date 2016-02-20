@@ -412,7 +412,8 @@ Blockly.Connection.prototype.disconnect = function() {
   setTimeout(function() {
       // Reconstruct parent and child blocks to restore type variables 
       if( childBlock.workspace ) {
-        var dragging = (Blockly.selected == childBlock);
+        var selected = (Blockly.selected == childBlock);
+        var dragging = (selected && Blockly.dragMode_ == 2);  // TODO: what is the right condition here?
         var workspace = childBlock.workspace;
         // Export child block to xml
         var childDom = Blockly.Xml.blockToDom( childBlock );
@@ -425,8 +426,10 @@ Blockly.Connection.prototype.disconnect = function() {
         newChildBlock.moveBy(workspace.RTL ? workspace.getWidth() - pos.x : pos.x, pos.y);
         
         // Resume dragging the cloned block
-        if( dragging ) {
+        if( selected ) {
           newChildBlock.select();
+        }
+        if( dragging ) {
           newChildBlock.startDrag_(workspace.dragStartEvent_);
         }
 //        Blockly.TypeVar.triggerGarbageCollection(); // Don't think this is necessary
