@@ -393,7 +393,8 @@ Blockly.Connection.prototype.disconnect = function() {
   }
   // Reconstruct parent and child blocks to restore type variables 
   if( parentBlock.workspace ) {  // workspace is non-null for user-initiated disconnections
-      // Find top-level ancestor block
+    // Should this be deferred also? Is it possible for parent to be dragged?
+    // Find top-level ancestor block
     var rootBlock = parentBlock.getRootBlock();
     var workspace = rootBlock.workspace;
     // Export top-level ancestor to xml
@@ -401,10 +402,11 @@ Blockly.Connection.prototype.disconnect = function() {
     // Save block position
     var pos = rootBlock.getRelativeToSurfaceXY();
     // Delete old block
-    parentBlock.dispose();
+    rootBlock.dispose();
     // Re-add block to recompute connection types
     var newRootBlock = Blockly.Xml.domToBlock( workspace, rootDom );
     newRootBlock.moveBy(workspace.RTL ? workspace.getWidth() - pos.x : pos.x, pos.y);
+//    Blockly.TypeVar.triggerGarbageCollection();  // Don't think this is necessary here
   }
   // We can't regenerate the child block yet until we have finished disconnecting it. Defer it until later.
   setTimeout(function() {
@@ -427,6 +429,7 @@ Blockly.Connection.prototype.disconnect = function() {
           newChildBlock.select();
           newChildBlock.startDrag_(workspace.dragStartEvent_);
         }
+//        Blockly.TypeVar.triggerGarbageCollection(); // Don't think this is necessary
       }
     }, 1);
 //  if (parentBlock.rendered) {
@@ -1194,6 +1197,10 @@ Blockly.TypeVar.initTypeVarDB_ = function() {
   Blockly.TypeVar.addTypeVar_("I", "Gold");
   Blockly.TypeVar.addTypeVar_("J", "HotPink");
   Blockly.TypeVar.addTypeVar_("K", "LightSkyBlue");
+  Blockly.TypeVar.addTypeVar_("L", "Orange");
+  Blockly.TypeVar.addTypeVar_("M", "Gray");
+  Blockly.TypeVar.addTypeVar_("N", "YellowGreen");
+  Blockly.TypeVar.addTypeVar_("O", "Maroon");
 }
 
 Blockly.TypeVar.addTypeVar_ = function(name, color) {
