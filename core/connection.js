@@ -403,7 +403,7 @@ Blockly.Connection.prototype.disconnect = function() {
     // Re-construct block but without rendering it
     var newRootBlock = Blockly.Xml.domToBlockHeadless_( workspace, rootDom );
     // Copy connection types from new block to old
-    rootBlock.copyConnectionTypes_( newRootBlock );
+    rootBlock.copyConnectionTypes_( newRootBlock, true );
     // Delete temporary block
     newRootBlock.dispose();
     
@@ -414,8 +414,9 @@ Blockly.Connection.prototype.disconnect = function() {
     var newChildBlock = Blockly.Xml.domToBlockHeadless_( workspace, childDom );
     
     // Copy connection types from new block to old
-    childBlock.copyConnectionTypes_( newChildBlock );
-    // Delete temporary block
+    childBlock.copyConnectionTypes_( newChildBlock, false );
+    
+    // Delete temporary blocks
     newChildBlock.dispose();
 //  Blockly.TypeVar.triggerGarbageCollection(); // Don't think this is necessary
   }

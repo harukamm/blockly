@@ -1331,19 +1331,22 @@ Blockly.Block.getById = function(id) {
 /**
  * Copy the connection types from the given block to this block.
  * @param {Blockly.Block} source Block to copy types from. Assumed to be the same block type as this block.
+ * @param {bool} keepVars If true, existing type variables should be kept if possible; if false, type variables will be replaced with those from source.
  */
-Blockly.Block.prototype.copyConnectionTypes_ = function(source) {
-//  console.log( "copyConnectionTypes:", this, source );
+Blockly.Block.prototype.copyConnectionTypes_ = function(source, keepVars) {
+  console.log( "copyConnectionTypes:", this, source, keepVars );
   if( !source ) return;
-  Blockly.Block.copyConnectionTypesR_( this, source, {} );
+  Blockly.Block.copyConnectionTypesR_( this, source, {}, keepVars );
 }
  
 /* Recursive worker version of copyConnectionTypes_ */
-Blockly.Block.copyConnectionTypesR_ = function(dest, source, subst) {
+Blockly.Block.copyConnectionTypesR_ = function(dest, source, subst, keepVars) {
   // Copy output type
   if( dest.outputConnection && source.outputConnection ) {
     // If both are type variables, keep the existing type variable and add a substitution rule
-    if( source.outputConnection.typeExpr.isTypeVar() && dest.outputConnection.typeExpr.isTypeVar() ) subst[source.outputConnection.typeExpr.name] = dest.outputConnection.typeExpr;
+    if( source.outputConnection.typeExpr.isTypeVar() && dest.outputConnection.typeExpr.isTypeVar() && keepVars ) {
+      subst[source.outputConnection.typeExpr.name] = dest.outputConnection.typeExpr;
+    }
     
     // Apply any accumulated substititions
     var substResult = source.outputConnection.typeExpr.apply( subst );
@@ -1361,7 +1364,9 @@ Blockly.Block.copyConnectionTypesR_ = function(dest, source, subst) {
 //        console.log( "copyConnectionTypes_: sourceInput.connection for connection '" + destInput.name + "' is OK", sourceInput );
         
         // If both are type variables, keep the existing type variable and add a substitution rule
-        if( sourceInput.connection.typeExpr.isTypeVar() && destInput.connection.typeExpr.isTypeVar() ) subst[sourceInput.connection.typeExpr.name] = destInput.connection.typeExpr;
+        if( sourceInput.connection.typeExpr.isTypeVar() && destInput.connection.typeExpr.isTypeVar() && keepVars ) {
+          subst[sourceInput.connection.typeExpr.name] = destInput.connection.typeExpr;
+        }
 
         // Apply any accumulated substititions
         var substResult = sourceInput.connection.typeExpr.apply( subst );
@@ -1372,12 +1377,11 @@ Blockly.Block.copyConnectionTypesR_ = function(dest, source, subst) {
 
         if( destInput.connection.targetConnection && sourceInput.connection.targetConnection ) {
           // Recursively copy types to child block
-          subst = Blockly.Block.copyConnectionTypesR_( destInput.connection.targetConnection.sourceBlock_, sourceInput.connection.targetConnection.sourceBlock_, subst );
-          // Re-render child block
-          destInput.connection.targetConnection.sourceBlock_.render();
+          subst = Blockly.Block.copyConnectionTypesR_( destInput.connection.targetConnection.sourceBlock_, sourceInput.connection.targetConnection.sourceBlock_, subst, keepVars );
         }
       }
     }
   }
+  dest.render();
   return( subst );
 };
