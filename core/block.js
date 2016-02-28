@@ -1326,3 +1326,58 @@ Blockly.Block.BlockDB_ = Object.create(null);
 Blockly.Block.getById = function(id) {
   return Blockly.Block.BlockDB_[id] || null;
 };
+
+
+/**
+ * Copy the connection types from the given block to this block.
+ * @param {Blockly.Block} source Block to copy types from. Assumed to be the same block type as this block.
+ */
+Blockly.Block.prototype.copyConnectionTypes_ = function(source) {
+//  console.log( "copyConnectionTypes:", this, source );
+  if( !source ) return;
+  Blockly.Block.copyConnectionTypesR_( this, source, {} );
+}
+ 
+/* Recursive worker version of copyConnectionTypes_ */
+Blockly.Block.copyConnectionTypesR_ = function(dest, source, subst) {
+  // Copy output type
+  if( dest.outputConnection && source.outputConnection ) {
+    // If both are type variables, keep the existing type variable and add a substitution rule
+    if( source.outputConnection.typeExpr.isTypeVar() && dest.outputConnection.typeExpr.isTypeVar() ) subst[source.outputConnection.typeExpr.name] = dest.outputConnection.typeExpr;
+    
+    // Apply any accumulated substititions
+    var substResult = source.outputConnection.typeExpr.apply( subst );
+
+    dest.outputConnection.setCheck( source.outputConnection.check_ );
+    dest.outputConnection.setTypeExpr( substResult );
+    dest.setColourByType();
+  }
+  
+  // Process inputs
+  for (var i = 0, destInput; destInput = dest.inputList[i]; i++) {
+    var sourceInput = source.getInput( destInput.name );
+    if( sourceInput ) { 
+      if( sourceInput.connection ) {  // connection will be null for dummy inputs
+//        console.log( "copyConnectionTypes_: sourceInput.connection for connection '" + destInput.name + "' is OK", sourceInput );
+        
+        // If both are type variables, keep the existing type variable and add a substitution rule
+        if( sourceInput.connection.typeExpr.isTypeVar() && destInput.connection.typeExpr.isTypeVar() ) subst[sourceInput.connection.typeExpr.name] = destInput.connection.typeExpr;
+
+        // Apply any accumulated substititions
+        var substResult = sourceInput.connection.typeExpr.apply( subst );
+        
+        // Copy input type
+        destInput.connection.setCheck( sourceInput.connection.check_ );
+        destInput.connection.setTypeExpr( substResult );
+
+        if( destInput.connection.targetConnection && sourceInput.connection.targetConnection ) {
+          // Recursively copy types to child block
+          subst = Blockly.Block.copyConnectionTypesR_( destInput.connection.targetConnection.sourceBlock_, sourceInput.connection.targetConnection.sourceBlock_, subst );
+          // Re-render child block
+          destInput.connection.targetConnection.sourceBlock_.render();
+        }
+      }
+    }
+  }
+  return( subst );
+};

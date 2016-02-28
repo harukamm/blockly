@@ -391,57 +391,42 @@ Blockly.Connection.prototype.disconnect = function() {
     blockShadow.initSvg();
     blockShadow.render(false);
   }
+
+  var workspace = parentBlock.workspace;
+  Blockly.Events.disable();
   // Reconstruct parent and child blocks to restore type variables 
-  if( parentBlock.workspace ) {  // workspace is non-null for user-initiated disconnections
-    // Should this be deferred also? Is it possible for parent to be dragged?
+  if( workspace ) {  // workspace is non-null for user-initiated disconnections
     // Find top-level ancestor block
     var rootBlock = parentBlock.getRootBlock();
-    var workspace = rootBlock.workspace;
     // Export top-level ancestor to xml
     var rootDom = Blockly.Xml.blockToDom( rootBlock );
-    // Save block position
-    var pos = rootBlock.getRelativeToSurfaceXY();
-    // Delete old block
-    rootBlock.dispose();
-    // Re-add block to recompute connection types
-    var newRootBlock = Blockly.Xml.domToBlock( workspace, rootDom );
-    newRootBlock.moveBy(workspace.RTL ? workspace.getWidth() - pos.x : pos.x, pos.y);
-//    Blockly.TypeVar.triggerGarbageCollection();  // Don't think this is necessary here
+    // Re-construct block but without rendering it
+    var newRootBlock = Blockly.Xml.domToBlockHeadless_( workspace, rootDom );
+    // Copy connection types from new block to old
+    rootBlock.copyConnectionTypes_( newRootBlock );
+    // Delete temporary block
+    newRootBlock.dispose();
+    
+    // Now do child block
+    // Export child block to xml
+    var childDom = Blockly.Xml.blockToDom( childBlock );
+    // Re-construct block but without rendering it
+    var newChildBlock = Blockly.Xml.domToBlockHeadless_( workspace, childDom );
+    
+    // Copy connection types from new block to old
+    childBlock.copyConnectionTypes_( newChildBlock );
+    // Delete temporary block
+    newChildBlock.dispose();
+//  Blockly.TypeVar.triggerGarbageCollection(); // Don't think this is necessary
   }
-  // We can't regenerate the child block yet until we have finished disconnecting it. Defer it until later.
-  setTimeout(function() {
-      // Reconstruct parent and child blocks to restore type variables 
-      if( childBlock.workspace ) {
-        var selected = (Blockly.selected == childBlock);
-        var dragging = (selected && Blockly.dragMode_ == 2);  // TODO: what is the right condition here?
-        var workspace = childBlock.workspace;
-        // Export child block to xml
-        var childDom = Blockly.Xml.blockToDom( childBlock );
-        // Save block position
-        var pos = childBlock.getRelativeToSurfaceXY();
-        // Delete old block
-        childBlock.dispose();
-        // Re-add block to recompute connection types
-        var newChildBlock = Blockly.Xml.domToBlock( workspace, childDom );
-        newChildBlock.moveBy(workspace.RTL ? workspace.getWidth() - pos.x : pos.x, pos.y);
-        
-        // Resume dragging the cloned block
-        if( selected ) {
-          newChildBlock.select();
-        }
-        if( dragging ) {
-          newChildBlock.startDrag_(workspace.dragStartEvent_);
-        }
-//        Blockly.TypeVar.triggerGarbageCollection(); // Don't think this is necessary
-      }
-    }, 1);
-//  if (parentBlock.rendered) {
+  Blockly.Events.enable();
+//  if (parentBlock.rendered) {   // Rendering is done in copyConnectionTypes_
 //    parentBlock.render();
 //  }
-//  if (childBlock.rendered) {
-//    childBlock.updateDisabled();
+  if (childBlock.rendered) {
+    childBlock.updateDisabled();
 //    childBlock.render();
-//  }
+  }
 };
 
 /**
@@ -1204,6 +1189,43 @@ Blockly.TypeVar.initTypeVarDB_ = function() {
   Blockly.TypeVar.addTypeVar_("M", "Gray");
   Blockly.TypeVar.addTypeVar_("N", "YellowGreen");
   Blockly.TypeVar.addTypeVar_("O", "Maroon");
+  Blockly.TypeVar.addTypeVar_("P", "Purple");
+  Blockly.TypeVar.addTypeVar_("Q", "Yellow");
+  Blockly.TypeVar.addTypeVar_("R", "Teal");
+  Blockly.TypeVar.addTypeVar_("S", "Aqua");
+  Blockly.TypeVar.addTypeVar_("T", "Olive");
+  Blockly.TypeVar.addTypeVar_("U", "Fuchsia");
+  Blockly.TypeVar.addTypeVar_("V", "Navy");
+  Blockly.TypeVar.addTypeVar_("W", "Lime");
+  Blockly.TypeVar.addTypeVar_("X", "Chocolate");
+  Blockly.TypeVar.addTypeVar_("Y", "DarkSlateGray");
+  Blockly.TypeVar.addTypeVar_("Z", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("AA", "Red");
+  Blockly.TypeVar.addTypeVar_("AB", "Blue");
+  Blockly.TypeVar.addTypeVar_("AC", "Green");
+  Blockly.TypeVar.addTypeVar_("AD", "Cyan");
+  Blockly.TypeVar.addTypeVar_("AE", "BlueViolet");
+  Blockly.TypeVar.addTypeVar_("AF", "Brown");
+  Blockly.TypeVar.addTypeVar_("AG", "Black");
+  Blockly.TypeVar.addTypeVar_("AH", "Chartreuse");
+  Blockly.TypeVar.addTypeVar_("AI", "Gold");
+  Blockly.TypeVar.addTypeVar_("AJ", "HotPink");
+  Blockly.TypeVar.addTypeVar_("AK", "LightSkyBlue");
+  Blockly.TypeVar.addTypeVar_("AL", "Orange");
+  Blockly.TypeVar.addTypeVar_("AM", "Gray");
+  Blockly.TypeVar.addTypeVar_("AN", "YellowGreen");
+  Blockly.TypeVar.addTypeVar_("AO", "Maroon");
+  Blockly.TypeVar.addTypeVar_("AP", "Purple");
+  Blockly.TypeVar.addTypeVar_("AQ", "Yellow");
+  Blockly.TypeVar.addTypeVar_("AR", "Teal");
+  Blockly.TypeVar.addTypeVar_("AS", "Aqua");
+  Blockly.TypeVar.addTypeVar_("AT", "Olive");
+  Blockly.TypeVar.addTypeVar_("AU", "Fuchsia");
+  Blockly.TypeVar.addTypeVar_("AV", "Navy");
+  Blockly.TypeVar.addTypeVar_("AW", "Lime");
+  Blockly.TypeVar.addTypeVar_("AX", "Chocolate");
+  Blockly.TypeVar.addTypeVar_("AY", "DarkSlateGray");
+  Blockly.TypeVar.addTypeVar_("AZ", "RosyBrown");
 }
 
 Blockly.TypeVar.addTypeVar_ = function(name, color) {
