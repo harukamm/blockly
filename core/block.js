@@ -1334,7 +1334,7 @@ Blockly.Block.getById = function(id) {
  * @param {bool} keepVars If true, existing type variables should be kept if possible; if false, type variables will be replaced with those from source.
  */
 Blockly.Block.prototype.copyConnectionTypes_ = function(source, keepVars) {
-  console.log( "copyConnectionTypes:", this, source, keepVars );
+//  console.log( "copyConnectionTypes:", this, source, keepVars );
   if( !source ) return;
   Blockly.Block.copyConnectionTypesR_( this, source, {}, keepVars );
 }
@@ -1382,6 +1382,6 @@ Blockly.Block.copyConnectionTypesR_ = function(dest, source, subst, keepVars) {
       }
     }
   }
-  dest.render();
+  dest.render();  // Not very efficient perhaps...
   return( subst );
 };
