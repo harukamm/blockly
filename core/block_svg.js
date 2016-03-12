@@ -112,11 +112,6 @@ Blockly.BlockSvg.prototype.initSvg = function() {
     Blockly.bindEvent_(this.getSvgRoot(), 'touchstart', null,
                        function(e) {Blockly.longStart_(e, thisBlock);});
   }
-  // Bind an onchange function, if it exists.
-  if (goog.isFunction(this.onchange) && !this.eventsInit_) {
-    this.onchangeWrapper_ = Blockly.bindEvent_(this.workspace.getCanvas(),
-        'blocklyWorkspaceChange', this, this.onchange);
-  }
   this.eventsInit_ = true;
 
   if (!this.getSvgRoot().parentNode) {
@@ -494,6 +489,7 @@ Blockly.BlockSvg.prototype.onMouseDown_ = function(e) {
     // dragged instead.
     return;
   } else {
+    Blockly.Events.group = Blockly.genUid();
     // Left-click (or middle click)
     this.startDrag_(e);
   }
@@ -541,6 +537,7 @@ Blockly.BlockSvg.prototype.onMouseUp_ = function(e) {
     Blockly.highlightedConnection_ = null;
   }
   Blockly.Css.setCursor(Blockly.Css.Cursor.OPEN);
+  Blockly.Events.group = '';
 };
 
 /**
@@ -849,7 +846,7 @@ Blockly.BlockSvg.prototype.setMovable = function(movable) {
 
 /**
  * Set whether this block is editable or not.
- * @param {boolean} movable True if editable.
+ * @param {boolean} editable True if editable.
  */
 Blockly.BlockSvg.prototype.setEditable = function(editable) {
   Blockly.BlockSvg.superClass_.setEditable.call(this, editable);
@@ -1349,11 +1346,6 @@ Blockly.BlockSvg.INNER_BOTTOM_LEFT_CORNER_HIGHLIGHT_LTR =
  */
 Blockly.BlockSvg.prototype.dispose = function(healStack, animate) {
   Blockly.Field.startCache();
-  // Terminate onchange event calls.
-  if (this.onchangeWrapper_) {
-    Blockly.unbindEvent_(this.onchangeWrapper_);
-    this.onchangeWrapper_ = null;
-  }
   // If this block is being dragged, unlink the mouse events.
   if (Blockly.selected == this) {
     Blockly.terminateDrag_();

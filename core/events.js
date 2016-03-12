@@ -28,6 +28,12 @@ goog.provide('Blockly.Events');
 
 
 /**
+ * Group ID for new events.  Grouped events are indivisible.
+ * @type {string}
+ */
+Blockly.Events.group = '';
+
+/**
  * Allow change events to be created and fired.
  * @type {number}
  * @private
@@ -65,12 +71,6 @@ Blockly.Events.MOVE = 'move';
 Blockly.Events.FIRE_QUEUE_ = [];
 
 /**
- * PID of next scheduled firing.
- * @private
- */
-Blockly.Events.fireTask_ = null;
-
-/**
  * Create a custom event and fire it.
  * @param {!Blockly.Events.Abstract} event Custom data for event.
  */
@@ -78,10 +78,11 @@ Blockly.Events.fire = function(event) {
   if (!Blockly.Events.isEnabled()) {
     return;
   }
-  Blockly.Events.FIRE_QUEUE_.push(event);
-  if (Blockly.Events.fireTask_ === null) {
-    Blockly.Events.fireTask_ = setTimeout(Blockly.Events.fireNow_, 0);
+  if (Blockly.Events.FIRE_QUEUE_.length == 0) {
+    // Schedule a firing of the event queue.
+    setTimeout(Blockly.Events.fireNow_, 0);
   }
+  Blockly.Events.FIRE_QUEUE_.push(event);
 };
 
 /**
@@ -91,21 +92,10 @@ Blockly.Events.fire = function(event) {
 Blockly.Events.fireNow_ = function() {
   var queue = Blockly.Events.filter_(Blockly.Events.FIRE_QUEUE_);
   Blockly.Events.FIRE_QUEUE_.length = 0;
-  Blockly.Events.fireTask_ = null;
-  for (var i = 0, detail; detail = queue[i]; i++) {
-//    console.log(detail);
-    var workspace = Blockly.Workspace.getById(detail.workspaceId);
-    if (workspace && workspace.rendered) {
-      // Create a custom event in a browser-compatible way.
-      if (typeof CustomEvent == 'function') {
-        // W3
-        var evt = new CustomEvent('blocklyWorkspaceChange', {'detail': detail});
-      } else {
-        // MSIE
-        var evt = document.createEvent('CustomEvent');
-        evt.initCustomEvent(eventName, false, false, detail);
-      }
-      workspace.getCanvas().dispatchEvent(evt);
+  for (var i = 0, event; event = queue[i]; i++) {
+    var workspace = Blockly.Workspace.getById(event.workspaceId);
+    if (workspace) {
+      workspace.fireChangeListener(event);
     }
   }
 };
@@ -175,10 +165,18 @@ Blockly.Events.isEnabled = function() {
 };
 
 /**
- * Abstract class for a change event.
+ * Abstract class for an event.
+ * @param {!Blockly.Block} block The block.
  * @constructor
  */
-Blockly.Events.Abstract = function() {};
+Blockly.Events.Abstract = function(block) {
+  if (block.isShadow()) {
+    console.error('Creating event for shadow block: ' + block.id);
+  }
+  this.blockId = block.id;
+  this.workspaceId = block.workspace.id;
+  this.group = Blockly.Events.group;
+};
 
 /**
  * Does this event record any change of state?
@@ -190,17 +188,21 @@ Blockly.Events.Abstract.prototype.isNull = function() {
 
 /**
  * Class for a block creation event.
- * @param {!Blockly.Workspace} workspace The workspace.
- * @param {!Element} xml XML DOM.
+ * @param {!Blockly.Block} block The created block.
  * @extends {Blockly.Events.Abstract}
  * @constructor
  */
-Blockly.Events.Create = function(workspace, xml) {
-  this.type = Blockly.Events.CREATE;
-  this.workspaceId = workspace.id;
-  this.xml = xml;
+Blockly.Events.Create = function(block) {
+  Blockly.Events.Create.superClass_.constructor.call(this, block);
+  this.xml = Blockly.Xml.blockToDomWithXY(block);
 };
 goog.inherits(Blockly.Events.Create, Blockly.Events.Abstract);
+
+/**
+ * Type of this event.
+ * @type {string}
+ */
+Blockly.Events.Create.prototype.type = Blockly.Events.CREATE;
 
 /**
  * Class for a block deletion event.
@@ -209,21 +211,23 @@ goog.inherits(Blockly.Events.Create, Blockly.Events.Abstract);
  * @constructor
  */
 Blockly.Events.Delete = function(block) {
-  this.type = Blockly.Events.DELETE;
-  this.workspaceId = block.workspace.id;
-  this.blockId = block.id;
-  this.oldXml = Blockly.Xml.blockToDom(block);
-  var parent = block.getParent();
-  if (parent) {
-    this.oldParentId = parent.id;
-    this.oldInput = getInputWithBlock(block).name
+  if (block.getParent()) {
+    throw 'Connected blocks cannot be deleted.';
   }
+  Blockly.Events.Delete.superClass_.constructor.call(this, block);
+  this.oldXml = Blockly.Xml.blockToDomWithXY(block);
 };
 goog.inherits(Blockly.Events.Delete, Blockly.Events.Abstract);
 
 /**
+ * Type of this event.
+ * @type {string}
+ */
+Blockly.Events.Delete.prototype.type = Blockly.Events.DELETE;
+
+/**
  * Class for a block change event.
- * @param {!Blockly.Block} block The deleted block.
+ * @param {!Blockly.Block} block The changed block.
  * @param {string} element One of 'field', 'comment', 'disabled', etc.
  * @param {?string} name Name of input or field affected, or null.
  * @param {string} oldValue Previous value of element.
@@ -232,15 +236,19 @@ goog.inherits(Blockly.Events.Delete, Blockly.Events.Abstract);
  * @constructor
  */
 Blockly.Events.Change = function(block, element, name, oldValue, newValue) {
-  this.type = Blockly.Events.CHANGE;
-  this.workspaceId = block.workspace.id;
-  this.blockId = block.id;
+  Blockly.Events.Change.superClass_.constructor.call(this, block);
   this.element = element;
   this.name = name;
   this.oldValue = oldValue;
   this.newValue = newValue;
 };
-goog.inherits(Blockly.Events.Create, Blockly.Events.Abstract);
+goog.inherits(Blockly.Events.Change, Blockly.Events.Abstract);
+
+/**
+ * Type of this event.
+ * @type {string}
+ */
+Blockly.Events.Change.prototype.type = Blockly.Events.CHANGE;
 
 /**
  * Does this event record any change of state?
@@ -257,16 +265,19 @@ Blockly.Events.Change.prototype.isNull = function() {
  * @constructor
  */
 Blockly.Events.Move = function(block) {
-  this.type = Blockly.Events.MOVE;
-  this.workspaceId = block.workspace.id;
-  this.blockId = block.id;
-
+  Blockly.Events.Move.superClass_.constructor.call(this, block);
   var location = this.currentLocation_();
   this.oldParentId = location.parentId;
   this.oldInputName = location.inputName;
   this.oldCoordinate = location.coordinate;
 };
 goog.inherits(Blockly.Events.Move, Blockly.Events.Abstract);
+
+/**
+ * Type of this event.
+ * @type {string}
+ */
+Blockly.Events.Move.prototype.type = Blockly.Events.MOVE;
 
 /**
  * Record the block's new location.  Called after the move.

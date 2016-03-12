@@ -37,20 +37,30 @@ goog.require('goog.dom');
  * @return {!Element} XML document.
  */
 Blockly.Xml.workspaceToDom = function(workspace) {
-  var width;  // Not used in LTR.
-  if (workspace.RTL) {
-    width = workspace.getWidth();
-  }
   var xml = goog.dom.createDom('xml');
   var blocks = workspace.getTopBlocks(true);
   for (var i = 0, block; block = blocks[i]; i++) {
-    var element = Blockly.Xml.blockToDom(block);
-    var xy = block.getRelativeToSurfaceXY();
-    element.setAttribute('x', Math.round(workspace.RTL ? width - xy.x : xy.x));
-    element.setAttribute('y', Math.round(xy.y));
-    xml.appendChild(element);
+    xml.appendChild(Blockly.Xml.blockToDomWithXY(block));
   }
   return xml;
+};
+
+/**
+ * Encode a block subtree as XML with XY coordinates.
+ * @param {!Blockly.Block} block The root block to encode.
+ * @return {!Element} Tree of XML elements.
+ */
+Blockly.Xml.blockToDomWithXY = function(block) {
+  var width;  // Not used in LTR.
+  if (block.workspace.RTL) {
+    width = block.workspace.getWidth();
+  }
+  var element = Blockly.Xml.blockToDom(block);
+  var xy = block.getRelativeToSurfaceXY();
+  element.setAttribute('x',
+      Math.round(block.workspace.RTL ? width - xy.x : xy.x));
+  element.setAttribute('y', Math.round(xy.y));
+  return element;
 };
 
 /**
@@ -322,7 +332,7 @@ Blockly.Xml.domToBlock = function(workspace, xmlBlock) {
   }
   Blockly.Events.enable();
   if (Blockly.Events.isEnabled() && !topBlock.isShadow()) {
-    Blockly.Events.fire(new Blockly.Events.Create(workspace, xmlBlock));
+    Blockly.Events.fire(new Blockly.Events.Create(topBlock));
   }
   return topBlock;
 };

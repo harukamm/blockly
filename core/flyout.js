@@ -155,9 +155,8 @@ Blockly.Flyout.prototype.init = function(targetWorkspace) {
   Array.prototype.push.apply(this.eventWrappers_,
       Blockly.bindEvent_(this.svgGroup_, 'wheel', this, this.wheel_));
   if (!this.autoClose) {
-    Array.prototype.push.apply(this.eventWrappers_,
-        Blockly.bindEvent_(this.targetWorkspace_.getCanvas(),
-        'blocklyWorkspaceChange', this, this.filterForCapacity_));
+    this.filterWrapper_ = this.filterForCapacity_.bind(this);
+    this.targetWorkspace_.addChangeListener(this.filterWrapper_);
   }
   // Dragging the flyout up and down.
   Array.prototype.push.apply(this.eventWrappers_,
@@ -171,6 +170,10 @@ Blockly.Flyout.prototype.init = function(targetWorkspace) {
 Blockly.Flyout.prototype.dispose = function() {
   this.hide();
   Blockly.unbindEvent_(this.eventWrappers_);
+  if (this.filterWrapper_) {
+    this.targetWorkspace_.removeChangeListener(this.filterWrapper_);
+    this.filterWrapper_ = null;
+  }
   if (this.scrollbar_) {
     this.scrollbar_.dispose();
     this.scrollbar_ = null;
@@ -295,7 +298,7 @@ Blockly.Flyout.prototype.position = function() {
 /**
  * Scroll the flyout to the top.
  */
-Blockly.Flyout.prototype.scrollToTop = function() {
+Blockly.Flyout.prototype.scrollToStart = function() {
   this.scrollbar_.set(0);
 };
 
@@ -345,7 +348,7 @@ Blockly.Flyout.prototype.hide = function() {
   }
   this.listeners_.length = 0;
   if (this.reflowWrapper_) {
-    Blockly.unbindEvent_(this.reflowWrapper_);
+    this.workspace_.removeChangeListener(this.reflowWrapper_);
     this.reflowWrapper_ = null;
   }
   // Do NOT delete the blocks here.  Wait until Flyout.show.
@@ -466,8 +469,8 @@ Blockly.Flyout.prototype.show = function(xmlList) {
 
   // Fire a resize event to update the flyout's scrollbar.
   Blockly.fireUiEventNow(window, 'resize');
-  this.reflowWrapper_ = Blockly.bindEvent_(this.workspace_.getCanvas(),
-      'blocklyWorkspaceChange', this, this.reflow);
+  this.reflowWrapper_ = this.reflow.bind(this);
+  this.workspace_.addChangeListener(this.reflowWrapper_);
 };
 
 /**
@@ -633,6 +636,7 @@ Blockly.Flyout.prototype.createBlockFunc_ = function(originBlock) {
       // Beyond capacity.
       return;
     }
+    Blockly.Events.disable();
     // Create the new block by cloning the block in the flyout (via XML).
     var xml = Blockly.Xml.blockToDom(originBlock);
     var block = Blockly.Xml.domToBlock(workspace, xml);
@@ -664,6 +668,10 @@ Blockly.Flyout.prototype.createBlockFunc_ = function(originBlock) {
       xyNew.x += workspace.toolbox_.width / workspace.scale;
     }
     block.moveBy(xyOld.x - xyNew.x, xyOld.y - xyNew.y);
+    Blockly.Events.enable();
+    if (Blockly.Events.isEnabled() && !block.isShadow()) {
+      Blockly.Events.fire(new Blockly.Events.Create(block));
+    }
     if (flyout.autoClose) {
       flyout.hide();
     } else {

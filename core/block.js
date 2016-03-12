@@ -122,8 +122,12 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   /** @type {boolean|undefined} */
   this.inputsInlineDefault = this.inputsInline;
   if (Blockly.Events.isEnabled() && !this.isShadow()) {
-    var xmlBlock = Blockly.Xml.blockToDom(this);
-    Blockly.Events.fire(new Blockly.Events.Create(workspace, xmlBlock));
+    Blockly.Events.fire(new Blockly.Events.Create(this));
+  }
+  // Bind an onchange function, if it exists.
+  if (goog.isFunction(this.onchange)) {
+    this.onchangeWrapper_ = this.onchange.bind(this);
+    this.workspace.addChangeListener(this.onchangeWrapper_);
   }
 };
 
@@ -162,6 +166,10 @@ Blockly.Block.prototype.colour_ = '#000000';
  *     all children of this block.
  */
 Blockly.Block.prototype.dispose = function(healStack) {
+  // Terminate onchange event calls.
+  if (this.onchangeWrapper_) {
+    this.workspace.removeChangeListener(this.onchangeWrapper_)
+  }
   this.unplug(healStack);
   if (Blockly.Events.isEnabled() && !this.isShadow()) {
     Blockly.Events.fire(new Blockly.Events.Delete(this));
@@ -327,7 +335,7 @@ Blockly.Block.prototype.getParent = function() {
 
 /**
  * Return the input that connects to the specified block.
- * @param {!Blockly.Block} A block connected to an input on this block.
+ * @param {!Blockly.Block} block A block connected to an input on this block.
  * @return {Blockly.Input} The input that connects to the specified block.
  */
 Blockly.Block.prototype.getInputWithBlock = function(block) {
@@ -506,9 +514,17 @@ Blockly.Block.prototype.setShadow = function(shadow) {
   }
   this.isShadow_ = shadow;
   if (Blockly.Events.isEnabled() && !shadow) {
+    Blockly.Events.group = Blockly.genUid();
     // Fire a creation event.
-    var xmlBlock = Blockly.Xml.blockToDom(this);
-    Blockly.Events.fire(new Blockly.Events.Create(this.workspace, xmlBlock));
+    Blockly.Events.fire(new Blockly.Events.Create(this));
+    var moveEvent = new Blockly.Events.Move(this);
+    // Claim that the block was at 0,0 and is being connected.
+    moveEvent.oldParentId = undefined;
+    moveEvent.oldInputName = undefined;
+    moveEvent.oldCoordinate = new goog.math.Coordinate(0, 0);
+    moveEvent.recordNew();
+    Blockly.Events.fire(moveEvent);
+    Blockly.Events.group = '';
   }
 };
 
