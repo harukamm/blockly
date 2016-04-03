@@ -270,6 +270,15 @@ Blockly.FieldDropdown.prototype.setValue = function(newValue) {
     Blockly.Events.fire(new Blockly.Events.Change(
         this.sourceBlock_, 'field', this.name, this.value_, newValue));
   }
+  if (this.sourceBlock_ && this.validator_) {
+    // Validator is probably an 'onchange' function
+    var validated = this.validator_(newValue);
+    // If the new text is invalid, validation returns null.
+    // In this case we still want to display the illegal result.
+    if (validated !== null && validated !== undefined) {
+      newValue = validated;
+    }
+  }
   this.value_ = newValue;
   // Look up and display the human-readable text.
   var options = this.getOptions_();
