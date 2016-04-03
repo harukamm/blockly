@@ -30,6 +30,7 @@ goog.provide('Blockly.Input');
 // goog.require('Blockly.Block');
 goog.require('Blockly.Connection');
 goog.require('Blockly.FieldLabel');
+goog.require('Blockly.TypeExpr');
 goog.require('goog.asserts');
 
 

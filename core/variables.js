@@ -61,26 +61,24 @@ Blockly.Variables.allVariables = function(root, type) {
   var variableHash = Object.create(null);
   // Iterate through every block and add each variable to the hash.
   for (var x = 0; x < blocks.length; x++) {
-    if (blocks[x].getVars) {
-      var blockVariables = blocks[x].getVars();
-      for (var y = 0; y < blockVariables.length; y++) {
-        if( blockVariables[y] instanceof String ) {
-          /* Variable is untyped */
-          if( !type ) {
-            var varName = blockVariables[y];
-            // Variable name may be null if the block is only half-built.
-            if (varName ) {
-              variableHash[varName.toLowerCase()] = varName;
-            }            
-          }
-        } else if( blockVariables[y] instanceof Array ) {
-          /* Variable is typed - blockVariables[y] is an array [name, type] */
-          var varName = blockVariables[y][0];
-          var varType = blockVariables[y][1];
+    var blockVariables = blocks[x].getVars();
+    for (var y = 0; y < blockVariables.length; y++) {
+      if( blockVariables[y] instanceof String ) {
+        /* Variable is untyped */
+        if( !type ) {
+          var varName = blockVariables[y];
           // Variable name may be null if the block is only half-built.
-          if (varName && (!type || (type == varType))) {
+          if (varName ) {
             variableHash[varName.toLowerCase()] = varName;
-          }
+          }            
+        }
+      } else if( blockVariables[y] instanceof Array ) {
+        /* Variable is typed - blockVariables[y] is an array [name, type] */
+        var varName = blockVariables[y][0];
+        var varType = blockVariables[y][1];
+        // Variable name may be null if the block is only half-built.
+        if (varName && (!type || (type == varType))) {
+          variableHash[varName.toLowerCase()] = varName;
         }
       }
     }
@@ -123,13 +121,13 @@ Blockly.Variables.allVariables = function(root, type) {
  * @param {!Blockly.Workspace} workspace Workspace rename variables in.
  */
 Blockly.Variables.renameVariable = function(oldName, newName, workspace) {
+  Blockly.Events.setGroup(true);
   var blocks = workspace.getAllBlocks();
   // Iterate through every block.
   for (var i = 0; i < blocks.length; i++) {
-    if (blocks[i].renameVar) {
-      blocks[i].renameVar(oldName, newName);
-    }
+    blocks[i].renameVar(oldName, newName);
   }
+  Blockly.Events.setGroup(false);
 };
 
 /**
