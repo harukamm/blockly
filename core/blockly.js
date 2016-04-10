@@ -39,6 +39,7 @@ goog.require('Blockly.FieldDropdown');
 goog.require('Blockly.FieldImage');
 goog.require('Blockly.FieldTextInput');
 goog.require('Blockly.FieldVariable');
+goog.require('Blockly.Flydown');
 goog.require('Blockly.Generator');
 goog.require('Blockly.Msg');
 goog.require('Blockly.Procedures');
@@ -383,14 +384,15 @@ Blockly.onContextMenu_ = function(e) {
 Blockly.hideChaff = function(opt_allowToolbox) {
   Blockly.Tooltip.hide();
   Blockly.WidgetDiv.hide();
+  var workspace = Blockly.getMainWorkspace();
   if (!opt_allowToolbox) {
-    var workspace = Blockly.getMainWorkspace();
     if (workspace.toolbox_ &&
         workspace.toolbox_.flyout_ &&
         workspace.toolbox_.flyout_.autoClose) {
       workspace.toolbox_.clearSelection();
     }
   }
+  if( workspace.flydown_ ) workspace.flydown_.hide();
 };
 
 /**
