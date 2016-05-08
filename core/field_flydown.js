@@ -29,11 +29,11 @@ goog.require('Blockly.FieldTextInput');
  * @constructor
  */
 
-Blockly.FieldFlydown = function(initialText, isEditable, displayLocation, opt_validator) {
-  Blockly.FieldFlydown.superClass_.constructor.call(this, initialText, opt_validator);
+Blockly.FieldFlydown = function(initialText, isEditable, displayLocation, opt_validator, opt_maxlength) {
+  Blockly.FieldFlydown.superClass_.constructor.call(this, initialText, opt_validator, opt_maxlength);
 
   this.EDITABLE = isEditable; // This by itself does not control editability
-  this.displayLocation = displayLocation; // [lyn, 10/27/13] Make flydown direction an instance variable
+  this.displayLocation = displayLocation;
   };
 goog.inherits(Blockly.FieldFlydown, Blockly.FieldTextInput);
 

@@ -40,12 +40,14 @@ goog.require('goog.userAgent');
  *     to validate any constraints on what the user entered.  Takes the new
  *     text as an argument and returns either the accepted text, a replacement
  *     text, or null to abort the change.
+ * @param {number=} opt_maxlength Maximum number of characters permitted as input
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldTextInput = function(text, opt_validator) {
+Blockly.FieldTextInput = function(text, opt_validator, opt_maxlength) {
   Blockly.FieldTextInput.superClass_.constructor.call(this, text,
       opt_validator);
+  this.maxLength_ = opt_maxlength;
 };
 goog.inherits(Blockly.FieldTextInput, Blockly.Field);
 
@@ -129,6 +131,7 @@ Blockly.FieldTextInput.prototype.showEditor_ = function(opt_quietInput) {
   // Create the input.
   var htmlInput = goog.dom.createDom('input', 'blocklyHtmlInput');
   htmlInput.setAttribute('spellcheck', this.spellcheck_);
+  if( this.maxLength_ ) htmlInput.setAttribute('maxlength', this.maxLength_ );
   var fontSize =
       (Blockly.FieldTextInput.FONTSIZE * this.workspace_.scale) + 'pt';
   div.style.fontSize = fontSize;
