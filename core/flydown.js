@@ -71,6 +71,18 @@ Blockly.Flydown.prototype.createDom = function() {
 };
 
 /**
+ * Set the CSS class of the flydown SVG group. Need to remove previous class if there is one.
+ * @param {!String} newCSSClassName The name of the new CSS class replacing the old one
+ */
+Blockly.Flydown.prototype.setCSSClass = function(newCSSClassName) {
+  if (newCSSClassName !== this.previousCSSClassName_) {
+    Blockly.removeClass_(this.svgGroup_, this.previousCSSClassName_);
+    Blockly.addClass_(this.svgGroup_, newCSSClassName);
+    this.previousCSSClassName_ = newCSSClassName;
+  }
+}
+
+/**
  * Initializes the Flydown.
  * @param {!Blockly.Workspace} workspace The workspace in which to create new
  *     blocks.

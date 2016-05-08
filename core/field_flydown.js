@@ -25,26 +25,16 @@ goog.require('Blockly.FieldTextInput');
  *     text as an argument and returns the accepted text or null to abort
  *     the change. E.g., for an associated getter/setter this could change
  *     references to names in this field.
- * @extends {Blockly.Field}
+ * @extends {Blockly.FieldTextInput}
  * @constructor
  */
 
-Blockly.FieldFlydown = function(name, isEditable, displayLocation, opt_changeHandler) {
-  Blockly.FieldFlydown.superClass_.constructor.call(this, name, opt_changeHandler);
+Blockly.FieldFlydown = function(initialText, isEditable, displayLocation, opt_validator) {
+  Blockly.FieldFlydown.superClass_.constructor.call(this, initialText, opt_validator);
 
   this.EDITABLE = isEditable; // This by itself does not control editability
   this.displayLocation = displayLocation; // [lyn, 10/27/13] Make flydown direction an instance variable
-  // this.fieldGroup_.style.cursor = '';
-
-  // Remove inherited field css classes ...
-  Blockly.removeClass_(/** @type {!Element} */ (this.fieldGroup_),
-      'blocklyEditableText');
-  Blockly.removeClass_(/** @type {!Element} */ (this.fieldGroup_),
-      'blocklyNoNEditableText');
-  // ... and add new one, so that look and feel of flyout fields can be customized
-  Blockly.addClass_(/** @type {!Element} */ (this.fieldGroup_),
-      this.fieldCSSClassName);
-};
+  };
 goog.inherits(Blockly.FieldFlydown, Blockly.FieldTextInput);
 
 /**
@@ -52,7 +42,7 @@ goog.inherits(Blockly.FieldFlydown, Blockly.FieldTextInput);
  * @type {number}
  * @const
  */
-Blockly.FieldFlydown.timeout = 750;
+Blockly.FieldFlydown.flydownTimeout = 750;
 
 /**
  * Process ID for timer event to show flydown (scheduled by mouseover event)
@@ -104,7 +94,21 @@ Blockly.FieldFlydown.prototype.showEditor_ = function() {
 
 Blockly.FieldFlydown.prototype.init = function(block) {
   Blockly.FieldFlydown.superClass_.init.call(this, block);
+
   Blockly.Flydown.workspaceInit( block.workspace );  // Set up Flydown for this workspace
+  
+  /* Set up CSS */
+  // Remove inherited field css classes ...
+  Blockly.removeClass_(/** @type {!Element} */ (this.fieldGroup_),
+      'blocklyEditableText');
+  Blockly.removeClass_(/** @type {!Element} */ (this.fieldGroup_),
+      'blocklyNoNEditableText');
+  // ... and add new one, so that look and feel of flyout fields can be customized
+  Blockly.addClass_(/** @type {!Element} */ (this.fieldGroup_),
+      this.fieldCSSClassName);
+  // this.fieldGroup_.style.cursor = '';
+  
+  /* Bind mouse handlers */
   this.mouseOverWrapper_ =
       Blockly.bindEvent_(this.fieldGroup_, 'mouseover', this, this.onMouseOver_);
   this.mouseOutWrapper_ =
@@ -112,10 +116,15 @@ Blockly.FieldFlydown.prototype.init = function(block) {
 };
 
 Blockly.FieldFlydown.prototype.onMouseOver_ = function(e) {
-  // alert("FieldFlydown mouseover");
+  console.log("FieldFlydown mouseover");
   if (! this.sourceBlock_.isInFlyout) { // [lyn, 10/22/13] No flydowns in a flyout!
-    Blockly.FieldFlydown.showPid_ =
-        window.setTimeout(this.showFlydownMaker_(), Blockly.FieldFlydown.timeout);
+    var field = this;
+    var callback = function() {
+      Blockly.FieldFlydown.showPid_ = 0;
+      field.showFlydown_();
+    };
+    if( Blockly.FieldFlydown.showPid_ ) window.clearTimeout( Blockly.FieldFlydown.showPid_ );
+    Blockly.FieldFlydown.showPid_ = window.setTimeout( callback, Blockly.FieldFlydown.flydownTimeout );
     // This event has been handled.  No need to bubble up to the document.
   }
   e.stopPropagation();
@@ -124,24 +133,13 @@ Blockly.FieldFlydown.prototype.onMouseOver_ = function(e) {
 Blockly.FieldFlydown.prototype.onMouseOut_ = function(e) {
   // Clear any pending timer event to show flydown
   console.log( "FieldFlydown onmouseout" );
-  window.clearTimeout(Blockly.FieldFlydown.showPid_);
-  Blockly.FieldFlydown.showPid_ = 0;
+  if( Blockly.FieldFlydown.showPid_ != 0 ) {
+    window.clearTimeout(Blockly.FieldFlydown.showPid_);
+    Blockly.FieldFlydown.showPid_ = 0;
+  }
   e.stopPropagation();
 };
 
-/**
- * Returns a thunk that creates a Flydown block of the getter and setter blocks for receiver field.
- *  @return A thunk (zero-parameter function).
- */
-Blockly.FieldFlydown.prototype.showFlydownMaker_ = function() {
-  var field = this; // Name receiver in variable so can close over this variable in returned thunk
-  return function() {
-    if (Blockly.FieldFlydown.showPid_ != 0) {
-      field.showFlydown_();
-      Blockly.FieldFlydown.showPid_ = 0;
-    }
-  };
-};
 
 /**
  * Creates a Flydown block of the getter and setter blocks for the parameter name in this field.
@@ -150,7 +148,9 @@ Blockly.FieldFlydown.prototype.showFlydown_ = function() {
   // Create XML elements from blocks and then create the blocks from the XML elements.
   // This is a bit crazy, but it's simplest that way. Otherwise, we'd have to duplicate
   // much of the code in Blockly.Flydown.prototype.show.
-  // alert("FieldFlydown show Flydown");
+  console.log("FieldFlydown show Flydown");
+  if( !this.getValue() || this.getValue() == "" ) return; // No flydown if no input entered
+  
   Blockly.hideChaff(); // Hide open context menus, dropDowns, flyouts, and other flydowns
   Blockly.FieldFlydown.flydownOwner_ = this; // Remember field to which flydown is attached
   var flydown = this.sourceBlock_.workspace.flydown_;
@@ -159,7 +159,7 @@ Blockly.FieldFlydown.prototype.showFlydown_ = function() {
   var blocksXMLText = this.flydownBlocksXML_()
   var blocksDom = Blockly.Xml.textToDom(blocksXMLText);
   var blocksXMLList = goog.dom.getChildren(blocksDom); // List of blocks for flydown
-  var xy = Blockly.getSvgXY_(this.borderRect_);
+  var xy = Blockly.getSvgXY_(this.borderRect_, this.sourceBlock_.workspace);
   var borderBBox = this.borderRect_.getBBox();
   var x = xy.x;
   var y = xy.y;
@@ -168,7 +168,7 @@ Blockly.FieldFlydown.prototype.showFlydown_ = function() {
   } else { // if (this.displayLocation === Blockly.FieldFlydown.DISPLAY_RIGHT) {
     x = x + borderBBox.width;
   }
-  Blockly.mainWorkspace.FieldFlydown.showAt(blocksXMLList, x, y);
+  flydown.showAt(blocksXMLList, x, y);
 };
 
 /**
