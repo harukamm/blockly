@@ -116,7 +116,7 @@ Blockly.FieldFlydown.prototype.init = function(block) {
 };
 
 Blockly.FieldFlydown.prototype.onMouseOver_ = function(e) {
-  console.log("FieldFlydown mouseover");
+//  console.log("FieldFlydown mouseover");
   if (! this.sourceBlock_.isInFlyout) { // [lyn, 10/22/13] No flydowns in a flyout!
     var field = this;
     var callback = function() {
@@ -132,7 +132,7 @@ Blockly.FieldFlydown.prototype.onMouseOver_ = function(e) {
 
 Blockly.FieldFlydown.prototype.onMouseOut_ = function(e) {
   // Clear any pending timer event to show flydown
-  console.log( "FieldFlydown onmouseout" );
+//  console.log( "FieldFlydown onmouseout" );
   if( Blockly.FieldFlydown.showPid_ != 0 ) {
     window.clearTimeout(Blockly.FieldFlydown.showPid_);
     Blockly.FieldFlydown.showPid_ = 0;
@@ -148,7 +148,7 @@ Blockly.FieldFlydown.prototype.showFlydown_ = function() {
   // Create XML elements from blocks and then create the blocks from the XML elements.
   // This is a bit crazy, but it's simplest that way. Otherwise, we'd have to duplicate
   // much of the code in Blockly.Flydown.prototype.show.
-  console.log("FieldFlydown show Flydown");
+//  console.log("FieldFlydown show Flydown");
   if( !this.getValue() || this.getValue() == "" ) return; // No flydown if no input entered
   
   Blockly.hideChaff(); // Hide open context menus, dropDowns, flyouts, and other flydowns
