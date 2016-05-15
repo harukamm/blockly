@@ -96,7 +96,16 @@ Blockly.FieldFlydown.prototype.init = function(block) {
   Blockly.FieldFlydown.superClass_.init.call(this, block);
 
   Blockly.Flydown.workspaceInit( block.workspace );  // Set up Flydown for this workspace
-  
+  Blockly.FieldFlydown.setupCSS_.call( this );
+   /* Bind mouse handlers */
+  this.mouseOverWrapper_ =
+      Blockly.bindEvent_(this.fieldGroup_, 'mouseover', this, this.onMouseOver_);
+  this.mouseOutWrapper_ =
+      Blockly.bindEvent_(this.fieldGroup_, 'mouseout', this, this.onMouseOut_);
+};
+
+Blockly.FieldFlydown.setupCSS_ = function() {
+  // This is a static member so must be called via Blockly.FieldFlydown.setupCSS_(this)
   /* Set up CSS */
   // Remove inherited field css classes ...
   Blockly.removeClass_(/** @type {!Element} */ (this.fieldGroup_),
@@ -107,13 +116,7 @@ Blockly.FieldFlydown.prototype.init = function(block) {
   Blockly.addClass_(/** @type {!Element} */ (this.fieldGroup_),
       this.fieldCSSClassName);
   // this.fieldGroup_.style.cursor = '';
-  
-  /* Bind mouse handlers */
-  this.mouseOverWrapper_ =
-      Blockly.bindEvent_(this.fieldGroup_, 'mouseover', this, this.onMouseOver_);
-  this.mouseOutWrapper_ =
-      Blockly.bindEvent_(this.fieldGroup_, 'mouseout', this, this.onMouseOut_);
-};
+}
 
 Blockly.FieldFlydown.prototype.onMouseOver_ = function(e) {
 //  console.log("FieldFlydown mouseover");
