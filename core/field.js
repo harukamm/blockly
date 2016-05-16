@@ -142,6 +142,7 @@ Blockly.Field.prototype.init = function(block) {
   this.textElement_ = Blockly.createSvgElement('text',
       {'class': 'blocklyText', 'y': this.size_.height - 12.5},
       this.fieldGroup_);
+  Blockly.Field.runQueuedCSSActions_.call( this );
 
   this.updateEditable();
   block.getSvgRoot().appendChild(this.fieldGroup_);
@@ -192,6 +193,47 @@ Blockly.Field.prototype.updateEditable = function() {
     this.fieldGroup_.style.cursor = '';
   }
 };
+
+/**
+ * Add a CSS class to the field's SVG element.
+ * If the field has not yet been initialised, the action will be queued until initialisation.
+ * @param {string} classname CSS class name to add.
+ */
+Blockly.Field.prototype.addCSSClass = function(classname) {
+  if( this.fieldGroup_ ) {
+    /* If field has already been initialised then just add the class. */
+    Blockly.addClass_( this.fieldGroup_, classname );
+  } else {
+    /* If field hasn't yet been initialised, then queue the action until init is called. */
+    var t = this;
+    if( !this.queuedCSSAction_ ) this.queuedCSSAction_ = [];
+    this.queuedCSSAction_.push( function(){t.addCSSClass(classname);} );
+  }
+}
+
+/**
+ * Remove a CSS class from the field's SVG element.
+ * If the field has not yet been initialised, the action will be queued until initialisation.
+ * @param {string} classname CSS class name to remove.
+ */
+Blockly.Field.prototype.removeCSSClass = function(classname) {
+  if( this.fieldGroup_ ) {
+    Blockly.removeClass_( this.fieldGroup_, classname );
+  } else {
+    var t = this;
+    if( !this.queuedCSSAction_ ) this.queuedCSSAction_ = [];
+    this.queuedCSSAction_.push( function(){t.removeCSSClass(classname);} );
+  }
+}
+
+/**
+ * Run any queued add/removeCSSClass calls.
+ */
+Blockly.Field.runQueuedCSSActions_ = function() {
+  for( var i in this.queuedCSSAction_ ) this.queuedCSSAction_[i]();
+  this.queuedCSSAction_ = null;
+}
+
 
 /**
  * Gets whether this editable field is visible or not.
