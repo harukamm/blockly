@@ -637,7 +637,7 @@ Blockly.Block.prototype.getVars = function() {
   var vars = [];
   for (var i = 0, input; input = this.inputList[i]; i++) {
     for (var j = 0, field; field = input.fieldRow[j]; j++) {
-      if (field instanceof Blockly.FieldVariable) {
+      if (field.isVariable_) {
         vars.push(field.getValue());
       }
     }

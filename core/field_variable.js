@@ -52,6 +52,8 @@ Blockly.FieldVariable = function(varname, opt_validator, opt_type) {
 };
 goog.inherits(Blockly.FieldVariable, Blockly.FieldDropdown);
 
+Blockly.FieldVariable.prototype.isVariable_ = true;
+
 /**
  * Sets a new change handler for angle field.
  * @param {Function} handler New change handler, or null.

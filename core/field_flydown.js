@@ -72,13 +72,6 @@ Blockly.FieldFlydown.DISPLAY_RIGHT = "RIGHT";
 Blockly.FieldFlydown.DISPLAY_LOCATION = Blockly.FieldFlydown.DISPLAY_BELOW; // [lyn, 10/14/13] Make global for now, change in future
 
 /**
- * Default CSS class name for the field itself
- * @type {String}
- * @const
- */
-Blockly.FieldFlydown.prototype.fieldCSSClassName = 'blocklyFieldFlydownField';
-
-/**
  * Default CSS class name for the flydown that flies down from the field
  * @type {String}
  * @const
@@ -96,27 +89,13 @@ Blockly.FieldFlydown.prototype.init = function(block) {
   Blockly.FieldFlydown.superClass_.init.call(this, block);
 
   Blockly.Flydown.workspaceInit( block.workspace );  // Set up Flydown for this workspace
-  Blockly.FieldFlydown.setupCSS_.call( this );
+  
    /* Bind mouse handlers */
   this.mouseOverWrapper_ =
       Blockly.bindEvent_(this.fieldGroup_, 'mouseover', this, this.onMouseOver_);
   this.mouseOutWrapper_ =
       Blockly.bindEvent_(this.fieldGroup_, 'mouseout', this, this.onMouseOut_);
 };
-
-Blockly.FieldFlydown.setupCSS_ = function() {
-  // This is a static member so must be called via Blockly.FieldFlydown.setupCSS_(this)
-  /* Set up CSS */
-  // Remove inherited field css classes ...
-  Blockly.removeClass_(/** @type {!Element} */ (this.fieldGroup_),
-      'blocklyEditableText');
-  Blockly.removeClass_(/** @type {!Element} */ (this.fieldGroup_),
-      'blocklyNoNEditableText');
-  // ... and add new one, so that look and feel of flyout fields can be customized
-  Blockly.addClass_(/** @type {!Element} */ (this.fieldGroup_),
-      this.fieldCSSClassName);
-  // this.fieldGroup_.style.cursor = '';
-}
 
 Blockly.FieldFlydown.prototype.onMouseOver_ = function(e) {
 //  console.log("FieldFlydown mouseover");
