@@ -142,10 +142,11 @@ Blockly.BlockSvg.JAGGED_TEETH_HEIGHT = 20;
 Blockly.BlockSvg.JAGGED_TEETH_WIDTH = 15;
 
 /** Define some colours for block types */
-Blockly.BlockSvg.NUMBER_COLOUR = 230;
-Blockly.BlockSvg.BOOLEAN_COLOUR = 120;
-Blockly.BlockSvg.SET_COLOUR = 45;
-Blockly.BlockSvg.VECTOR_COLOUR = 300;
+Blockly.BlockSvg.NUMBER_COLOUR = 210;
+Blockly.BlockSvg.BOOLEAN_COLOUR = 100;
+Blockly.BlockSvg.COLOR_COLOUR = 290;
+Blockly.BlockSvg.PICTURE_COLOUR = 160;
+Blockly.BlockSvg.PROGRAM_COLOUR = 0;
 Blockly.BlockSvg.ABSTRACT_COLOUR = "#888888";
 
 /** Define connector shapes for various types
@@ -264,14 +265,14 @@ Blockly.BlockSvg.typeVarShapes_ = {
     blockColour: Blockly.BlockSvg.NUMBER_COLOUR
   },
 
-  Boolean : {
+  Bool : {
     down: 'l 0,5 -8,7.5 8,7.5',
     up: 'l -8,-7.5 8,-7.5 0,-5',
     height: 20,
     blockColour: Blockly.BlockSvg.BOOLEAN_COLOUR
   },
 
-  Set : {
+  Color : {
     down: 'l 0,4 ' + 
       'c -4,0 -1.6,6.75 -6,8 ' +
       'c 4.4,1.25 2,8 6,8',  //       'c 4.4,0.75 3,7.5 6,8',
@@ -280,14 +281,14 @@ Blockly.BlockSvg.typeVarShapes_ = {
       'c 4.4,-1.25 2,-8 6,-8 ' + 
       'l 0,-4',
     height: 20,
-    blockColour: Blockly.BlockSvg.SET_COLOUR
+    blockColour: Blockly.BlockSvg.COLOR_COLOUR
   },
   
-  Vector: {
+  Picture: {
     down: 'l 0,2 v 5 h -3 v -5 l -5 10 l 5 10 v -5 h 3 v 5 l 0,2',
     up: 'l 0,-2 v -5 h -3 v 5 l -5 -10 l 5 -10 v 5 h 3 v -5 l 0,-2',
     height: 24,
-    blockColour: Blockly.BlockSvg.VECTOR_COLOUR
+    blockColour: Blockly.BlockSvg.PICTURE_COLOUR
   },
 
   typeVar : { 
