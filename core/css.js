@@ -264,6 +264,14 @@ Blockly.Css.CONTENT = [
     'font-size: 11pt;',
   '}',
 
+  '.blocklyTextEmph {',
+    'cursor: default;',
+    'fill: #fff;',
+    'display: block;',
+    'font-size: 11pt;',
+    'font-weight: bold;',
+  '}',
+
   '.blocklyNonEditableText>text {',
     'pointer-events: none;',
   '}',

@@ -46,6 +46,7 @@ goog.addDependency("../../../" + dir + "/core/options.js", ['Blockly.Options'], 
 goog.addDependency("../../../" + dir + "/core/toolbox.js", ['Blockly.Toolbox'], ['Blockly.Flyout', 'goog.dom', 'goog.events', 'goog.events.BrowserFeature', 'goog.html.SafeHtml', 'goog.math.Rect', 'goog.style', 'goog.ui.tree.TreeControl', 'goog.ui.tree.TreeNode']);
 goog.addDependency("../../../" + dir + "/core/procedures.js", ['Blockly.Procedures'], ['Blockly.Field', 'Blockly.Names', 'Blockly.Workspace']);
 goog.addDependency("../../../" + dir + "/core/constants.js", ['Blockly.constants'], []);
+goog.addDependency("../../../" + dir + "/core/field_label_emph.js", ['Blockly.FieldLabelEmphEmph'], ['Blockly.Field', 'Blockly.Tooltip', 'goog.dom', 'goog.math.Size']);
 goog.addDependency("../../../" + dir + "/core/type_expr.js", ['Blockly.TypeExpr', 'Blockly.TypeVar'], []);
 goog.addDependency("../../../" + dir + "/core/trashcan.js", ['Blockly.Trashcan'], ['goog.Timer', 'goog.dom', 'goog.math', 'goog.math.Rect']);
 goog.addDependency("../../../" + dir + "/core/field_colour.js", ['Blockly.FieldColour'], ['Blockly.Field', 'goog.dom', 'goog.events', 'goog.style', 'goog.ui.ColorPicker']);
@@ -1624,6 +1625,7 @@ goog.require('Blockly.FieldDropdown');
 goog.require('Blockly.FieldFlydown');
 goog.require('Blockly.FieldImage');
 goog.require('Blockly.FieldLabel');
+goog.require('Blockly.FieldLabelEmphEmph');
 goog.require('Blockly.FieldTextInput');
 goog.require('Blockly.FieldVariable');
 goog.require('Blockly.Flydown');
