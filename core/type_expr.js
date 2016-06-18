@@ -132,6 +132,23 @@ Blockly.TypeVar.initTypeVarDB_ = function() {
   Blockly.TypeVar.addTypeVar_("AX", "Chocolate");
   Blockly.TypeVar.addTypeVar_("AY", "DarkSlateGray");
   Blockly.TypeVar.addTypeVar_("AZ", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BA", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BB", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BC", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BD", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BE", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BF", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BG", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BH", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BI", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BJ", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BK", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BL", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BM", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BN", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BP", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BQ", "RosyBrown");
+  Blockly.TypeVar.addTypeVar_("BR", "RosyBrown");
 }
 
 Blockly.TypeVar.addTypeVar_ = function(name, color) {
