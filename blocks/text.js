@@ -46,7 +46,7 @@ Blockly.Blocks['text'] = {
         .appendField(this.newQuote_(true))
         .appendField(new Blockly.FieldTextInput(''), 'TEXT')
         .appendField(this.newQuote_(false));
-    this.setOutput(true, 'String');
+    this.setOutput(true, 'Text');
     // Assign 'this' to a variable for use in the tooltip closure below.
     var thisBlock = this;
     // Text block is trivial.  Use tooltip of parent block if it exists.
