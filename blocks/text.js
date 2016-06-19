@@ -41,19 +41,14 @@ Blockly.Blocks['text'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.TEXT_TEXT_HELPURL);
-    this.setColour(Blockly.Blocks.texts.HUE);
+    this.setColour(45);
     this.appendDummyInput()
         .appendField(this.newQuote_(true))
         .appendField(new Blockly.FieldTextInput(''), 'TEXT')
         .appendField(this.newQuote_(false));
-    this.setOutput(true, 'Text');
-    // Assign 'this' to a variable for use in the tooltip closure below.
-    var thisBlock = this;
-    // Text block is trivial.  Use tooltip of parent block if it exists.
-    this.setTooltip(function() {
-      var parent = thisBlock.getParent();
-      return (parent && parent.tooltip) || Blockly.Msg.TEXT_TEXT_TOOLTIP;
-    });
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Text'));
+    this.setTooltip("Gives the given text");
   },
   /**
    * Create an image of an open or closed quote.
