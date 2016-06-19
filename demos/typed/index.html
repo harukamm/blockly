@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Blockly Demo: Fixed Blockly</title>
-  <script src="../../blockly_compressed.js"></script>
+  <script src="../../blockly_uncompressed.js"></script>
   <script src="../../blocks_compressed.js"></script>
   <script src="../../core/field_label_emph.js"></script>
   <script src="../../msg/js/en.js"></script>
@@ -25,13 +25,14 @@ Blockly.Blocks['math_foo'] = {
         .appendField(new Blockly.FieldLabelEmph("Field label emph"));
     this.appendDummyInput()
         .appendField("Plain text")
-        .appendField(new Blockly.FieldTextInput("Text Input"), "NAME");
+        .appendField(new Blockly.FieldTextInput("Text Input"), "NAME")
     this.appendValueInput("NAME")
-        .setCheck(null)
-        .appendField("Value Input");
+        .appendField("Value Input")
+        .setTypeExpr(new Blockly.TypeExpr('Text'));
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Text'));
     this.setColour(120);
     this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
   }
 };
 </script>
