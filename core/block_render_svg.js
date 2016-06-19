@@ -146,6 +146,7 @@ Blockly.BlockSvg.NUMBER_COLOUR = 210;
 Blockly.BlockSvg.BOOLEAN_COLOUR = 100;
 Blockly.BlockSvg.COLOR_COLOUR = 290;
 Blockly.BlockSvg.PICTURE_COLOUR = 160;
+Blockly.BlockSvg.TEXT_COLOUR = 45;
 Blockly.BlockSvg.PROGRAM_COLOUR = 0;
 Blockly.BlockSvg.ABSTRACT_COLOUR = "#888888";
 
@@ -266,10 +267,10 @@ Blockly.BlockSvg.typeVarShapes_ = {
   },
 
   Text : {
-    down: 'l 0,0',
-    up: 'l -8,-7.5 8,-7.5 0,-5',
+    down: 'l 0,3 -8,0 0,4, 8,0 0,3',
+    up:  'l 0,-3 -8,0 0,-4, 8,0 0,-3',
     height: 20,
-    blockColour: Blockly.BlockSvg.BOOLEAN_COLOUR
+    blockColour: Blockly.BlockSvg.TEXT_COLOUR
   },
 
   Bool : {
