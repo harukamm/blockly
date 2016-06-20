@@ -267,8 +267,8 @@ Blockly.BlockSvg.typeVarShapes_ = {
   },
 
   Text : {
-    down: 'l 0,5 a 4.5 4.5, 0, 0, 0, 12.5 12.5 l 0,3',  
-    up: 'l 0,-3 a 4.5,4.5,0,0,1,-5,-12.5 l 0,-5',
+    down: 'l 0,0 -3,7.5 3,7.5',
+    up: 'l -3,-11 6,-11 0,0',
     height: 20,
     blockColour: Blockly.BlockSvg.TEXT_COLOUR
   },

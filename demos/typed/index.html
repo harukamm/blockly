@@ -30,6 +30,7 @@ Blockly.Blocks['math_foo'] = {
         .appendField("Value Input")
         .setTypeExpr(new Blockly.TypeExpr('Text'));
     this.setOutput(true);
+    //this.setInputsInline(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Text'));
     this.setColour(120);
     this.setTooltip('');
@@ -46,7 +47,7 @@ Blockly.Blocks['math_foo'] = {
 
   <p>&rarr; More info on <a href="https://developers.google.com/blockly/installation/injecting-fixed-size">injecting fixed-sized Blockly</a>&hellip;</p>
 
-  <div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
+  <div id="blocklyDiv" style="height: 980px; width: 1024px;"></div>
 
   <xml id="toolbox" style="display: none">
     <block type="math_foo"></block>
