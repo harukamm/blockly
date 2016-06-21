@@ -1392,6 +1392,16 @@ Blockly.BlockSvg.prototype.addErrorSelect = function() {
   this.svgGroup_.parentNode.appendChild(this.svgGroup_);
 };
 
+/**
+ * Unselect this block.  Remove its highlighting.
+ */
+Blockly.BlockSvg.prototype.removeErrorSelect = function() {
+  Blockly.removeClass_(/** @type {!Element} */ (this.svgGroup_),
+                       'blocklyErrorSelected');
+};
+
+/**
+
 
 /**
  * Unselect this block.  Remove its highlighting.
