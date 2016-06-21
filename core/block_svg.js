@@ -1383,6 +1383,17 @@ Blockly.BlockSvg.prototype.addSelect = function() {
 };
 
 /**
+ * Select this block as an error.
+ */
+Blockly.BlockSvg.prototype.addErrorSelect = function() {
+  Blockly.addClass_(/** @type {!Element} */ (this.svgGroup_),
+                    'blocklyErrorSelected');
+  // Move the selected block to the top of the stack.
+  this.svgGroup_.parentNode.appendChild(this.svgGroup_);
+};
+
+
+/**
  * Unselect this block.  Remove its highlighting.
  */
 Blockly.BlockSvg.prototype.removeSelect = function() {
