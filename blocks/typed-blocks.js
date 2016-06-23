@@ -99,20 +99,22 @@ Blockly.Blocks['logic_ternary_typed'] = {
 };
 
 /* should go in blocks/math.js */ 
-Blockly.Blocks['math_number_typed'] = {
+// Stefan
+// Renamed for funblocks
+Blockly.Blocks['numNumber'] = {
   /**
    * Block for numeric value.
    * @this Blockly.Block
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.MATH_NUMBER_HELPURL);
-    this.setColour(230);
+    this.setColour(210);
     this.appendDummyInput()
         .appendField(new Blockly.FieldTextInput('0',
         Blockly.FieldTextInput.numberValidator), 'NUM');
     this.setOutput(true, 'Number');
     // Sorin
-    this.setOutputTypeExpr(new Blockly.TypeExpr('int'));
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
     this.setTooltip(Blockly.Msg.MATH_NUMBER_TOOLTIP);
   }
 };
