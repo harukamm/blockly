@@ -787,6 +787,12 @@ Blockly.Block.prototype.setOutputTypeExpr = function(typeExpr) {
   this.outputConnection.setTypeExpr(typeExpr);
 }
 
+Blockly.Block.prototype.getOutputTypeExpr = function() {
+  if( !this.outputConnection )
+    return null;
+  this.outputConnection.getTypeExpr();
+}
+
 Blockly.Block.prototype.setColourByType = function(typeExpr) {
   if( !typeExpr && this.outputConnection && this.outputConnection.typeExpr ) typeExpr = this.outputConnection.typeExpr;
   var colour;

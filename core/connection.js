@@ -832,6 +832,11 @@ Blockly.Connection.prototype.setTypeExpr = function(t) {
   return this;
 }
 
+Blockly.Connection.prototype.getTypeExpr = function() {
+  return this.typeExpr;
+}
+
+
 /**
  * Change a connection's shadow block.
  * @param {Element} shadow DOM representation of a block or null.

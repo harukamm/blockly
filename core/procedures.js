@@ -64,7 +64,7 @@ Blockly.Procedures.allProcedures = function(root) {
   }
   proceduresNoReturn.sort(Blockly.Procedures.procTupleComparator_);
   proceduresReturn.sort(Blockly.Procedures.procTupleComparator_);
-  return [proceduresNoReturn, proceduresReturn];
+  return proceduresReturn;
 };
 
 /**
@@ -157,27 +157,24 @@ Blockly.Procedures.rename = function(text) {
  */
 Blockly.Procedures.flyoutCategory = function(workspace) {
   var xmlList = [];
-  if (Blockly.Blocks['procedures_defnoreturn']) {
-    // <block type="procedures_defnoreturn" gap="16"></block>
-    var block = goog.dom.createDom('block');
-    block.setAttribute('type', 'procedures_defnoreturn');
-    block.setAttribute('gap', 16);
-    xmlList.push(block);
-  }
-  if (Blockly.Blocks['procedures_defreturn']) {
+ 
+  /*if (Blockly.Blocks['procedures_defreturn']) {
     // <block type="procedures_defreturn" gap="16"></block>
     var block = goog.dom.createDom('block');
     block.setAttribute('type', 'procedures_defreturn');
     block.setAttribute('gap', 16);
     xmlList.push(block);
-  }
-  if (Blockly.Blocks['procedures_ifreturn']) {
-    // <block type="procedures_ifreturn" gap="16"></block>
+  }*/
+
+
+  if (Blockly.Blocks['procedures_letVar']) {
+    // <block type="procedures_defreturn" gap="16"></block>
     var block = goog.dom.createDom('block');
-    block.setAttribute('type', 'procedures_ifreturn');
+    block.setAttribute('type', 'procedures_letVar');
     block.setAttribute('gap', 16);
     xmlList.push(block);
   }
+
   if (xmlList.length) {
     // Add slightly larger gap between system blocks and user calls.
     xmlList[xmlList.length - 1].setAttribute('gap', 24);
@@ -187,11 +184,13 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     for (var i = 0; i < procedureList.length; i++) {
       var name = procedureList[i][0];
       var args = procedureList[i][1];
+
       // <block type="procedures_callnoreturn" gap="16">
       //   <mutation name="do something">
       //     <arg name="x"></arg>
       //   </mutation>
       // </block>
+
       var block = goog.dom.createDom('block');
       block.setAttribute('type', templateName);
       block.setAttribute('gap', 16);
@@ -207,9 +206,8 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     }
   }
 
-  var tuple = Blockly.Procedures.allProcedures(workspace);
-  populateProcedures(tuple[0], 'procedures_callnoreturn');
-  populateProcedures(tuple[1], 'procedures_callreturn');
+  var procs= Blockly.Procedures.allProcedures(workspace);
+  populateProcedures(procs, 'procedures_callreturn');
   return xmlList;
 };
 

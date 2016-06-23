@@ -166,7 +166,8 @@ Blockly.Blocks['procedures_defnoreturn'] = {
     Blockly.Procedures.mutateCallers(this);
 
     // Show or hide the statement input.
-    this.setStatements_(xmlElement.getAttribute('statements') !== 'false');
+    if(this.setStatements_)
+      this.setStatements_(xmlElement.getAttribute('statements') !== 'false');
   },
   /**
    * Populate the mutator's dialog with this block's components.
@@ -348,26 +349,23 @@ Blockly.Blocks['procedures_defreturn'] = {
    * @this Blockly.Block
    */
   init: function() {
+    var A = Blockly.TypeVar.getUnusedTypeVar();
     var nameField = new Blockly.FieldTextInput(
         Blockly.Msg.PROCEDURES_DEFRETURN_PROCEDURE,
         Blockly.Procedures.rename);
     nameField.setSpellcheck(false);
     this.appendDummyInput()
-        .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_TITLE)
+        .appendField("LetFunc")
         .appendField(nameField, 'NAME')
         .appendField('', 'PARAMS');
     this.appendValueInput('RETURN')
-        .setAlign(Blockly.ALIGN_RIGHT)
+        .setTypeExpr(A)
         .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
     this.setMutator(new Blockly.Mutator(['procedures_mutatorarg']));
-    if (Blockly.Msg.PROCEDURES_DEFRETURN_COMMENT) {
-      this.setCommentText(Blockly.Msg.PROCEDURES_DEFRETURN_COMMENT);
-    }
     this.setColour(Blockly.Blocks.procedures.HUE);
     this.setTooltip(Blockly.Msg.PROCEDURES_DEFRETURN_TOOLTIP);
-    this.setHelpUrl(Blockly.Msg.PROCEDURES_DEFRETURN_HELPURL);
     this.arguments_ = [];
-    this.setStatements_(true);
+    this.setStatements_(false);
     this.statementConnection_ = null;
   },
   setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
@@ -394,6 +392,54 @@ Blockly.Blocks['procedures_defreturn'] = {
   customContextMenu: Blockly.Blocks['procedures_defnoreturn'].customContextMenu,
   callType_: 'procedures_callreturn'
 };
+
+Blockly.Blocks['procedures_letVar'] = {
+  /**
+   * Block for defining a procedure with a return value.
+   * @this Blockly.Block
+   */
+  init: function() {
+    var A = Blockly.TypeVar.getUnusedTypeVar();
+    var nameField = new Blockly.FieldTextInput(
+        "foo",
+        Blockly.Procedures.rename);
+    nameField.setSpellcheck(false);
+    this.appendDummyInput()
+        .appendField('Let')
+        .appendField(nameField, 'NAME')
+        .appendField('', 'PARAMS');
+    this.appendValueInput('RETURN')
+        .setTypeExpr(A)
+    this.setColour(Blockly.Blocks.procedures.HUE);
+    this.setTooltip(Blockly.Msg.PROCEDURES_DEFRETURN_TOOLTIP);
+    this.arguments_ = [];
+    this.statementConnection_ = null;
+  },
+  validate: Blockly.Blocks['procedures_defnoreturn'].validate,
+  updateParams_: Blockly.Blocks['procedures_defnoreturn'].updateParams_,
+  mutationToDom: Blockly.Blocks['procedures_defnoreturn'].mutationToDom,
+  domToMutation: Blockly.Blocks['procedures_defnoreturn'].domToMutation,
+  decompose: Blockly.Blocks['procedures_defnoreturn'].decompose,
+  compose: Blockly.Blocks['procedures_defnoreturn'].compose,
+  dispose: Blockly.Blocks['procedures_defnoreturn'].dispose,
+  /**
+   * Return the signature of this procedure definition.
+   * @return {!Array} Tuple containing three elements:
+   *     - the name of the defined procedure,
+   *     - a list of all its arguments,
+   *     - that it DOES have a return value.
+   * @this Blockly.Block
+   */
+  getProcedureDef: function() {
+    return [this.getFieldValue('NAME'), this.arguments_, true];
+  },
+  getVars: Blockly.Blocks['procedures_defnoreturn'].getVars,
+  renameVar: Blockly.Blocks['procedures_defnoreturn'].renameVar,
+  customContextMenu: Blockly.Blocks['procedures_defnoreturn'].customContextMenu,
+  callType_: 'procedures_callreturn'
+};
+
+
 
 Blockly.Blocks['procedures_mutatorcontainer'] = {
   /**
@@ -512,6 +558,17 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       this.quarkConnections_ = {};
       this.quarkIds_ = null;
     }
+
+
+    // Set the type to that of the defining block
+    if (defBlock.type == "procedures_letVar")
+    {
+      var tp = defBlock.getInput("RETURN").connection.getTypeExpr();
+      this.setOutputTypeExpr(tp);
+      this.setColourByType(tp);
+      this.outputConnection.typeExpr.unify(tp);
+    }
+
     if (!paramIds) {
       // Reset the quarks (a mutator is about to open).
       return;
@@ -691,6 +748,8 @@ Blockly.Blocks['procedures_callreturn'] = {
    * Block for calling a procedure with a return value.
    * @this Blockly.Block
    */
+
+  
   init: function() {
     this.appendDummyInput('TOPROW')
         .appendField('', 'NAME');
@@ -701,6 +760,7 @@ Blockly.Blocks['procedures_callreturn'] = {
     this.arguments_ = [];
     this.quarkConnections_ = {};
     this.quarkIds_ = null;
+
   },
   getProcedureCall: Blockly.Blocks['procedures_callnoreturn'].getProcedureCall,
   renameProcedure: Blockly.Blocks['procedures_callnoreturn'].renameProcedure,
@@ -797,5 +857,5 @@ Blockly.Blocks['procedures_ifreturn'] = {
    * To add a new function type add this to your code:
    * Blockly.Blocks['procedures_ifreturn'].FUNCTION_TYPES.push('custom_func');
    */
-  FUNCTION_TYPES: ['procedures_defnoreturn', 'procedures_defreturn']
+  FUNCTION_TYPES: ['procedures_defnoreturn', 'procedures_defreturn' ]
 };
