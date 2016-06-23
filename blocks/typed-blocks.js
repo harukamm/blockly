@@ -111,7 +111,7 @@ Blockly.Blocks['numNumber'] = {
     this.setColour(210);
     this.appendDummyInput()
         .appendField(new Blockly.FieldTextInput('0',
-        Blockly.FieldTextInput.numberValidator), 'NUM');
+        Blockly.FieldTextInput.numberValidator), 'NUMBER');
     this.setOutput(true, 'Number');
     // Sorin
     this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
