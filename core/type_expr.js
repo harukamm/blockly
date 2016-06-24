@@ -78,7 +78,9 @@ Blockly.TypeVar.getTypeVarDB_ = function() {
   return Blockly.TypeVar.typeVarDB_;
 }
 
+
 Blockly.TypeVar.initTypeVarDB_ = function() {
+  Blockly.TypeVar.typeCount = 0;
   Blockly.TypeVar.typeVarDB_ = {};
   Blockly.TypeVar.addTypeVar_("A", "Red");
   Blockly.TypeVar.addTypeVar_("B", "Blue");
@@ -132,23 +134,6 @@ Blockly.TypeVar.initTypeVarDB_ = function() {
   Blockly.TypeVar.addTypeVar_("AX", "Chocolate");
   Blockly.TypeVar.addTypeVar_("AY", "DarkSlateGray");
   Blockly.TypeVar.addTypeVar_("AZ", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BA", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BB", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BC", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BD", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BE", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BF", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BG", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BH", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BI", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BJ", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BK", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BL", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BM", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BN", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BP", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BQ", "RosyBrown");
-  Blockly.TypeVar.addTypeVar_("BR", "RosyBrown");
 }
 
 Blockly.TypeVar.addTypeVar_ = function(name, color) {
@@ -161,6 +146,8 @@ Blockly.TypeVar.getTypeVarColor = function(name) {
 }
 
 Blockly.TypeVar.getUnusedTypeVar = function() {
+
+  Blockly.TypeVar.needGC = true;
   Blockly.TypeVar.doGarbageCollection();
   var db = Blockly.TypeVar.getTypeVarDB_();
   for (name in db) {
@@ -169,7 +156,16 @@ Blockly.TypeVar.getUnusedTypeVar = function() {
       return new Blockly.TypeExpr(name);
     }
   }
-  throw 'Ran out of type variables!';
+ 
+  // Generate new type vars as necessary
+  var name = String(Blockly.TypeVar.typeCount);
+  Blockly.TypeVar.typeCount += 1;
+  var color = "RosyBrown";
+  addTypeVar_(name,color); 
+  db[name].used = true;
+  return new Blockly.TypeExpr(name);
+
+  // throw 'Ran out of type variables!';
 }
 
 Blockly.TypeVar.triggerGarbageCollection = function () {
@@ -182,6 +178,7 @@ Blockly.TypeVar.doGarbageCollection = function () {
     return;
   }
   var db = Blockly.TypeVar.getTypeVarDB_();
+  // Set all typevars as unused
   for (name in db) {
     db[name].used = false;
   }
