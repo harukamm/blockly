@@ -146,8 +146,6 @@ Blockly.TypeVar.getTypeVarColor = function(name) {
 }
 
 Blockly.TypeVar.getUnusedTypeVar = function() {
-
-  Blockly.TypeVar.needGC = true;
   Blockly.TypeVar.doGarbageCollection();
   var db = Blockly.TypeVar.getTypeVarDB_();
   for (name in db) {
