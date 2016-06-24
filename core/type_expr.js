@@ -159,7 +159,7 @@ Blockly.TypeVar.getUnusedTypeVar = function() {
   var name = String(Blockly.TypeVar.typeCount);
   Blockly.TypeVar.typeCount += 1;
   var color = "RosyBrown";
-  addTypeVar_(name,color); 
+  Blockly.TypeVar.addTypeVar_(name,color); 
   db[name].used = true;
   return new Blockly.TypeExpr(name);
 
