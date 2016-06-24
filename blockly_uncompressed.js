@@ -55,6 +55,7 @@ goog.addDependency("../../../" + dir + "/core/field_textinput.js", ['Blockly.Fie
 goog.addDependency("../../../" + dir + "/core/mutator.js", ['Blockly.Mutator'], ['Blockly.Bubble', 'Blockly.Icon', 'Blockly.WorkspaceSvg', 'goog.Timer', 'goog.dom']);
 goog.addDependency("../../../" + dir + "/core/utils.js", ['Blockly.utils'], ['goog.dom', 'goog.events.BrowserFeature', 'goog.math.Coordinate', 'goog.userAgent']);
 goog.addDependency("../../../" + dir + "/core/input.js", ['Blockly.Input'], ['Blockly.Connection', 'Blockly.FieldLabel', 'Blockly.TypeExpr', 'goog.asserts']);
+goog.addDependency("../../../" + dir + "/core/field_textinputlarge.js", ['Blockly.FieldTextInputLarge'], ['Blockly.Field', 'Blockly.Msg', 'goog.asserts', 'goog.dom', 'goog.userAgent']);
 goog.addDependency("../../../" + dir + "/core/field_dropdown.js", ['Blockly.FieldDropdown'], ['Blockly.Field', 'goog.dom', 'goog.events', 'goog.style', 'goog.ui.Menu', 'goog.ui.MenuItem', 'goog.userAgent']);
 goog.addDependency("../../../" + dir + "/core/tooltip.js", ['Blockly.Tooltip'], ['goog.dom']);
 goog.addDependency("../../../" + dir + "/core/msg.js", ['Blockly.Msg'], []);
@@ -1627,6 +1628,7 @@ goog.require('Blockly.FieldImage');
 goog.require('Blockly.FieldLabel');
 goog.require('Blockly.FieldLabelEmphEmph');
 goog.require('Blockly.FieldTextInput');
+goog.require('Blockly.FieldTextInputLarge');
 goog.require('Blockly.FieldVariable');
 goog.require('Blockly.Flydown');
 goog.require('Blockly.Flyout');

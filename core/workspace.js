@@ -111,6 +111,21 @@ Blockly.Workspace.prototype.removeTopBlock = function(block) {
 };
 
 /**
+ * Is the given block a top block >.
+ * @param {!Blockly.Block} block Block to test against
+ */
+Blockly.Workspace.prototype.isTopBlock = function(block) {
+  for (var child, i = 0; child = this.topBlocks_[i]; i++) {
+    if (child == block) {
+      return true;
+    }
+  }
+  return false;
+};
+
+
+
+/**
  * Finds the top-level blocks and returns them.  Blocks are optionally sorted
  * by position; top to bottom (with slight LTR or RTL bias).
  * @param {boolean} ordered Sort the list if true.
