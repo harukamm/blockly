@@ -1322,6 +1322,7 @@ Blockly.BlockSvg.prototype.setWarningText = function(text, opt_id) {
       changedState = true;
     }
     this.warning.setText(/** @type {string} */ (text), id);
+    this.warning.setVisible(true);
   } else {
     // Dispose all warnings if no id is given.
     if (this.warning && !id) {
