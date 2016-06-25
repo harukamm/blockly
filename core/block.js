@@ -1261,6 +1261,20 @@ Blockly.Block.prototype.getInput = function(name) {
   return null;
 };
 
+Blockly.Block.prototype.allInputsConnected = function(){
+  for (var i = 0, input; input = this.inputList[i]; i++) {
+    if(!input.name)
+      continue;
+    if(input.name=='')
+      continue;
+    if (!input.connection.targetBlock()) {
+      return false;
+    }
+  }
+  return true;
+
+};
+
 /**
  * Fetches the block attached to the named input.
  * @param {string} name The name of the input.
