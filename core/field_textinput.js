@@ -304,10 +304,10 @@ Blockly.FieldTextInput.numberValidator = function(text) {
   text = String(text);
   // TODO: Handle cases like 'ten', '1.203,14', etc.
   // 'O' is sometimes mistaken for '0' by inexperienced users.
-  text = text.replace(/O/ig, '0');
+  //text = text.replace(/O/ig, '0');
   // Strip out thousands separators.
-  text = text.replace(/,/g, '');
-  var n = parseFloat(text || 0);
+  //text = text.replace(/,/g, '');
+  var n = Number(text);
   return isNaN(n) ? null : String(n);
 };
 
