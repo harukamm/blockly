@@ -690,10 +690,28 @@ Blockly.Flyout.prototype.createBlockFunc_ = function(originBlock) {
 Blockly.Flyout.prototype.filterForCapacity_ = function() {
   var remainingCapacity = this.targetWorkspace_.remainingCapacity();
   var blocks = this.workspace_.getTopBlocks(false);
+
   for (var i = 0, block; block = blocks[i]; i++) {
     if (this.permanentlyDisabled_.indexOf(block) == -1) {
       var allBlocks = block.getDescendants();
       block.setDisabled(allBlocks.length > remainingCapacity);
+    }
+  }
+
+  var workspaceBlocks = Blockly.getMainWorkspace().getTopBlocks(false);
+  var programBlocks = 0;
+  var programBlockList = ["logic_negate", "cwDrawingOf"];
+  for(var j = 0, blockW; blockW = workspaceBlocks[j]; j++)
+  {
+    if(programBlockList.indexOf(blockW.type) > -1)
+      programBlocks += 1;
+  }
+  if(programBlocks > 0)
+  {
+    for (var i = 0, block; block = blocks[i]; i++) {
+
+      if(programBlockList.indexOf(block.type) > -1)
+        block.setDisabled(true);
     }
   }
 };
