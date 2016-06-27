@@ -245,7 +245,7 @@ Blockly.Events.getDescendantIds_ = function(block) {
  * @constructor
  */
 Blockly.Events.Abstract = function(block) {
-  if (block && block.workspace) {
+  if (block) {
     this.blockId = block.id;
     this.workspaceId = block.workspace.id;
   }
