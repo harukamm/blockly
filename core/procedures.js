@@ -135,6 +135,13 @@ Blockly.Procedures.isLegalName = function(name, workspace, opt_exclude) {
  * @this {!Blockly.Field}
  */
 Blockly.Procedures.rename = function(text) {
+  
+  if(/[^a-z_]/.test( text[0] ) )
+    return null; // functions may not start with non-alpha numeric chars
+
+  if(/[^a-zA-Z0-9_]/.test( text ) )
+    return null;
+
   // Strip leading and trailing whitespace.  Beyond this, all names are legal.
   text = text.replace(/^[\s\xa0]+|[\s\xa0]+$/g, '');
 
