@@ -119,6 +119,26 @@ Blockly.Blocks['numNumber'] = {
   }
 };
 
+// TODO, moves these to Haskell
+Blockly.Blocks['numNumberPerc'] = {
+  /**
+   * Block for numeric value.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.MATH_NUMBER_HELPURL);
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldTextInput('0',
+        Blockly.FieldTextInput.numberValidator), 'NUMBER')
+        .appendField('%');
+    this.setOutput(true, 'Number');
+    // Sorin
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
+    this.setTooltip(Blockly.Msg.MATH_NUMBER_TOOLTIP);
+  }
+};
+
 /* should go in blocks/math.js */ 
 Blockly.Blocks['math_arithmetic_typed'] = {
   /**
