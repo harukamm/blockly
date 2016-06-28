@@ -4,7 +4,15 @@
   <meta charset="utf-8">
   <title>Blockly Demo: Fixed Blockly</title>
   <script type="text/javascript" src="../../blockly_uncompressed.js"></script>
-  <script type="text/javascript" src="../../blocks_compressed.js"></script>
+  <script src="../../blocks/logic.js"></script>
+  <script src="../../blocks/loops.js"></script>
+  <script src="../../blocks/math.js"></script>
+  <script src="../../blocks/text.js"></script>
+  <script src="../../blocks/lists.js"></script>
+  <script src="../../blocks/colour.js"></script>
+  <script src="../../blocks/typed-blocks.js"></script>
+  <script src="../../blocks/variables.js"></script>
+  <script src="../../blocks/procedures.js"></script>
   <script type="text/javascript" src="../../msg/js/en.js"></script>
   <style>
     body {
@@ -30,7 +38,7 @@
       <block type="lists_create_with_typed"></block>
     </category>
     <category name="Math">
-      <block type="math_number_typed"></block>
+      <block type="numNumber"></block>
       <block type="math_arithmetic_typed"></block>
     </category>
     <category name="Pairs">
@@ -42,6 +50,7 @@
       <block type="lambda_typed"></block>
       <block type="lambda_app_typed"></block>
     </category>
+    <category name="Definitions" custom="PROCEDURE"></category>
     <category name="Variables">
       <block type="variables_get_typed"></block>
     </category>

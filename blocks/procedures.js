@@ -471,12 +471,39 @@ Blockly.Blocks['procedures_letVar'] = {
     {
       // Disconnect old block, make polymorphic
       var callers = Blockly.Procedures.getCallers(name, workspace);
+      var tp = defBlock.getInput("RETURN").connection.getTypeExpr();
 
       callers.forEach(function(block)
       {
-        if(block.outputConnection.isConnected())
-          return; // Only change type if it is disconnected
+        if(block.outputConnection && block.outputConnection.isConnected())
+        {
+          var targetBlock = block.outputConnection.targetBlock();
+          var targetConnection = block.outputConnection.targetConnection;
 
+          block.outputConnection.disconnect();
+          block.setOutput(true);
+          block.setColour(Blockly.Blocks.procedures.HUE);
+
+          
+          block.setOutputTypeExpr(tp);
+          block.setColourByType(tp);
+          if(block.outputConnection.typeExpr)
+            block.outputConnection.typeExpr.unify(tp);
+
+          block.outputConnection.connect(targetConnection);
+
+
+          // We're working over here
+          // block.setOutputTypeExpr(tp);
+          // block.setColourByType(tp);
+          // if(block.outputConnection.typeExpr)
+          //   block.outputConnection.typeExpr.unify(tp);
+
+          block.render();
+
+          return; // Only change type if it is disconnected
+        }
+        // Unconnected
         if(block.outputConnection)
         {
           // block.outputConnection.disconnect();
@@ -485,6 +512,11 @@ Blockly.Blocks['procedures_letVar'] = {
         block.outputConnection = null;
         block.setOutput(true);
         block.setColour(Blockly.Blocks.procedures.HUE);
+
+        block.setOutputTypeExpr(tp);
+        if(block.outputConnection.typeExpr)
+          block.outputConnection.typeExpr.unify(tp);
+
         block.render();
       });
     }
