@@ -90,6 +90,8 @@ Blockly.Procedures.findLegalName = function(name, block) {
     // Flyouts can have multiple procedures called 'do something'.
     return name;
   }
+  if(block.getFieldValue('NAME') == name) // No change necessary if name is the same
+    return name;
   while (!Blockly.Procedures.isLegalName(name, block.workspace, block)) {
     // Collision with another procedure.
     var r = name.match(/^(.*?)(\d+)$/);
@@ -135,7 +137,7 @@ Blockly.Procedures.isLegalName = function(name, workspace, opt_exclude) {
  * @this {!Blockly.Field}
  */
 Blockly.Procedures.rename = function(text) {
-  
+
   if(/[^a-z_]/.test( text[0] ) )
     return null; // functions may not start with non-alpha numeric chars
 
@@ -154,6 +156,7 @@ Blockly.Procedures.rename = function(text) {
       blocks[i].renameProcedure(this.text_, text);
     }
   }
+
   return text;
 };
 
@@ -248,6 +251,7 @@ Blockly.Procedures.getCallers = function(name, workspace) {
  */
 Blockly.Procedures.disposeCallers = function(name, workspace) {
   var callers = Blockly.Procedures.getCallers(name, workspace);
+
   for (var i = 0; i < callers.length; i++) {
     callers[i].dispose(true, false);
   }

@@ -22,7 +22,8 @@
  * @fileoverview Procedure blocks for Blockly.
  * @author fraser@google.com (Neil Fraser)
  */
-'use strict';
+
+// 'use strict';
 
 goog.provide('Blockly.Blocks.procedures');
 
@@ -249,9 +250,10 @@ Blockly.Blocks['procedures_defnoreturn'] = {
    * Dispose of any callers.
    * @this Blockly.Block
    */
-  dispose: function() {
+  dispose: function Dispose() {
     var name = this.getFieldValue('NAME');
-    Blockly.Procedures.disposeCallers(name, this.workspace);
+    if(arguments.length > 0)
+      Blockly.Procedures.disposeCallers(name, this.workspace);
     // Call parent's destructor.
     this.constructor.prototype.dispose.apply(this, arguments);
   },
@@ -413,8 +415,10 @@ Blockly.Blocks['procedures_letVar'] = {
     this.setColour(Blockly.Blocks.procedures.HUE);
     this.setTooltip(Blockly.Msg.PROCEDURES_DEFRETURN_TOOLTIP);
     this.arguments_ = [];
+    // this.setStatements_(false);
     this.statementConnection_ = null;
   },
+  // setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
   validate: Blockly.Blocks['procedures_defnoreturn'].validate,
   updateParams_: Blockly.Blocks['procedures_defnoreturn'].updateParams_,
   mutationToDom: Blockly.Blocks['procedures_defnoreturn'].mutationToDom,
@@ -422,6 +426,69 @@ Blockly.Blocks['procedures_letVar'] = {
   decompose: Blockly.Blocks['procedures_defnoreturn'].decompose,
   compose: Blockly.Blocks['procedures_defnoreturn'].compose,
   dispose: Blockly.Blocks['procedures_defnoreturn'].dispose,
+
+
+  onchange: function(changeEvent) {
+    var name = this.getFieldValue('NAME');
+    var defBlock = this;
+    var workspace = Blockly.getMainWorkspace();
+    var eventBlock = workspace.getBlockById(changeEvent.blockId);
+    if(!eventBlock || eventBlock.blockId != this.blockId)
+      return; // Only care about events on the parent this block
+
+    var parentBlock = null;
+    if(changeEvent.oldParentId)
+      parentBlock = workspace.getBlockById(changeEvent.oldParentId);
+    else if(changeEvent.newParentId)
+      parentBlock = workspace.getBlockById(changeEvent.newParentId);
+
+    if(!parentBlock || parentBlock.type != 'procedures_letVar')
+      return; 
+
+    if(changeEvent.type == Blockly.Events.MOVE && changeEvent.newInputName)
+    {
+      // Plug in new block
+      var callers = Blockly.Procedures.getCallers(name, workspace);
+      var tp = defBlock.getInput("RETURN").connection.getTypeExpr();
+      callers.forEach(function(block)
+          {
+            if(block.outputConnection.typeExpr.name != tp.name)
+            {
+              // block.outputConnection.bumpAwayFrom_(block.outputConnection.targetConnection);
+              block.unplug();
+              block.moveBy(-20,-20);
+
+              block.setOutputTypeExpr(tp);
+              block.setColourByType(tp);
+              if(block.outputConnection.typeExpr)
+                block.outputConnection.typeExpr.unify(tp);
+
+              block.render();
+            }
+          });
+    }
+    if(changeEvent.type == Blockly.Events.MOVE && changeEvent.oldInputName)
+    {
+      // Disconnect old block, make polymorphic
+      var callers = Blockly.Procedures.getCallers(name, workspace);
+
+      callers.forEach(function(block)
+      {
+        if(block.outputConnection.isConnected())
+          return; // Only change type if it is disconnected
+
+        if(block.outputConnection)
+        {
+          // block.outputConnection.disconnect();
+          block.outputConnection.dispose();
+        }
+        block.outputConnection = null;
+        block.setOutput(true);
+        block.setColour(Blockly.Blocks.procedures.HUE);
+        block.render();
+      });
+    }
+  },
   /**
    * Return the signature of this procedure definition.
    * @return {!Array} Tuple containing three elements:
@@ -434,7 +501,7 @@ Blockly.Blocks['procedures_letVar'] = {
     return [this.getFieldValue('NAME'), this.arguments_, true];
   },
   getVars: Blockly.Blocks['procedures_defnoreturn'].getVars,
-  renameVar: Blockly.Blocks['procedures_defnoreturn'].renameVar,
+  renameVar: function(a,b){},
   customContextMenu: Blockly.Blocks['procedures_defnoreturn'].customContextMenu,
   callType_: 'procedures_callreturn'
 };
@@ -559,7 +626,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       this.quarkIds_ = null;
     }
 
-
+    // StefanJ
     // Set the type to that of the defining block
     if (defBlock)
     {
@@ -568,7 +635,8 @@ Blockly.Blocks['procedures_callnoreturn'] = {
         var tp = defBlock.getInput("RETURN").connection.getTypeExpr();
         this.setOutputTypeExpr(tp);
         this.setColourByType(tp);
-        this.outputConnection.typeExpr.unify(tp);
+        if(this.outputConnection.typeExpr)
+          this.outputConnection.typeExpr.unify(tp);
       }
     }
 
@@ -752,7 +820,6 @@ Blockly.Blocks['procedures_callreturn'] = {
    * @this Blockly.Block
    */
 
-  
   init: function() {
     this.appendDummyInput('TOPROW')
         .appendField('', 'NAME');
