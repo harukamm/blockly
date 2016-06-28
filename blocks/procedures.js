@@ -23,7 +23,7 @@
  * @author fraser@google.com (Neil Fraser)
  */
 
-// 'use strict';
+'use strict';
 
 goog.provide('Blockly.Blocks.procedures');
 
