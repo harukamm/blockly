@@ -664,11 +664,16 @@ Blockly.Blocks['procedures_callnoreturn'] = {
     {
       if (defBlock.type == "procedures_letVar")
       {
-        var tp = defBlock.getInput("RETURN").connection.getTypeExpr();
+
+        var defBlockMain = Blockly.Procedures.getDefinition(this.getProcedureCall(),
+          Blockly.getMainWorkspace()); // The definition block on the main workspace
+
+        var tp = defBlockMain.getInput("RETURN").connection.getTypeExpr();
         this.setOutputTypeExpr(tp);
         this.setColourByType(tp);
         if(this.outputConnection.typeExpr)
           this.outputConnection.typeExpr.unify(tp);
+        this.render();
       }
     }
 
