@@ -660,14 +660,13 @@ Blockly.Blocks['procedures_callnoreturn'] = {
 
     // StefanJ
     // Set the type to that of the defining block
-    if (defBlock)
-    {
-      if (defBlock.type == "procedures_letVar")
-      {
 
-        var defBlockMain = Blockly.Procedures.getDefinition(this.getProcedureCall(),
+    var defBlockMain = Blockly.Procedures.getDefinition(this.getProcedureCall(),
           Blockly.getMainWorkspace()); // The definition block on the main workspace
-
+    if (defBlockMain)
+    {
+      if (defBlockMain.type == "procedures_letVar")
+      {
         var tp = defBlockMain.getInput("RETURN").connection.getTypeExpr();
         this.setOutputTypeExpr(tp);
         this.setColourByType(tp);
