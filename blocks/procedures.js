@@ -401,10 +401,13 @@ Blockly.Blocks['procedures_letVar'] = {
    * @this Blockly.Block
    */
   init: function() {
+    var thisBlock = this;
     var A = Blockly.TypeVar.getUnusedTypeVar();
     var nameField = new Blockly.FieldTextInput(
-        "foo",
-        Blockly.Procedures.rename);
+        "foo"
+        ,function(t){ if(thisBlock != this.sourceBlock_)return;
+          //console.log('f for ' + thisBlock.getFieldValue('NAME') + ' to ' + t); 
+        });
     nameField.setSpellcheck(false);
     this.appendDummyInput()
         .appendField('Let')
@@ -654,6 +657,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
     //     Existing param IDs.
     // Note that quarkConnections_ may include IDs that no longer exist, but
     // which might reappear if a param is reattached in the mutator.
+
     var defBlock = Blockly.Procedures.getDefinition(this.getProcedureCall(),
         Blockly.getMainWorkspace());
     var mutatorOpen = defBlock && defBlock.mutator &&
