@@ -445,6 +445,9 @@ Blockly.Blocks['procedures_letVar'] = {
     if(!parentBlock || parentBlock.type != 'procedures_letVar')
       return; 
 
+    if(parentBlock.getFieldValue('NAME') != name)
+      return; // Only event when parentblock is this block
+
     if(changeEvent.type == Blockly.Events.MOVE && changeEvent.newInputName)
     {
       // Plug in new block
@@ -452,18 +455,21 @@ Blockly.Blocks['procedures_letVar'] = {
       var tp = defBlock.getInput("RETURN").connection.getTypeExpr();
       callers.forEach(function(block)
           {
-            if(block.outputConnection.typeExpr.name != tp.name)
+            if(block.getProcedureCall() == name)
             {
-              // block.outputConnection.bumpAwayFrom_(block.outputConnection.targetConnection);
-              block.unplug();
-              block.moveBy(-20,-20);
+              if(block.outputConnection.typeExpr.name != tp.name)
+              {
+                // block.outputConnection.bumpAwayFrom_(block.outputConnection.targetConnection);
+                block.unplug();
+                block.moveBy(-20,-20);
 
-              block.setOutputTypeExpr(tp);
-              block.setColourByType(tp);
-              if(block.outputConnection.typeExpr)
-                block.outputConnection.typeExpr.unify(tp);
+                block.setOutputTypeExpr(tp);
+                block.setColourByType(tp);
+                if(block.outputConnection.typeExpr)
+                  block.outputConnection.typeExpr.unify(tp);
 
-              block.render();
+                block.render();
+              }
             }
           });
     }
@@ -475,7 +481,7 @@ Blockly.Blocks['procedures_letVar'] = {
 
       callers.forEach(function(block)
       {
-        if(block.outputConnection && block.outputConnection.isConnected())
+        if(block.outputConnection && block.outputConnection.isConnected() && block.getProcedure() == name)
         {
           var targetBlock = block.outputConnection.targetBlock();
           var targetConnection = block.outputConnection.targetConnection;
@@ -501,10 +507,9 @@ Blockly.Blocks['procedures_letVar'] = {
 
           block.render();
 
-          return; // Only change type if it is disconnected
+          // return; // Only change type if it is disconnected
         }
-        // Unconnected
-        if(block.outputConnection)
+        else if(block.outputConnection)
         {
           // block.outputConnection.disconnect();
           block.outputConnection.dispose();
@@ -650,7 +655,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
     // Note that quarkConnections_ may include IDs that no longer exist, but
     // which might reappear if a param is reattached in the mutator.
     var defBlock = Blockly.Procedures.getDefinition(this.getProcedureCall(),
-        this.workspace);
+        Blockly.getMainWorkspace());
     var mutatorOpen = defBlock && defBlock.mutator &&
         defBlock.mutator.isVisible();
     if (!mutatorOpen) {

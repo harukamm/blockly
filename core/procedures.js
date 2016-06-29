@@ -90,8 +90,10 @@ Blockly.Procedures.findLegalName = function(name, block) {
     // Flyouts can have multiple procedures called 'do something'.
     return name;
   }
+
   if(block.getFieldValue('NAME') == name) // No change necessary if name is the same
     return name;
+
   while (!Blockly.Procedures.isLegalName(name, block.workspace, block)) {
     // Collision with another procedure.
     var r = name.match(/^(.*?)(\d+)$/);
@@ -144,11 +146,26 @@ Blockly.Procedures.rename = function(text) {
   if(/[^a-zA-Z0-9_]/.test( text ) )
     return null;
 
+  if(!this.sourceBlock_.workspace)
+    return null;
+
+  // TODO, remove this to rename all callers
+  return;
+
+  console.log('renameProc for ' + this.sourceBlock_.getFieldValue('NAME'));
+  console.log(this.sourceBlock_.workspace);
+//  if(this.sourceBlock_.getFieldValue('NAME') == 'foo')
+    console.log(this.sourceBlock_);
+
   // Strip leading and trailing whitespace.  Beyond this, all names are legal.
   text = text.replace(/^[\s\xa0]+|[\s\xa0]+$/g, '');
 
   // Ensure two identically-named procedures don't exist.
   text = Blockly.Procedures.findLegalName(text, this.sourceBlock_);
+
+  console.log('new name: ' + text);
+  console.log('');
+
   // Rename any callers.
   var blocks = this.sourceBlock_.workspace.getAllBlocks();
   for (var i = 0; i < blocks.length; i++) {
