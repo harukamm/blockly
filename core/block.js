@@ -856,8 +856,10 @@ Blockly.Block.prototype.getInputsInline = function() {
  */
 Blockly.Block.prototype.setDisabled = function(disabled) {
   if (this.disabled != disabled) {
-    Blockly.Events.fire(new Blockly.Events.Change(
-        this, 'disabled', null, this.disabled, disabled));
+// Stefan
+// Dont fire disabled event, we disable blocks automatically, disallow undo
+//    Blockly.Events.fire(new Blockly.Events.Change(
+//        this, 'disabled', null, this.disabled, disabled));
     this.disabled = disabled;
   }
 };
