@@ -293,5 +293,5 @@ Blockly.Trashcan.prototype.click = function() {
   if (Math.sqrt(dx * dx + dy * dy) > Blockly.DRAG_RADIUS) {
     return;
   }
-  console.log('TODO: Inspect trash.');
+  // console.log('TODO: Inspect trash.');
 };
