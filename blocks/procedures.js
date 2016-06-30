@@ -485,7 +485,7 @@ Blockly.Blocks['procedures_letVar'] = {
 
       callers.forEach(function(block)
       {
-        if(block.outputConnection && block.outputConnection.isConnected() && block.getProcedure() == name)
+        if(block.outputConnection && block.outputConnection.isConnected() && block.getProcedureCall() == name)
         {
           var targetBlock = block.outputConnection.targetBlock();
           var targetConnection = block.outputConnection.targetConnection;
@@ -493,7 +493,6 @@ Blockly.Blocks['procedures_letVar'] = {
           block.outputConnection.disconnect();
           block.setOutput(true);
           block.setColour(Blockly.Blocks.procedures.HUE);
-
           
           block.setOutputTypeExpr(tp);
           block.setColourByType(tp);
