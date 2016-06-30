@@ -312,6 +312,7 @@ Blockly.Blocks['procedures_defnoreturn'] = {
    */
   customContextMenu: function(options) {
     // Add option to create caller.
+    
     var option = {enabled: true};
     var name = this.getFieldValue('NAME');
     option.text = Blockly.Msg.PROCEDURES_CREATE_DO.replace('%1', name);
@@ -542,7 +543,8 @@ Blockly.Blocks['procedures_letVar'] = {
   },
   getVars: Blockly.Blocks['procedures_defnoreturn'].getVars,
   renameVar: function(a,b){},
-  customContextMenu: Blockly.Blocks['procedures_defnoreturn'].customContextMenu,
+  customContextMenu: function(o){},
+    // Blockly.Blocks['procedures_defnoreturn'].customContextMenu,
   callType_: 'procedures_callreturn'
 };
 
