@@ -322,7 +322,7 @@ Blockly.Blocks['pair_create_typed'] = {
     var B = Blockly.TypeVar.getUnusedTypeVar();
     this.appendValueInput('FIRST')
         .setTypeExpr(A)
-        .appendField("create pair with");
+        .appendField(new Blockly.FieldLabel("Pair","blocklyTextEmph") );
     this.appendValueInput('SECOND')
         .setTypeExpr(B)
     this.setOutput(true);
@@ -341,7 +341,7 @@ Blockly.Blocks['pair_first_typed'] = {
     var B = Blockly.TypeVar.getUnusedTypeVar();
     this.appendValueInput('PAIR')
         .setTypeExpr(new Blockly.TypeExpr ("pair", [A, B]))
-        .appendField("get 1st elmt of pair");
+        .appendField(new Blockly.FieldLabel("fst","blocklyTextEmph") );
     this.setOutput(true);
     this.setOutputTypeExpr(A);
   }
@@ -358,7 +358,7 @@ Blockly.Blocks['pair_second_typed'] = {
     var B = Blockly.TypeVar.getUnusedTypeVar();
     this.appendValueInput('PAIR')
         .setTypeExpr(new Blockly.TypeExpr ("pair", [A, B]))
-        .appendField("get 2nd elmt of pair");
+        .appendField(new Blockly.FieldLabel("snd","blocklyTextEmph") );
     this.setOutput(true);
     this.setOutputTypeExpr(B);
   }
