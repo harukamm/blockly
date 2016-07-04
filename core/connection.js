@@ -222,6 +222,7 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
     event = new Blockly.Events.Move(childBlock);
   }
   // Stefan  
+  // Sorin
   /* Unify type expressions */
   var unifyResult;
   if (parentConnection.typeExpr && childConnection.typeExpr) {
@@ -391,6 +392,7 @@ Blockly.Connection.prototype.canConnectWithReason_ = function(target) {
   } else if (blockA && blockB && blockA.workspace !== blockB.workspace) {
     return Blockly.Connection.REASON_DIFFERENT_WORKSPACES;
   } else if (!this.checkType_(target)) {
+    
     return Blockly.Connection.REASON_CHECKS_FAILED;
   } else if (blockA.isShadow() && !blockB.isShadow()) {
     return Blockly.Connection.REASON_SHADOW_PARENT;
@@ -686,15 +688,23 @@ Blockly.Connection.prototype.targetBlock = function() {
 Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   // Stefan
   /* Check if polymorphic types match */
+
+  
+
+  var isStatement = otherConnection.type == Blockly.NEXT_STATEMENT || otherConnection.type == Blockly.PREVIOUS_CONNECTION;
+  if(isStatement)
+    return true; // Stefan, Temp Fix
+
   var unifyResult = true;
   if (this.typeExpr && otherConnection.typeExpr) {
     unifyResult = this.typeExpr.unify(otherConnection.typeExpr);
   }
+  // STEFAN, TODO CHANGE IF TYPES DONT MATCH ANYMORE
   else if (!this.typeExpr && otherConnection.typeExpr) {
-    return false;
+    // return false;
   }
   else if (this.typeExpr && !otherConnection.typeExpr) {
-    return false;
+    // return false;
   }
 
   if (!this.check_ || !otherConnection.check_) {

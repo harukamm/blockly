@@ -1417,7 +1417,7 @@ Blockly.Block.copyConnectionTypesR_ = function(dest, source, subst, keepVars) {
   for (var i = 0, destInput; destInput = dest.inputList[i]; i++) {
     var sourceInput = source.getInput( destInput.name );
     if( sourceInput ) { 
-      if( sourceInput.connection ) {  // connection will be null for dummy inputs
+      if( sourceInput.connection && sourceInput.connection.typeExpr && destInput.connection.typeExpr) {  // connection will be null for dummy inputs
 //        console.log( "copyConnectionTypes_: sourceInput.connection for connection '" + destInput.name + "' is OK", sourceInput );
         
         // If both are type variables, keep the existing type variable and add a substitution rule

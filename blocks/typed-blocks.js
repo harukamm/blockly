@@ -257,11 +257,12 @@ Blockly.Blocks['lists_create_with_typed'] = {
    */
   decompose: function(workspace) {
     var containerBlock =
-        Blockly.Block.obtain(workspace, 'lists_create_with_container');
+        workspace.newBlock('lists_create_with_container');
     containerBlock.initSvg();
     var connection = containerBlock.getInput('STACK').connection;
     for (var x = 0; x < this.itemCount_; x++) {
-      var itemBlock = Blockly.Block.obtain(workspace, 'lists_create_with_item');
+      var itemBlock = workspace.newBlock('lists_create_with_item');
+      // TODO
       itemBlock.initSvg();
       connection.connect(itemBlock.previousConnection);
       connection = itemBlock.nextConnection;
@@ -303,6 +304,7 @@ Blockly.Blocks['lists_create_with_typed'] = {
       this.appendDummyInput('EMPTY')
           .appendField(Blockly.Msg.LISTS_CREATE_EMPTY_TITLE);
     }
+    this.renderMoveConnections_();
   },
   /**
    * Store pointers to any connected child blocks.

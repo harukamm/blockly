@@ -312,9 +312,6 @@ Blockly.RenderedConnection.prototype.isConnectionAllowed = function(candidate,
     return false;
   }
 
-
-
-
   return Blockly.RenderedConnection.superClass_.isConnectionAllowed.call(this,
       candidate);
 };
@@ -407,6 +404,7 @@ Blockly.RenderedConnection.prototype.connect_ = function(childConnection) {
 };
 
 // Stefan
+// Sorin
 Blockly.Connection.prototype.renderTypeVarHighlights = function() {
   if (this.typeVarPaths_) {
     for (var i = 0; i < this.typeVarPaths_.length; i++) {

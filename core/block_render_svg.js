@@ -707,6 +707,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
           inlineSteps.push('h', Blockly.BlockSvg.TAB_WIDTH - 2 -
                            input.renderWidth);
           // Stefan
+          // Sorin
           inlineSteps.push(Blockly.BlockSvg.getDownPath(input.connection));
           var tabHeight = Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);
           // inlineSteps.push(Blockly.BlockSvg.TAB_PATH_DOWN);

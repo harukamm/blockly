@@ -86,7 +86,6 @@ goog.addDependency("../../../" + dir + "/core/icon.js", ['Blockly.Icon'], ['goog
 goog.addDependency("../../../" + dir + "/core/connection.js", ['Blockly.Connection'], ['goog.asserts', 'goog.dom']);
 goog.addDependency("../../../" + dir + "/core/connection_db.js", ['Blockly.ConnectionDB'], ['Blockly.Connection']);
 goog.addDependency("../../../" + dir + "/core/warning.js", ['Blockly.Warning'], ['Blockly.Bubble', 'Blockly.Icon']);
-goog.addDependency("../../../" + dir + "/core/flydown.js", ['Blockly.Flydown'], ['Blockly.Flyout', 'Blockly.Block', 'Blockly.Comment']);
 goog.addDependency("../../../" + dir + "/core/xml.js", ['Blockly.Xml'], ['goog.asserts', 'goog.dom']);
 goog.addDependency("../../protractor_spec.js", [], []);
 goog.addDependency("../../protractor.conf.js", [], []);
@@ -1629,7 +1628,6 @@ goog.require('Blockly.FieldLabel');
 goog.require('Blockly.FieldNumber');
 goog.require('Blockly.FieldTextInput');
 goog.require('Blockly.FieldVariable');
-goog.require('Blockly.Flydown');
 goog.require('Blockly.Flyout');
 goog.require('Blockly.Generator');
 goog.require('Blockly.Icon');
