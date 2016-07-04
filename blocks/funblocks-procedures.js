@@ -174,8 +174,99 @@ Blockly.Blocks['procedures_let_callreturn'] = {
   },
   getProcedureCall: Blockly.Blocks['procedures_callnoreturn'].getProcedureCall,
   renameProcedure: Blockly.Blocks['procedures_callnoreturn'].renameProcedure,
-  setProcedureParameters_:
-      Blockly.Blocks['procedures_callnoreturn'].setProcedureParameters_,
+
+  setProcedureParameters_: function(paramNames, paramIds) {
+   var defBlock = Blockly.Procedures.getDefinition(this.getProcedureCall(),
+        this.workspace);
+    var mutatorOpen = defBlock && defBlock.mutator &&
+        defBlock.mutator.isVisible();
+    if (!mutatorOpen) {
+      this.quarkConnections_ = {};
+      this.quarkIds_ = null;
+    }
+
+    // StefanJ
+    // Set the type to that of the defining block
+    if (defBlock)
+    {
+      if (defBlock.type == "procedures_letVar")
+      {
+
+        var defBlockMain = Blockly.Procedures.getDefinition(this.getProcedureCall(),
+          Blockly.getMainWorkspace()); // The definition block on the main workspace
+
+        var tp = defBlockMain.getInput("RETURN").connection.getTypeExpr();
+        this.setOutputTypeExpr(tp);
+        this.setColourByType(tp);
+        if(this.outputConnection.typeExpr)
+          this.outputConnection.typeExpr.unify(tp);
+        this.render();
+      }
+    }
+
+    if (!paramIds) {
+      return;
+    }
+    if (goog.array.equals(this.arguments_, paramNames)) {
+      this.quarkIds_ = paramIds;
+      return;
+    }
+    if (paramIds.length != paramNames.length) {
+      throw 'Error: paramNames and paramIds must be the same length.';
+    }
+    this.setCollapsed(false);
+    if (!this.quarkIds_) {
+      // Initialize tracking for this block.
+      this.quarkConnections_ = {};
+      if (paramNames.join('\n') == this.arguments_.join('\n')) {
+        // No change to the parameters, allow quarkConnections_ to be
+        // populated with the existing connections.
+        this.quarkIds_ = paramIds;
+      } else {
+        this.quarkIds_ = [];
+      }
+    }
+    // Switch off rendering while the block is rebuilt.
+    var savedRendered = this.rendered;
+    this.rendered = false;
+    // Update the quarkConnections_ with existing connections.
+    for (var i = 0; i < this.arguments_.length; i++) {
+      var input = this.getInput('ARG' + i);
+      if (input) {
+        var connection = input.connection.targetConnection;
+        this.quarkConnections_[this.quarkIds_[i]] = connection;
+        if (mutatorOpen && connection &&
+            paramIds.indexOf(this.quarkIds_[i]) == -1) {
+          // This connection should no longer be attached to this block.
+          connection.disconnect();
+          connection.getSourceBlock().bumpNeighbours_();
+        }
+      }
+    }
+    // Rebuild the block's arguments.
+    this.arguments_ = [].concat(paramNames);
+    this.updateShape_();
+    this.quarkIds_ = paramIds;
+    // Reconnect any child blocks.
+    if (this.quarkIds_) {
+      for (var i = 0; i < this.arguments_.length; i++) {
+        var quarkId = this.quarkIds_[i];
+        if (quarkId in this.quarkConnections_) {
+          var connection = this.quarkConnections_[quarkId];
+          if (!Blockly.Mutator.reconnect(connection, this, 'ARG' + i)) {
+            // Block no longer exists or has been attached elsewhere.
+            delete this.quarkConnections_[quarkId];
+          }
+        }
+      }
+    }
+    // Restore rendering and show the changes.
+    this.rendered = savedRendered;
+    if (this.rendered) {
+      this.render();
+    }
+  },
+
   updateShape_: Blockly.Blocks['procedures_callnoreturn'].updateShape_,
   mutationToDom: Blockly.Blocks['procedures_callnoreturn'].mutationToDom,
   domToMutation: Blockly.Blocks['procedures_callnoreturn'].domToMutation,

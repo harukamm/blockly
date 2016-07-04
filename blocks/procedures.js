@@ -512,6 +512,28 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       this.quarkConnections_ = {};
       this.quarkIds_ = null;
     }
+
+     // StefanJ
+    // Set the type to that of the defining block
+    var defBlockMain = Blockly.Procedures.getDefinition(this.getProcedureCall(),
+          Blockly.getMainWorkspace()); 
+
+    console.log('setProcParams');
+    if (defBlockMain)
+    {
+      console.log(defBlockMain.type);
+      if (defBlockMain.type == "procedures_letVar")
+      {
+        console.log('stefan');
+                var tp = defBlockMain.getInput("RETURN").connection.getTypeExpr();
+        this.setOutputTypeExpr(tp);
+        this.setColourByType(tp);
+        if(this.outputConnection.typeExpr)
+          this.outputConnection.typeExpr.unify(tp);
+        this.render();
+      }
+    }
+
     if (!paramIds) {
       // Reset the quarks (a mutator is about to open).
       return;
