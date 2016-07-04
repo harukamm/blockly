@@ -26,8 +26,7 @@
 
 goog.provide('Blockly.Variables');
 
-// TODO(scr): Fix circular dependencies
-// goog.require('Blockly.Block');
+goog.require('Blockly.Blocks');
 goog.require('Blockly.Workspace');
 goog.require('goog.string');
 
@@ -38,23 +37,18 @@ goog.require('goog.string');
 Blockly.Variables.NAME_TYPE = 'VARIABLE';
 
 /**
- * Find all user-created variables, optionally of specified type.
+ * Find all user-created variables.
  * @param {!Blockly.Block|!Blockly.Workspace} root Root block or workspace.
- * @param {string=} type Type of variables to return. If non-null, returns
- *    all variables of given type. If null, returns all variables of any type.
  * @return {!Array.<string>} Array of variable names.
  */
-Blockly.Variables.allVariables = function(root, type) {
+Blockly.Variables.allVariables = function(root) {
   var blocks;
-  var workspace;
   if (root.getDescendants) {
     // Root is Block.
     blocks = root.getDescendants();
-    workspace = root.workspace;
   } else if (root.getAllBlocks) {
     // Root is Workspace.
     blocks = root.getAllBlocks();
-    workspace = root;
   } else {
     throw 'Not Block or Workspace: ' + root;
   }
@@ -63,45 +57,10 @@ Blockly.Variables.allVariables = function(root, type) {
   for (var x = 0; x < blocks.length; x++) {
     var blockVariables = blocks[x].getVars();
     for (var y = 0; y < blockVariables.length; y++) {
-      if( blockVariables[y] instanceof String ) {
-        /* Variable is untyped */
-        if( !type ) {
-          var varName = blockVariables[y];
-          // Variable name may be null if the block is only half-built.
-          if (varName ) {
-            variableHash[varName.toLowerCase()] = varName;
-          }            
-        }
-      } else if( blockVariables[y] instanceof Array ) {
-        /* Variable is typed - blockVariables[y] is an array [name, type] */
-        var varName = blockVariables[y][0];
-        var varType = blockVariables[y][1];
-        // Variable name may be null if the block is only half-built.
-        if (varName && (!type || (type == varType))) {
-          variableHash[varName.toLowerCase()] = varName;
-        }
-      }
-    }
-  }
-  // Add predefined global variables
-  if( workspace.globalVariables ) {
-    for (var y = 0; y < workspace.globalVariables.length; y++) {
-      if( workspace.globalVariables[y] instanceof String ) {
-        /* Variable is untyped */
-        if( !type ) {
-          var varName = workspace.globalVariables[y];
-          if (varName ) {
-            variableHash[varName.toLowerCase()] = varName;
-          }            
-        }
-      } else if( workspace.globalVariables[y] instanceof Array ) {
-        /* Variable is typed - workspace.globalVariables[y] is an array [name, type] */
-        var varName = workspace.globalVariables[y][0];
-        var varType = workspace.globalVariables[y][1];
-        // Variable name may be null if the block is only half-built.
-        if (varName && (!type || (type == varType))) {
-          variableHash[varName.toLowerCase()] = varName;
-        }
+      var varName = blockVariables[y];
+      // Variable name may be null if the block is only half-built.
+      if (varName) {
+        variableHash[varName.toLowerCase()] = varName;
       }
     }
   }
@@ -112,7 +71,6 @@ Blockly.Variables.allVariables = function(root, type) {
   }
   return variableList;
 };
-
 
 /**
  * Find all instances of the specified variable and rename them.

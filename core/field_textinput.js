@@ -40,14 +40,12 @@ goog.require('goog.userAgent');
  *     to validate any constraints on what the user entered.  Takes the new
  *     text as an argument and returns either the accepted text, a replacement
  *     text, or null to abort the change.
- * @param {number=} opt_maxlength Maximum number of characters permitted as input
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldTextInput = function(text, opt_validator, opt_maxlength) {
+Blockly.FieldTextInput = function(text, opt_validator) {
   Blockly.FieldTextInput.superClass_.constructor.call(this, text,
       opt_validator);
-  this.maxLength_ = opt_maxlength;
 };
 goog.inherits(Blockly.FieldTextInput, Blockly.Field);
 
@@ -131,7 +129,6 @@ Blockly.FieldTextInput.prototype.showEditor_ = function(opt_quietInput) {
   // Create the input.
   var htmlInput = goog.dom.createDom('input', 'blocklyHtmlInput');
   htmlInput.setAttribute('spellcheck', this.spellcheck_);
-  if( this.maxLength_ ) htmlInput.setAttribute('maxlength', this.maxLength_ );
   var fontSize =
       (Blockly.FieldTextInput.FONTSIZE * this.workspace_.scale) + 'pt';
   div.style.fontSize = fontSize;
@@ -201,6 +198,7 @@ Blockly.FieldTextInput.prototype.onHtmlInputChange_ = function(e) {
     this.sourceBlock_.render();
   }
   this.resizeEditor_();
+  Blockly.svgResize(this.sourceBlock_.workspace);
 };
 
 /**
@@ -298,16 +296,18 @@ Blockly.FieldTextInput.prototype.widgetDispose_ = function() {
  * @return {?string} A string representing a valid number, or null if invalid.
  */
 Blockly.FieldTextInput.numberValidator = function(text) {
+  console.warn('Blockly.FieldTextInput.numberValidator is deprecated. ' +
+               'Use Blockly.FieldNumber instead.');
   if (text === null) {
     return null;
   }
   text = String(text);
   // TODO: Handle cases like 'ten', '1.203,14', etc.
   // 'O' is sometimes mistaken for '0' by inexperienced users.
-  //text = text.replace(/O/ig, '0');
+  text = text.replace(/O/ig, '0');
   // Strip out thousands separators.
-  //text = text.replace(/,/g, '');
-  var n = Number(text);
+  text = text.replace(/,/g, '');
+  var n = parseFloat(text || 0);
   return isNaN(n) ? null : String(n);
 };
 

@@ -26,11 +26,8 @@
 
 goog.provide('Blockly.Input');
 
-// TODO(scr): Fix circular dependencies
-// goog.require('Blockly.Block');
 goog.require('Blockly.Connection');
 goog.require('Blockly.FieldLabel');
-goog.require('Blockly.TypeExpr');
 goog.require('goog.asserts');
 
 
@@ -48,7 +45,10 @@ Blockly.Input = function(type, name, block, connection) {
   this.type = type;
   /** @type {string} */
   this.name = name;
-  /** @type {!Blockly.Block} */
+  /**
+   * @type {!Blockly.Block}
+   * @private
+   */
   this.sourceBlock_ = block;
   /** @type {Blockly.Connection} */
   this.connection = connection;
@@ -85,8 +85,9 @@ Blockly.Input.prototype.appendField = function(field, opt_name) {
   if (goog.isString(field)) {
     field = new Blockly.FieldLabel(/** @type {string} */ (field));
   }
+  field.setSourceBlock(this.sourceBlock_);
   if (this.sourceBlock_.rendered) {
-    field.init(this.sourceBlock_);
+    field.init();
   }
   field.name = opt_name;
 
@@ -200,14 +201,6 @@ Blockly.Input.prototype.setCheck = function(check) {
   return this;
 };
 
-Blockly.Input.prototype.setTypeExpr = function(t) {
-  if (!this.connection) {
-    throw 'This input does not have a connection.';
-  }
-  this.connection.setTypeExpr(t);
-  return this;
-};
-
 /**
  * Change the alignment of the connection's field(s).
  * @param {number} align One of Blockly.ALIGN_LEFT, ALIGN_CENTRE, ALIGN_RIGHT.
@@ -230,7 +223,7 @@ Blockly.Input.prototype.init = function() {
     return;  // Headless blocks don't need fields initialized.
   }
   for (var x = 0; x < this.fieldRow.length; x++) {
-    this.fieldRow[x].init(this.sourceBlock_);
+    this.fieldRow[x].init();
   }
 };
 
@@ -246,3 +239,14 @@ Blockly.Input.prototype.dispose = function() {
   }
   this.sourceBlock_ = null;
 };
+
+// Stefan
+Blockly.Input.prototype.setTypeExpr = function(t) {
+  if (!this.connection) {
+    throw 'This input does not have a connection.';
+  }
+  this.connection.setTypeExpr(t);
+  return this;
+};
+
+

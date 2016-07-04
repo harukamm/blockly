@@ -118,15 +118,22 @@ Blockly.Field.NBSP = '\u00A0';
 Blockly.Field.prototype.EDITABLE = true;
 
 /**
- * Install this field on a block.
+ * Attach this field to a block.
  * @param {!Blockly.Block} block The block containing this field.
  */
-Blockly.Field.prototype.init = function(block) {
-  if (this.sourceBlock_) {
+Blockly.Field.prototype.setSourceBlock = function(block) {
+  goog.asserts.assert(!this.sourceBlock_, 'Field already bound to a block.');
+  this.sourceBlock_ = block;
+};
+
+/**
+ * Install this field on a block.
+ */
+Blockly.Field.prototype.init = function() {
+  if (this.fieldGroup_) {
     // Field has already been initialized once.
     return;
   }
-  this.sourceBlock_ = block;
   // Build the DOM.
   this.fieldGroup_ = Blockly.createSvgElement('g', {}, null);
   if (!this.visible_) {
@@ -142,18 +149,13 @@ Blockly.Field.prototype.init = function(block) {
   this.textElement_ = Blockly.createSvgElement('text',
       {'class': 'blocklyText', 'y': this.size_.height - 12.5},
       this.fieldGroup_);
-  Blockly.Field.runQueuedCSSActions_.call( this );
 
   this.updateEditable();
-  block.getSvgRoot().appendChild(this.fieldGroup_);
+  this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_);
   this.mouseUpWrapper_ =
       Blockly.bindEvent_(this.fieldGroup_, 'mouseup', this, this.onMouseUp_);
   // Force a render.
   this.updateTextNode_();
-  if (Blockly.Events.isEnabled()) {
-    Blockly.Events.fire(new Blockly.Events.Change(
-        this.sourceBlock_, 'field', this.name, '', this.getValue()));
-  }
 };
 
 /**
@@ -195,47 +197,6 @@ Blockly.Field.prototype.updateEditable = function() {
 };
 
 /**
- * Add a CSS class to the field's SVG element.
- * If the field has not yet been initialised, the action will be queued until initialisation.
- * @param {string} classname CSS class name to add.
- */
-Blockly.Field.prototype.addCSSClass = function(classname) {
-  if( this.fieldGroup_ ) {
-    /* If field has already been initialised then just add the class. */
-    Blockly.addClass_( this.fieldGroup_, classname );
-  } else {
-    /* If field hasn't yet been initialised, then queue the action until init is called. */
-    var t = this;
-    if( !this.queuedCSSAction_ ) this.queuedCSSAction_ = [];
-    this.queuedCSSAction_.push( function(){t.addCSSClass(classname);} );
-  }
-}
-
-/**
- * Remove a CSS class from the field's SVG element.
- * If the field has not yet been initialised, the action will be queued until initialisation.
- * @param {string} classname CSS class name to remove.
- */
-Blockly.Field.prototype.removeCSSClass = function(classname) {
-  if( this.fieldGroup_ ) {
-    Blockly.removeClass_( this.fieldGroup_, classname );
-  } else {
-    var t = this;
-    if( !this.queuedCSSAction_ ) this.queuedCSSAction_ = [];
-    this.queuedCSSAction_.push( function(){t.removeCSSClass(classname);} );
-  }
-}
-
-/**
- * Run any queued add/removeCSSClass calls.
- */
-Blockly.Field.runQueuedCSSActions_ = function() {
-  for( var i in this.queuedCSSAction_ ) this.queuedCSSAction_[i]();
-  this.queuedCSSAction_ = null;
-}
-
-
-/**
  * Gets whether this editable field is visible or not.
  * @return {boolean} True if visible.
  */
@@ -265,6 +226,14 @@ Blockly.Field.prototype.setVisible = function(visible) {
  */
 Blockly.Field.prototype.setValidator = function(handler) {
   this.validator_ = handler;
+};
+
+/**
+ * Gets the validation function for editable fields.
+ * @return {Function} Validation function, or null.
+ */
+Blockly.Field.prototype.getValidator = function() {
+  return this.validator_;
 };
 
 /**
@@ -485,7 +454,7 @@ Blockly.Field.prototype.setTooltip = function(newTip) {
 /**
  * Return the absolute coordinates of the top-left corner of this field.
  * The origin (0,0) is the top-left corner of the page body.
- * @return {{!goog.math.Coordinate}} Object with .x and .y properties.
+ * @return {!goog.math.Coordinate} Object with .x and .y properties.
  * @private
  */
 Blockly.Field.prototype.getAbsoluteXY_ = function() {

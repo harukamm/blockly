@@ -4,17 +4,17 @@
   <meta charset="utf-8">
   <title>Blockly Demo: Toolbox</title>
   <script src="../../blockly_uncompressed.js"></script>
-  <!-- <script src="../../blocks_compressed.js"></script> -->
+  <script src="../../msg/js/en.js"></script>
   <script src="../../blocks/logic.js"></script>
   <script src="../../blocks/loops.js"></script>
   <script src="../../blocks/math.js"></script>
   <script src="../../blocks/text.js"></script>
   <script src="../../blocks/lists.js"></script>
   <script src="../../blocks/colour.js"></script>
-  <script src="../../blocks/typed-blocks.js"></script>
   <script src="../../blocks/variables.js"></script>
   <script src="../../blocks/procedures.js"></script>
-  <script src="../../msg/js/en.js"></script>
+  <script src="../../blocks/typed-blocks.js"></script>
+  <script src="../../blocks/funblocks-procedures.js"></script>
   <style>
     body {
       background-color: #fff;
@@ -32,7 +32,7 @@
 
   <p>This is a demo of a complex category structure for the toolbox.</p>
 
-  <p>&rarr; More info on the <a href="https://developers.google.com/blockly/installation/toolbox">Toolbox</a>&hellip;</p>
+  <p>&rarr; More info on the <a href="https://developers.google.com/blockly/guides/configure/web/toolbox">Toolbox</a>&hellip;</p>
 
   <div id="blocklyDiv" style="height: 600px; width: 800px;"></div>
 
@@ -48,9 +48,12 @@
         </block>
       </category>
       <category name="Boolean">
-        <block type="logic_boolean_typed"></block>
-        <block type="logic_ternary_typed"></block>
-        <block type="logic_compare_typed"></block>
+        <block type="logic_compare"></block>
+        <block type="logic_operation"></block>
+        <block type="logic_negate"></block>
+        <block type="logic_boolean"></block>
+        <block type="logic_null"></block>
+        <block type="logic_ternary"></block>
       </category>
     </category>
     <category name="Loops">
@@ -84,9 +87,47 @@
       <block type="controls_flow_statements"></block>
     </category>
     <category name="Math">
-      <block type="numNumber"></block>
-      <block type="numNumberPerc"></block>
-      <block type="math_arithmetic_typed"></block>
+      <block type="math_number"></block>
+      <block type="math_arithmetic"></block>
+      <block type="math_single"></block>
+      <block type="math_trig"></block>
+      <block type="math_constant"></block>
+      <block type="math_number_property"></block>
+      <block type="math_change">
+        <value name="DELTA">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+      </block>
+      <block type="math_round"></block>
+      <block type="math_on_list"></block>
+      <block type="math_modulo"></block>
+      <block type="math_constrain">
+        <value name="LOW">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="HIGH">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+      </block>
+      <block type="math_random_int">
+        <value name="FROM">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="TO">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+      </block>
+      <block type="math_random_float"></block>
     </category>
     <category name="Lists">
       <block type="lists_create_empty"></block>

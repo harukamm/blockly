@@ -26,8 +26,7 @@
 
 goog.provide('Blockly.Procedures');
 
-// TODO(scr): Fix circular dependencies
-// goog.require('Blockly.Block');
+goog.require('Blockly.Blocks');
 goog.require('Blockly.Field');
 goog.require('Blockly.Names');
 goog.require('Blockly.Workspace');
@@ -64,7 +63,7 @@ Blockly.Procedures.allProcedures = function(root) {
   }
   proceduresNoReturn.sort(Blockly.Procedures.procTupleComparator_);
   proceduresReturn.sort(Blockly.Procedures.procTupleComparator_);
-  return proceduresReturn;
+  return [proceduresNoReturn, proceduresReturn];
 };
 
 /**
@@ -90,10 +89,6 @@ Blockly.Procedures.findLegalName = function(name, block) {
     // Flyouts can have multiple procedures called 'do something'.
     return name;
   }
-
-  //if(block.getFieldValue('NAME') == name) // No change necessary if name is the same
-  //  return name;
-
   while (!Blockly.Procedures.isLegalName(name, block.workspace, block)) {
     // Collision with another procedure.
     var r = name.match(/^(.*?)(\d+)$/);
@@ -140,40 +135,28 @@ Blockly.Procedures.isLegalName = function(name, workspace, opt_exclude) {
  */
 Blockly.Procedures.rename = function(text) {
 
+  // Stefan
+  // Check if names conform to Haskell def requirements
   if(/[^a-z_]/.test( text[0] ) )
     return null; // functions may not start with non-alpha numeric chars
 
   if(/[^a-zA-Z0-9_]/.test( text ) )
     return null;
 
-  var currentName = this.sourceBlock_.getFieldValue("NAME");
-  if(!currentName)
-    return;
-  //if(currentName == text) // Current name is the same, no need to change
-  //  return;
 
-  // TODO, remove this to rename all callers
 
   // Strip leading and trailing whitespace.  Beyond this, all names are legal.
   text = text.replace(/^[\s\xa0]+|[\s\xa0]+$/g, '');
 
   // Ensure two identically-named procedures don't exist.
   text = Blockly.Procedures.findLegalName(text, this.sourceBlock_);
-
   // Rename any callers.
-  //var blocks = this.sourceBlock_.workspace.getAllBlocks();
-  var blocks = Blockly.Procedures.getCallers(currentName, Blockly.getMainWorkspace());
+  var blocks = this.sourceBlock_.workspace.getAllBlocks();
   for (var i = 0; i < blocks.length; i++) {
-    if(!blocks[i].getProcedureCall)
-      continue;
-    var blockName = blocks[i].getProcedureCall();
-    if(blockName != currentName)
-      continue;
     if (blocks[i].renameProcedure) {
       blocks[i].renameProcedure(this.text_, text);
     }
   }
-
   return text;
 };
 
@@ -184,16 +167,29 @@ Blockly.Procedures.rename = function(text) {
  */
 Blockly.Procedures.flyoutCategory = function(workspace) {
   var xmlList = [];
- 
-  /*if (Blockly.Blocks['procedures_defreturn']) {
+  // Stefan
+  // Disable all procedures except let
+  if (Blockly.Blocks['procedures_defnoreturn']) {
+    // <block type="procedures_defnoreturn" gap="16"></block>
+    var block = goog.dom.createDom('block');
+    block.setAttribute('type', 'procedures_defnoreturn');
+    block.setAttribute('gap', 16);
+    // xmlList.push(block);
+  }
+  if (Blockly.Blocks['procedures_defreturn']) {
     // <block type="procedures_defreturn" gap="16"></block>
     var block = goog.dom.createDom('block');
     block.setAttribute('type', 'procedures_defreturn');
     block.setAttribute('gap', 16);
-    xmlList.push(block);
-  }*/
-
-
+    // xmlList.push(block);
+  }
+  if (Blockly.Blocks['procedures_ifreturn']) {
+    // <block type="procedures_ifreturn" gap="16"></block>
+    var block = goog.dom.createDom('block');
+    block.setAttribute('type', 'procedures_ifreturn');
+    block.setAttribute('gap', 16);
+    // xmlList.push(block);
+  }
   if (Blockly.Blocks['procedures_letVar']) {
     // <block type="procedures_defreturn" gap="16"></block>
     var block = goog.dom.createDom('block');
@@ -201,6 +197,7 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     block.setAttribute('gap', 16);
     xmlList.push(block);
   }
+
 
   if (xmlList.length) {
     // Add slightly larger gap between system blocks and user calls.
@@ -211,13 +208,11 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     for (var i = 0; i < procedureList.length; i++) {
       var name = procedureList[i][0];
       var args = procedureList[i][1];
-
       // <block type="procedures_callnoreturn" gap="16">
       //   <mutation name="do something">
       //     <arg name="x"></arg>
       //   </mutation>
       // </block>
-
       var block = goog.dom.createDom('block');
       block.setAttribute('type', templateName);
       block.setAttribute('gap', 16);
@@ -233,8 +228,9 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     }
   }
 
-  var procs= Blockly.Procedures.allProcedures(workspace);
-  populateProcedures(procs, 'procedures_callreturn');
+  var tuple = Blockly.Procedures.allProcedures(workspace);
+  populateProcedures(tuple[0], 'procedures_callnoreturn');
+  populateProcedures(tuple[1], 'procedures_callreturn');
   return xmlList;
 };
 
@@ -268,7 +264,6 @@ Blockly.Procedures.getCallers = function(name, workspace) {
  */
 Blockly.Procedures.disposeCallers = function(name, workspace) {
   var callers = Blockly.Procedures.getCallers(name, workspace);
-
   for (var i = 0; i < callers.length; i++) {
     callers[i].dispose(true, false);
   }

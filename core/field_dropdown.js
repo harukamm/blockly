@@ -77,21 +77,19 @@ Blockly.FieldDropdown.prototype.CURSOR = 'default';
 
 /**
  * Install this dropdown on a block.
- * @param {!Blockly.Block} block The block containing this text.
  */
-Blockly.FieldDropdown.prototype.init = function(block) {
-  if (this.sourceBlock_) {
+Blockly.FieldDropdown.prototype.init = function() {
+  if (this.fieldGroup_) {
     // Dropdown has already been initialized once.
     return;
   }
-
   // Add dropdown arrow: "option ▾" (LTR) or "▾ אופציה" (RTL)
   this.arrow_ = Blockly.createSvgElement('tspan', {}, null);
   this.arrow_.appendChild(document.createTextNode(
-      block.RTL ? Blockly.FieldDropdown.ARROW_CHAR + ' ' :
+      this.sourceBlock_.RTL ? Blockly.FieldDropdown.ARROW_CHAR + ' ' :
           ' ' + Blockly.FieldDropdown.ARROW_CHAR));
 
-  Blockly.FieldDropdown.superClass_.init.call(this, block);
+  Blockly.FieldDropdown.superClass_.init.call(this);
   // Force a reset of the text to add the arrow.
   var text = this.text_;
   this.text_ = null;
@@ -269,15 +267,6 @@ Blockly.FieldDropdown.prototype.setValue = function(newValue) {
   if (this.sourceBlock_ && Blockly.Events.isEnabled()) {
     Blockly.Events.fire(new Blockly.Events.Change(
         this.sourceBlock_, 'field', this.name, this.value_, newValue));
-  }
-  if (this.sourceBlock_ && this.validator_) {
-    // Validator is probably an 'onchange' function
-    var validated = this.validator_(newValue);
-    // If the new text is invalid, validation returns null.
-    // In this case we still want to display the illegal result.
-    if (validated !== null && validated !== undefined) {
-      newValue = validated;
-    }
   }
   this.value_ = newValue;
   // Look up and display the human-readable text.

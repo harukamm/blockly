@@ -54,9 +54,9 @@ goog.require('goog.string');
  */
 Blockly.Block = function(workspace, prototypeName, opt_id) {
   /** @type {string} */
-  this.id = (opt_id && !Blockly.Block.getById(opt_id)) ?
+  this.id = (opt_id && !workspace.getBlockById(opt_id)) ?
       opt_id : Blockly.genUid();
-  Blockly.Block.BlockDB_[this.id] = this;
+  workspace.blockDB_[this.id] = this;
   /** @type {Blockly.Connection} */
   this.outputConnection = null;
   /** @type {Blockly.Connection} */
@@ -74,25 +74,55 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   /** @type {boolean} */
   this.contextMenu = true;
 
-  /** @type {Blockly.Block} */
+  /**
+   * @type {Blockly.Block}
+   * @private
+   */
   this.parentBlock_ = null;
-  /** @type {!Array.<!Blockly.Block>} */
+
+  /**
+   * @type {!Array.<!Blockly.Block>}
+   * @private
+   */
   this.childBlocks_ = [];
-  /** @type {boolean} */
+
+  /**
+   * @type {boolean}
+   * @private
+   */
   this.deletable_ = true;
-  /** @type {boolean} */
+
+  /**
+   * @type {boolean}
+   * @private
+   */
   this.movable_ = true;
-  /** @type {boolean} */
+
+  /**
+   * @type {boolean}
+   * @private
+   */
   this.editable_ = true;
-  /** @type {boolean} */
+
+  /**
+   * @type {boolean}
+   * @private
+   */
   this.isShadow_ = false;
-  /** @type {boolean} */
+
+  /**
+   * @type {boolean}
+   * @private
+   */
   this.collapsed_ = false;
 
   /** @type {string|Blockly.Comment} */
   this.comment = null;
 
-  /** @type {!goog.math.Coordinate} */
+  /**
+   * @type {!goog.math.Coordinate}
+   * @private
+   */
   this.xy_ = new goog.math.Coordinate(0, 0);
 
   /** @type {!Blockly.Workspace} */
@@ -180,6 +210,8 @@ Blockly.Block.prototype.dispose = function(healStack) {
   // Remove this block from the workspace's list of top-most blocks.
   if (this.workspace) {
     this.workspace.removeTopBlock(this);
+    // Remove from block database.
+    delete this.workspace.blockDB_[this.id];
     this.workspace = null;
   }
 
@@ -206,12 +238,8 @@ Blockly.Block.prototype.dispose = function(healStack) {
     }
     connections[i].dispose();
   }
-  // Remove from block database.
-  delete Blockly.Block.BlockDB_[this.id];
   Blockly.Events.enable();
-  
 
-  // Trigger garbage collection for type variables
   Blockly.TypeVar.triggerGarbageCollection();
 };
 
@@ -637,7 +665,7 @@ Blockly.Block.prototype.getVars = function() {
   var vars = [];
   for (var i = 0, input; input = this.inputList[i]; i++) {
     for (var j = 0, field; field = input.fieldRow[j]; j++) {
-      if (field.isVariable_) {
+      if (field instanceof Blockly.FieldVariable) {
         vars.push(field.getValue());
       }
     }
@@ -715,21 +743,24 @@ Blockly.Block.prototype.setTitleValue = function(newValue, name) {
  *     list of statement types.  Null/undefined if any type could be connected.
  */
 Blockly.Block.prototype.setPreviousStatement = function(newBoolean, opt_check) {
-  if (this.previousConnection) {
-    goog.asserts.assert(!this.previousConnection.isConnected(),
-        'Must disconnect previous statement before removing connection.');
-    this.previousConnection.dispose();
-    this.previousConnection = null;
-  }
   if (newBoolean) {
-    goog.asserts.assert(!this.outputConnection,
-        'Remove output connection prior to adding previous connection.');
     if (opt_check === undefined) {
       opt_check = null;
     }
-    this.previousConnection =
-        new Blockly.Connection(this, Blockly.PREVIOUS_STATEMENT);
+    if (!this.previousConnection) {
+      goog.asserts.assert(!this.outputConnection,
+          'Remove output connection prior to adding previous connection.');
+      this.previousConnection =
+          this.makeConnection_(Blockly.PREVIOUS_STATEMENT);
+    }
     this.previousConnection.setCheck(opt_check);
+  } else {
+    if (this.previousConnection) {
+      goog.asserts.assert(!this.previousConnection.isConnected(),
+          'Must disconnect previous statement before removing connection.');
+      this.previousConnection.dispose();
+      this.previousConnection = null;
+    }
   }
 };
 
@@ -740,19 +771,21 @@ Blockly.Block.prototype.setPreviousStatement = function(newBoolean, opt_check) {
  *     list of statement types.  Null/undefined if any type could be connected.
  */
 Blockly.Block.prototype.setNextStatement = function(newBoolean, opt_check) {
-  if (this.nextConnection) {
-    goog.asserts.assert(!this.nextConnection.isConnected(),
-        'Must disconnect next statement before removing connection.');
-    this.nextConnection.dispose();
-    this.nextConnection = null;
-  }
   if (newBoolean) {
     if (opt_check === undefined) {
       opt_check = null;
     }
-    this.nextConnection =
-        new Blockly.Connection(this, Blockly.NEXT_STATEMENT);
+    if (!this.nextConnection) {
+      this.nextConnection = this.makeConnection_(Blockly.NEXT_STATEMENT);
+    }
     this.nextConnection.setCheck(opt_check);
+  } else {
+    if (this.nextConnection) {
+      goog.asserts.assert(!this.nextConnection.isConnected(),
+          'Must disconnect next statement before removing connection.');
+      this.nextConnection.dispose();
+      this.nextConnection = null;
+    }
   }
 };
 
@@ -764,52 +797,25 @@ Blockly.Block.prototype.setNextStatement = function(newBoolean, opt_check) {
  *     (e.g. variable get).
  */
 Blockly.Block.prototype.setOutput = function(newBoolean, opt_check) {
-  if (this.outputConnection) {
-    goog.asserts.assert(!this.outputConnection.isConnected(),
-        'Must disconnect output value before removing connection.');
-    this.outputConnection.dispose();
-    this.outputConnection = null;
-  }
   if (newBoolean) {
-    goog.asserts.assert(!this.previousConnection,
-        'Remove previous connection prior to adding output connection.');
     if (opt_check === undefined) {
       opt_check = null;
     }
-    this.outputConnection =
-        new Blockly.Connection(this, Blockly.OUTPUT_VALUE);
+    if (!this.outputConnection) {
+      goog.asserts.assert(!this.previousConnection,
+          'Remove previous connection prior to adding output connection.');
+      this.outputConnection = this.makeConnection_(Blockly.OUTPUT_VALUE);
+    }
     this.outputConnection.setCheck(opt_check);
+  } else {
+    if (this.outputConnection) {
+      goog.asserts.assert(!this.outputConnection.isConnected(),
+          'Must disconnect output value before removing connection.');
+      this.outputConnection.dispose();
+      this.outputConnection = null;
+    }
   }
 };
-
-Blockly.Block.prototype.setOutputTypeExpr = function(typeExpr) {
-  if( !this.outputConnection ) this.setOutput( true );  /* Should call setOutput() first, but just in case... */
-  this.outputConnection.setTypeExpr(typeExpr);
-}
-
-Blockly.Block.prototype.getOutputTypeExpr = function() {
-  if( !this.outputConnection )
-    return null;
-  this.outputConnection.getTypeExpr();
-}
-
-Blockly.Block.prototype.setColourByType = function(typeExpr) {
-  if( !typeExpr && this.outputConnection && this.outputConnection.typeExpr ) typeExpr = this.outputConnection.typeExpr;
-  var colour;
-  if( typeExpr ) {
-    if( typeExpr.isTypeVar() ) {
-      colour = Blockly.BlockSvg.ABSTRACT_COLOUR;
-    }
-    else if( !(colour = Blockly.BlockSvg.getShapeForType( typeExpr.name ).blockColour) ) {
-      colour = 180;  /* A default colour */
-    }
-  } else {
-    colour = 180;
-  }
-  this.setColour( colour );
-  return( colour );
-  /* TODO: Provide some way to manually override colours? Eg allow slightly different shade for quantifiers */
-}
 
 /**
  * Set whether value inputs are arranged horizontally or vertically.
@@ -856,10 +862,8 @@ Blockly.Block.prototype.getInputsInline = function() {
  */
 Blockly.Block.prototype.setDisabled = function(disabled) {
   if (this.disabled != disabled) {
-// Stefan
-// Dont fire disabled event, we disable blocks automatically, disallow undo
-//    Blockly.Events.fire(new Blockly.Events.Change(
-//        this, 'disabled', null, this.disabled, disabled));
+    Blockly.Events.fire(new Blockly.Events.Change(
+        this, 'disabled', null, this.disabled, disabled));
     this.disabled = disabled;
   }
 };
@@ -1021,7 +1025,7 @@ Blockly.Block.prototype.jsonInit = function(json) {
  * @private
  */
 Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
-  var tokens = Blockly.tokenizeInterpolation(message);
+  var tokens = Blockly.utils.tokenizeInterpolation(message);
   // Interpolate the arguments.  Build a list of elements.
   var indexDup = [];
   var indexCount = 0;
@@ -1048,11 +1052,11 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
   // Add last dummy input if needed.
   if (elements.length && (typeof elements[elements.length - 1] == 'string' ||
       elements[elements.length - 1]['type'].indexOf('field_') == 0)) {
-    var input = {type: 'input_dummy'};
+    var dummyInput = {type: 'input_dummy'};
     if (lastDummyAlign) {
-      input['align'] = lastDummyAlign;
+      dummyInput['align'] = lastDummyAlign;
     }
-    elements.push(input);
+    elements.push(dummyInput);
   }
   // Lookup of alignment constants.
   var alignmentLookup = {
@@ -1110,6 +1114,10 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
             field = new Blockly.FieldImage(element['src'],
                 element['width'], element['height'], element['alt']);
             break;
+          case 'field_number':
+            field = new Blockly.FieldNumber(element['value'],
+                element['min'], element['max'], element['precision']);
+            break;
           case 'field_date':
             if (Blockly.FieldDate) {
               field = new Blockly.FieldDate(element['date']);
@@ -1154,7 +1162,7 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
 Blockly.Block.prototype.appendInput_ = function(type, name) {
   var connection = null;
   if (type == Blockly.INPUT_VALUE || type == Blockly.NEXT_STATEMENT) {
-    connection = new Blockly.Connection(this, type);
+    connection = this.makeConnection_(type);
   }
   var input = new Blockly.Input(type, name, this, connection);
   // Append input to list.
@@ -1263,20 +1271,6 @@ Blockly.Block.prototype.getInput = function(name) {
   return null;
 };
 
-Blockly.Block.prototype.allInputsConnected = function(){
-  for (var i = 0, input; input = this.inputList[i]; i++) {
-    if(!input.name)
-      continue;
-    if(input.name=='')
-      continue;
-    if (!input.connection.targetBlock()) {
-      return false;
-    }
-  }
-  return true;
-
-};
-
 /**
  * Fetches the block attached to the named input.
  * @param {string} name The name of the input.
@@ -1347,20 +1341,49 @@ Blockly.Block.prototype.moveBy = function(dx, dy) {
 };
 
 /**
- * Database of all blocks.
+ * Create a connection of the specified type.
+ * @param {number} type The type of the connection to create.
+ * @return {!Blockly.Connection} A new connection of the specified type.
  * @private
  */
-Blockly.Block.BlockDB_ = Object.create(null);
-
-/**
- * Find the block with the specified ID.
- * @param {string} id ID of block to find.
- * @return {Blockly.Block} The sought after block or null if not found.
- */
-Blockly.Block.getById = function(id) {
-  return Blockly.Block.BlockDB_[id] || null;
+Blockly.Block.prototype.makeConnection_ = function(type) {
+  return new Blockly.Connection(this, type);
 };
 
+
+Blockly.Block.prototype.setOutputTypeExpr = function(typeExpr) {
+  if( !this.outputConnection ) this.setOutput( true );  /* Should call setOutput() first, but just in case... */
+  this.outputConnection.setTypeExpr(typeExpr);
+}
+
+Blockly.Block.prototype.getOutputTypeExpr = function() {
+  if( !this.outputConnection )
+    return null;
+  this.outputConnection.getTypeExpr();
+}
+
+Blockly.Block.prototype.setColourByType = function(typeExpr) {
+  if( !typeExpr && this.outputConnection && this.outputConnection.typeExpr ) typeExpr = this.outputConnection.typeExpr;
+  var colour;
+  if( typeExpr ) {
+    if( typeExpr.isTypeVar() ) {
+      colour = Blockly.BlockSvg.ABSTRACT_COLOUR;
+    }
+    else if( !(colour = Blockly.BlockSvg.getShapeForType( typeExpr.name ).blockColour) ) {
+      colour = 180;  /* A default colour */
+    }
+  } else {
+    colour = 180;
+  }
+  this.setColour( colour );
+  return( colour );
+  /* TODO: Provide some way to manually override colours? Eg allow slightly different shade for quantifiers */
+}
+
+
+
+// Stefan
+// (But actually Anthony)
 
 /**
  * Copy the connection types from the given block to this block.
@@ -1419,3 +1442,23 @@ Blockly.Block.copyConnectionTypesR_ = function(dest, source, subst, keepVars) {
   dest.render();  // Not very efficient perhaps...
   return( subst );
 };
+
+// Stefan
+/**
+ * Returns whether all inputs have blocks connected to them
+ */
+Blockly.Block.prototype.allInputsConnected = function(){
+  for (var i = 0, input; input = this.inputList[i]; i++) {
+    if(!input.name)
+      continue;
+    if(input.name=='')
+      continue;
+    if (!input.connection.targetBlock()) {
+      return false;
+    }
+  }
+  return true;
+
+};
+
+

@@ -38,21 +38,15 @@ goog.require('goog.string');
  *     a unique variable name will be generated.
  * @param {Function=} opt_validator A function that is executed when a new
  *     option is selected.  Its sole argument is the new option value.
- * @param {string=} opt_type Type of the variable. Only variables of the same
- *     type will be shown in the dropdown. If null, variables of all types
- *     are shown.
  * @extends {Blockly.FieldDropdown}
  * @constructor
  */
-Blockly.FieldVariable = function(varname, opt_validator, opt_type) {
+Blockly.FieldVariable = function(varname, opt_validator) {
   Blockly.FieldVariable.superClass_.constructor.call(this,
       Blockly.FieldVariable.dropdownCreate, opt_validator);
   this.setValue(varname || '');
-  this.type_ = opt_type;
 };
 goog.inherits(Blockly.FieldVariable, Blockly.FieldDropdown);
-
-Blockly.FieldVariable.prototype.isVariable_ = true;
 
 /**
  * Sets a new change handler for angle field.
@@ -85,18 +79,19 @@ Blockly.FieldVariable.prototype.setValidator = function(handler) {
 
 /**
  * Install this dropdown on a block.
- * @param {!Blockly.Block} block The block containing this text.
  */
-Blockly.FieldVariable.prototype.init = function(block) {
-  if (this.sourceBlock_) {
+Blockly.FieldVariable.prototype.init = function() {
+  if (this.fieldGroup_) {
     // Dropdown has already been initialized once.
     return;
   }
-  Blockly.FieldVariable.superClass_.init.call(this, block);
+  Blockly.FieldVariable.superClass_.init.call(this);
   if (!this.getValue()) {
     // Variables without names get uniquely named for this workspace.
     var workspace =
-        block.isInFlyout ? block.workspace.targetWorkspace : block.workspace;
+        this.sourceBlock_.isInFlyout ?
+            this.sourceBlock_.workspace.targetWorkspace :
+            this.sourceBlock_.workspace;
     this.setValue(Blockly.Variables.generateUniqueName(workspace));
   }
 };
@@ -132,7 +127,7 @@ Blockly.FieldVariable.prototype.setValue = function(newValue) {
 Blockly.FieldVariable.dropdownCreate = function() {
   if (this.sourceBlock_ && this.sourceBlock_.workspace) {
     var variableList =
-        Blockly.Variables.allVariables(this.sourceBlock_.workspace, this.type_);
+        Blockly.Variables.allVariables(this.sourceBlock_.workspace);
   } else {
     var variableList = [];
   }

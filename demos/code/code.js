@@ -72,7 +72,7 @@ Code.LANGUAGE_NAME = {
   'tr': 'Türkçe',
   'uk': 'Українська',
   'vi': 'Tiếng Việt',
-  'zh-hans': '簡體中文',
+  'zh-hans': '简体中文',
   'zh-hant': '正體中文'
 };
 
@@ -139,11 +139,11 @@ Code.loadBlocks = function(defaultXml) {
     // Language switching stores the blocks during the reload.
     delete window.sessionStorage.loadOnceBlocks;
     var xml = Blockly.Xml.textToDom(loadOnce);
-    Blockly.Xml.domToWorkspace(Code.workspace, xml);
+    Blockly.Xml.domToWorkspace(xml, Code.workspace);
   } else if (defaultXml) {
     // Load the editor with default starting blocks.
     var xml = Blockly.Xml.textToDom(defaultXml);
-    Blockly.Xml.domToWorkspace(Code.workspace, xml);
+    Blockly.Xml.domToWorkspace(xml, Code.workspace);
   } else if ('BlocklyStorage' in window) {
     // Restore saved blocks in a separate thread so that subsequent
     // initialization is not affected from a failed load.
@@ -270,7 +270,7 @@ Code.tabClick = function(clickedName) {
     }
     if (xmlDom) {
       Code.workspace.clear();
-      Blockly.Xml.domToWorkspace(Code.workspace, xmlDom);
+      Blockly.Xml.domToWorkspace(xmlDom, Code.workspace);
     }
   }
 
@@ -294,7 +294,7 @@ Code.tabClick = function(clickedName) {
   if (clickedName == 'blocks') {
     Code.workspace.setVisible(true);
   }
-  Blockly.fireUiEvent(window, 'resize');
+  Blockly.svgResize(Code.workspace);
 };
 
 /**
@@ -380,10 +380,14 @@ Code.init = function() {
           // Account for the 19 pixel margin and on each side.
     }
   };
-  onresize();
   window.addEventListener('resize', onresize, false);
 
-  var toolbox = document.getElementById('toolbox');
+  // Interpolate translated messages into toolbox.
+  var toolboxText = document.getElementById('toolbox').outerHTML;
+  toolboxText = toolboxText.replace(/{(\w+)}/g,
+      function(m, p1) {return MSG[p1]});
+  var toolboxXml = Blockly.Xml.textToDom(toolboxText);
+
   Code.workspace = Blockly.inject('content_blocks',
       {grid:
           {spacing: 25,
@@ -392,7 +396,7 @@ Code.init = function() {
            snap: true},
        media: '../../media/',
        rtl: rtl,
-       toolbox: toolbox,
+       toolbox: toolboxXml,
        zoom:
            {controls: true,
             wheel: true}
@@ -432,6 +436,8 @@ Code.init = function() {
     Code.bindClick('tab_' + name,
         function(name_) {return function() {Code.tabClick(name_);};}(name));
   }
+  onresize();
+  Blockly.svgResize(Code.workspace);
 
   // Lazy-load the syntax-highlighting.
   window.setTimeout(Code.importPrettify, 1);
@@ -480,20 +486,6 @@ Code.initLanguage = function() {
   document.getElementById('linkButton').title = MSG['linkTooltip'];
   document.getElementById('runButton').title = MSG['runTooltip'];
   document.getElementById('trashButton').title = MSG['trashTooltip'];
-
-  var categories = ['catLogic', 'catLoops', 'catMath', 'catText', 'catLists',
-                    'catColour', 'catVariables', 'catFunctions'];
-  for (var i = 0, cat; cat = categories[i]; i++) {
-    document.getElementById(cat).setAttribute('name', MSG[cat]);
-  }
-  var textVars = document.getElementsByClassName('textVar');
-  for (var i = 0, textVar; textVar = textVars[i]; i++) {
-    textVar.textContent = MSG['textVariable'];
-  }
-  var listVars = document.getElementsByClassName('listVar');
-  for (var i = 0, listVar; listVar = listVars[i]; i++) {
-    listVar.textContent = MSG['listVariable'];
-  }
 };
 
 /**

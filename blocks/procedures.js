@@ -22,7 +22,6 @@
  * @fileoverview Procedure blocks for Blockly.
  * @author fraser@google.com (Neil Fraser)
  */
-
 'use strict';
 
 goog.provide('Blockly.Blocks.procedures');
@@ -33,7 +32,7 @@ goog.require('Blockly.Blocks');
 /**
  * Common HSV hue for all blocks in this category.
  */
-Blockly.Blocks.procedures.HUE = 300;
+Blockly.Blocks.procedures.HUE = 290;
 
 Blockly.Blocks['procedures_defnoreturn'] = {
   /**
@@ -65,7 +64,7 @@ Blockly.Blocks['procedures_defnoreturn'] = {
    * inconsistent as a result of the XML loading.
    * @this Blockly.Block
    */
-  validate: function () {
+  validate: function() {
     var name = Blockly.Procedures.findLegalName(
         this.getFieldValue('NAME'), this);
     this.setFieldValue(name, 'NAME');
@@ -167,8 +166,7 @@ Blockly.Blocks['procedures_defnoreturn'] = {
     Blockly.Procedures.mutateCallers(this);
 
     // Show or hide the statement input.
-    if(this.setStatements_)
-      this.setStatements_(xmlElement.getAttribute('statements') !== 'false');
+    this.setStatements_(xmlElement.getAttribute('statements') !== 'false');
   },
   /**
    * Populate the mutator's dialog with this block's components.
@@ -250,10 +248,9 @@ Blockly.Blocks['procedures_defnoreturn'] = {
    * Dispose of any callers.
    * @this Blockly.Block
    */
-  dispose: function Dispose() {
+  dispose: function() {
     var name = this.getFieldValue('NAME');
-    if(arguments.length > 0)
-      Blockly.Procedures.disposeCallers(name, this.workspace);
+    Blockly.Procedures.disposeCallers(name, this.workspace);
     // Call parent's destructor.
     this.constructor.prototype.dispose.apply(this, arguments);
   },
@@ -312,7 +309,6 @@ Blockly.Blocks['procedures_defnoreturn'] = {
    */
   customContextMenu: function(options) {
     // Add option to create caller.
-    
     var option = {enabled: true};
     var name = this.getFieldValue('NAME');
     option.text = Blockly.Msg.PROCEDURES_CREATE_DO.replace('%1', name);
@@ -352,23 +348,26 @@ Blockly.Blocks['procedures_defreturn'] = {
    * @this Blockly.Block
    */
   init: function() {
-    var A = Blockly.TypeVar.getUnusedTypeVar();
     var nameField = new Blockly.FieldTextInput(
         Blockly.Msg.PROCEDURES_DEFRETURN_PROCEDURE,
         Blockly.Procedures.rename);
     nameField.setSpellcheck(false);
     this.appendDummyInput()
-        .appendField("LetFunc")
+        .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_TITLE)
         .appendField(nameField, 'NAME')
         .appendField('', 'PARAMS');
     this.appendValueInput('RETURN')
-        .setTypeExpr(A)
+        .setAlign(Blockly.ALIGN_RIGHT)
         .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
     this.setMutator(new Blockly.Mutator(['procedures_mutatorarg']));
+    if (Blockly.Msg.PROCEDURES_DEFRETURN_COMMENT) {
+      this.setCommentText(Blockly.Msg.PROCEDURES_DEFRETURN_COMMENT);
+    }
     this.setColour(Blockly.Blocks.procedures.HUE);
     this.setTooltip(Blockly.Msg.PROCEDURES_DEFRETURN_TOOLTIP);
+    this.setHelpUrl(Blockly.Msg.PROCEDURES_DEFRETURN_HELPURL);
     this.arguments_ = [];
-    this.setStatements_(false);
+    this.setStatements_(true);
     this.statementConnection_ = null;
   },
   setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
@@ -395,159 +394,6 @@ Blockly.Blocks['procedures_defreturn'] = {
   customContextMenu: Blockly.Blocks['procedures_defnoreturn'].customContextMenu,
   callType_: 'procedures_callreturn'
 };
-
-Blockly.Blocks['procedures_letVar'] = {
-  /**
-   * Block for defining a procedure with a return value.
-   * @this Blockly.Block
-   */
-  init: function() {
-    var thisBlock = this;
-    var A = Blockly.TypeVar.getUnusedTypeVar();
-    var nameField = new Blockly.FieldTextInput(
-        "foo"
-        ,function(t){ if(thisBlock != this.sourceBlock_)return;
-          //console.log('f for ' + thisBlock.getFieldValue('NAME') + ' to ' + t); 
-        });
-    nameField.setSpellcheck(false);
-    this.appendDummyInput()
-        .appendField('Let')
-        .appendField(nameField, 'NAME')
-        .appendField('', 'PARAMS');
-    this.appendValueInput('RETURN')
-        .setTypeExpr(A)
-    this.setColour(Blockly.Blocks.procedures.HUE);
-    this.setTooltip(Blockly.Msg.PROCEDURES_DEFRETURN_TOOLTIP);
-    this.arguments_ = [];
-    // this.setStatements_(false);
-    this.statementConnection_ = null;
-  },
-  // setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
-  validate: Blockly.Blocks['procedures_defnoreturn'].validate,
-  updateParams_: Blockly.Blocks['procedures_defnoreturn'].updateParams_,
-  mutationToDom: Blockly.Blocks['procedures_defnoreturn'].mutationToDom,
-  domToMutation: Blockly.Blocks['procedures_defnoreturn'].domToMutation,
-  decompose: Blockly.Blocks['procedures_defnoreturn'].decompose,
-  compose: Blockly.Blocks['procedures_defnoreturn'].compose,
-  dispose: Blockly.Blocks['procedures_defnoreturn'].dispose,
-
-
-  onchange: function(changeEvent) {
-    var name = this.getFieldValue('NAME');
-    var defBlock = this;
-    var workspace = Blockly.getMainWorkspace();
-    var eventBlock = workspace.getBlockById(changeEvent.blockId);
-    if(!eventBlock || eventBlock.blockId != this.blockId)
-      return; // Only care about events on the parent this block
-
-    var parentBlock = null;
-    if(changeEvent.oldParentId)
-      parentBlock = workspace.getBlockById(changeEvent.oldParentId);
-    else if(changeEvent.newParentId)
-      parentBlock = workspace.getBlockById(changeEvent.newParentId);
-
-    if(!parentBlock || parentBlock.type != 'procedures_letVar')
-      return; 
-
-    if(parentBlock.getFieldValue('NAME') != name)
-      return; // Only event when parentblock is this block
-
-    if(changeEvent.type == Blockly.Events.MOVE && changeEvent.newInputName)
-    {
-      // Plug in new block
-      var callers = Blockly.Procedures.getCallers(name, workspace);
-      var tp = defBlock.getInput("RETURN").connection.getTypeExpr();
-      callers.forEach(function(block)
-          {
-            if(block.getProcedureCall() == name)
-            {
-              if(block.outputConnection.typeExpr.name != tp.name)
-              {
-                // block.outputConnection.bumpAwayFrom_(block.outputConnection.targetConnection);
-                block.unplug();
-                block.moveBy(-20,-20);
-
-                block.setOutputTypeExpr(tp);
-                block.setColourByType(tp);
-                if(block.outputConnection.typeExpr)
-                  block.outputConnection.typeExpr.unify(tp);
-
-                block.render();
-              }
-            }
-          });
-    }
-    if(changeEvent.type == Blockly.Events.MOVE && changeEvent.oldInputName)
-    {
-      // Disconnect old block, make polymorphic
-      var callers = Blockly.Procedures.getCallers(name, workspace);
-      var tp = defBlock.getInput("RETURN").connection.getTypeExpr();
-
-      callers.forEach(function(block)
-      {
-        if(block.outputConnection && block.outputConnection.isConnected() && block.getProcedureCall() == name)
-        {
-          var targetBlock = block.outputConnection.targetBlock();
-          var targetConnection = block.outputConnection.targetConnection;
-
-          block.outputConnection.disconnect();
-          block.setOutput(true);
-          block.setColour(Blockly.Blocks.procedures.HUE);
-          
-          block.setOutputTypeExpr(tp);
-          block.setColourByType(tp);
-          if(block.outputConnection.typeExpr)
-            block.outputConnection.typeExpr.unify(tp);
-
-          block.outputConnection.connect(targetConnection);
-
-
-          // We're working over here
-          // block.setOutputTypeExpr(tp);
-          // block.setColourByType(tp);
-          // if(block.outputConnection.typeExpr)
-          //   block.outputConnection.typeExpr.unify(tp);
-
-          block.render();
-
-          // return; // Only change type if it is disconnected
-        }
-        else if(block.outputConnection)
-        {
-          // block.outputConnection.disconnect();
-          block.outputConnection.dispose();
-        }
-        block.outputConnection = null;
-        block.setOutput(true);
-        block.setColour(Blockly.Blocks.procedures.HUE);
-
-        block.setOutputTypeExpr(tp);
-        if(block.outputConnection.typeExpr)
-          block.outputConnection.typeExpr.unify(tp);
-
-        block.render();
-      });
-    }
-  },
-  /**
-   * Return the signature of this procedure definition.
-   * @return {!Array} Tuple containing three elements:
-   *     - the name of the defined procedure,
-   *     - a list of all its arguments,
-   *     - that it DOES have a return value.
-   * @this Blockly.Block
-   */
-  getProcedureDef: function() {
-    return [this.getFieldValue('NAME'), this.arguments_, true];
-  },
-  getVars: Blockly.Blocks['procedures_defnoreturn'].getVars,
-  renameVar: function(a,b){},
-  customContextMenu: function(o){},
-    // Blockly.Blocks['procedures_defnoreturn'].customContextMenu,
-  callType_: 'procedures_callreturn'
-};
-
-
 
 Blockly.Blocks['procedures_mutatorcontainer'] = {
   /**
@@ -658,34 +504,14 @@ Blockly.Blocks['procedures_callnoreturn'] = {
     //     Existing param IDs.
     // Note that quarkConnections_ may include IDs that no longer exist, but
     // which might reappear if a param is reattached in the mutator.
-
     var defBlock = Blockly.Procedures.getDefinition(this.getProcedureCall(),
-        Blockly.getMainWorkspace());
+        this.workspace);
     var mutatorOpen = defBlock && defBlock.mutator &&
         defBlock.mutator.isVisible();
     if (!mutatorOpen) {
       this.quarkConnections_ = {};
       this.quarkIds_ = null;
     }
-
-    // StefanJ
-    // Set the type to that of the defining block
-
-    var defBlockMain = Blockly.Procedures.getDefinition(this.getProcedureCall(),
-          Blockly.getMainWorkspace()); // The definition block on the main workspace
-    if (defBlockMain)
-    {
-      if (defBlockMain.type == "procedures_letVar")
-      {
-        var tp = defBlockMain.getInput("RETURN").connection.getTypeExpr();
-        this.setOutputTypeExpr(tp);
-        this.setColourByType(tp);
-        if(this.outputConnection.typeExpr)
-          this.outputConnection.typeExpr.unify(tp);
-        this.render();
-      }
-    }
-
     if (!paramIds) {
       // Reset the quarks (a mutator is about to open).
       return;
@@ -865,7 +691,6 @@ Blockly.Blocks['procedures_callreturn'] = {
    * Block for calling a procedure with a return value.
    * @this Blockly.Block
    */
-
   init: function() {
     this.appendDummyInput('TOPROW')
         .appendField('', 'NAME');
@@ -876,7 +701,6 @@ Blockly.Blocks['procedures_callreturn'] = {
     this.arguments_ = [];
     this.quarkConnections_ = {};
     this.quarkIds_ = null;
-
   },
   getProcedureCall: Blockly.Blocks['procedures_callnoreturn'].getProcedureCall,
   renameProcedure: Blockly.Blocks['procedures_callnoreturn'].renameProcedure,
@@ -973,5 +797,5 @@ Blockly.Blocks['procedures_ifreturn'] = {
    * To add a new function type add this to your code:
    * Blockly.Blocks['procedures_ifreturn'].FUNCTION_TYPES.push('custom_func');
    */
-  FUNCTION_TYPES: ['procedures_defnoreturn', 'procedures_defreturn' ]
+  FUNCTION_TYPES: ['procedures_defnoreturn', 'procedures_defreturn']
 };
