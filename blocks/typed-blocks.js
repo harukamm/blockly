@@ -195,6 +195,19 @@ Blockly.Blocks['math_arithmetic_typed'] = {
   }
 };
 
+Blockly.Blocks['lists_path'] = {
+  init: function() {
+    this.setColour(160);
+    var pair = new Blockly.TypeExpr('pair', [new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')]);
+    this.appendValueInput('LST')
+        .setTypeExpr(new Blockly.TypeExpr('list',[pair]))
+        .appendField(new Blockly.FieldLabel("Path","blocklyTextEmph") );
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Picture'));
+  }
+};
+
+
 /* should go in blocks/lists.js */ 
 Blockly.Blocks['lists_create_with_typed'] = {
   /**
@@ -206,7 +219,7 @@ Blockly.Blocks['lists_create_with_typed'] = {
     this.typeParams = { elmtType: Blockly.TypeVar.getUnusedTypeVar() };
     this.appendValueInput('ADD0')
         .setTypeExpr(this.typeParams.elmtType)
-        .appendField(Blockly.Msg.LISTS_CREATE_WITH_INPUT_WITH);
+        .appendField(new Blockly.FieldLabel("List","blocklyTextEmph"));
     this.appendValueInput('ADD1')
         .setTypeExpr(this.typeParams.elmtType);
     this.appendValueInput('ADD2')
