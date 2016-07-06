@@ -586,7 +586,6 @@ Blockly.Blocks['lists_comprehension'] = {
   init: function() {
     this.setColour(260);
     this.vars_ = ['x','y','z'];
-    //this.typeParams = { elmtType: Blockly.TypeVar.getUnusedTypeVar() };
     var A = Blockly.TypeVar.getUnusedTypeVar();
     var B = Blockly.TypeVar.getUnusedTypeVar();
     var C = Blockly.TypeVar.getUnusedTypeVar();
@@ -618,8 +617,8 @@ Blockly.Blocks['lists_comprehension'] = {
    */
   mutationToDom: function() {
     var container = document.createElement('mutation');
-    container.setAttribute('guardCount', this.guardCount_);
-    container.setAttribute('varCount', this.varCount_);
+    container.setAttribute('guardcount', this.guardCount_);
+    container.setAttribute('varcount', this.varCount_);
 
     for (var i = 0; i < this.varCount_; i++) {
       var parameter = document.createElement('var');
@@ -637,15 +636,15 @@ Blockly.Blocks['lists_comprehension'] = {
    */
   domToMutation: function(xmlElement) {
 
-    this.varCount_ = parseInt(xmlElement.getAttribute('varCount'), 10);
-    this.guardCount_ = parseInt(xmlElement.getAttribute('guardCount'), 10);
-
     for (var x = 0; x < this.varCount_; x++) {
       this.removeInput('VAR' + x);
     }
     for (var x = 0; x < this.guardCount_; x++) {
       this.removeInput('GUARD' + x);
     }
+
+    this.varCount_ = parseInt(xmlElement.getAttribute('varcount'), 10);
+    this.guardCount_ = parseInt(xmlElement.getAttribute('guardcount'), 10);
 
     for (var i = 0, childNode; childNode = xmlElement.childNodes[i]; i++) {
       if (childNode.nodeName.toLowerCase() == 'var') {
@@ -659,6 +658,15 @@ Blockly.Blocks['lists_comprehension'] = {
             .appendField('\u2190');
       }
     }
+
+    for (var x = 0; x < this.guardCount_; x++){
+      var input = this.appendValueInput('GUARD' + x)
+                      .setTypeExpr(new Blockly.TypeExpr ("Bool"))
+                      .setAlign(Blockly.ALIGN_RIGHT)
+                      .appendField('If');
+    }
+
+
   },
   /**
    * Populate the mutator's dialog with this block's components.
