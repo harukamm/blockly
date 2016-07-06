@@ -18,6 +18,8 @@
    https://github.com/UCSD-PL/typed-blockly
 */
 
+// TODO, move blocks over to Haskell
+
 Blockly.Blocks['logic_boolean_typed'] = {
   /**
    * Block for boolean data type: true and false.
@@ -153,7 +155,6 @@ Blockly.Blocks['numNumberPerc'] = {
   }
 };
 
-/* should go in blocks/math.js */ 
 Blockly.Blocks['math_arithmetic_typed'] = {
   /**
    * Block for basic arithmetic operator.
@@ -206,6 +207,21 @@ Blockly.Blocks['lists_path'] = {
     this.setOutputTypeExpr(new Blockly.TypeExpr('Picture'));
   }
 };
+
+Blockly.Blocks['lists_length'] = {
+  init: function() {
+    var a = Blockly.TypeVar.getUnusedTypeVar();
+    this.setColour(210);
+    this.appendValueInput('LST')
+        .setTypeExpr(new Blockly.TypeExpr('list',[a]))
+        .appendField(new Blockly.FieldLabel("Length","blocklyTextEmph") );
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
+  }
+};
+
+
+
 
 
 /* should go in blocks/lists.js */ 
