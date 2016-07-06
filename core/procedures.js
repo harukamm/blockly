@@ -181,7 +181,7 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     var block = goog.dom.createDom('block');
     block.setAttribute('type', 'procedures_defreturn');
     block.setAttribute('gap', 16);
-    // xmlList.push(block);
+    //xmlList.push(block);
   }
   if (Blockly.Blocks['procedures_ifreturn']) {
     // <block type="procedures_ifreturn" gap="16"></block>
@@ -197,6 +197,15 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     block.setAttribute('gap', 16);
     xmlList.push(block);
   }
+  if (Blockly.Blocks['procedures_letFunc']) {
+    // <block type="procedures_defreturn" gap="16"></block>
+    var block = goog.dom.createDom('block');
+    block.setAttribute('type', 'procedures_letFunc');
+    block.setAttribute('gap', 16);
+    xmlList.push(block);
+  }
+
+
 
 
   if (xmlList.length) {

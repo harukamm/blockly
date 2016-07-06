@@ -220,11 +220,6 @@ Blockly.Blocks['lists_length'] = {
   }
 };
 
-
-
-
-
-/* should go in blocks/lists.js */ 
 Blockly.Blocks['lists_create_with_typed'] = {
   /**
    * Block for creating a list with any number of elements of any type.
@@ -270,7 +265,7 @@ Blockly.Blocks['lists_create_with_typed'] = {
       var input = this.appendValueInput('ADD' + x)
                       .setTypeExpr(this.typeParams.elmtType);
       if (x == 0) {
-        input.appendField(Blockly.Msg.LISTS_CREATE_WITH_INPUT_WITH);
+        input.appendField("List");
       }
     }
     if (this.itemCount_ == 0) {
@@ -291,7 +286,6 @@ Blockly.Blocks['lists_create_with_typed'] = {
     var connection = containerBlock.getInput('STACK').connection;
     for (var x = 0; x < this.itemCount_; x++) {
       var itemBlock = workspace.newBlock('lists_create_with_item');
-      // TODO
       itemBlock.initSvg();
       connection.connect(itemBlock.previousConnection);
       connection = itemBlock.nextConnection;
@@ -319,7 +313,7 @@ Blockly.Blocks['lists_create_with_typed'] = {
       var input = this.appendValueInput('ADD' + this.itemCount_)
                       .setTypeExpr(this.typeParams.elmtType);
       if (this.itemCount_ == 0) {
-        input.appendField(Blockly.Msg.LISTS_CREATE_WITH_INPUT_WITH);
+        input.appendField("List");
       }
       // Reconnect any child blocks.
       if (itemBlock.valueConnection_) {
@@ -331,7 +325,7 @@ Blockly.Blocks['lists_create_with_typed'] = {
     }
     if (this.itemCount_ == 0) {
       this.appendDummyInput('EMPTY')
-          .appendField(Blockly.Msg.LISTS_CREATE_EMPTY_TITLE);
+          .appendField("[]");
     }
     this.renderMoveConnections_();
   },
@@ -352,6 +346,7 @@ Blockly.Blocks['lists_create_with_typed'] = {
     }
   }
 };
+
 
 /**
  * Pairs
@@ -583,4 +578,347 @@ Blockly.Blocks['text_typed'] = {
   }
 };
 
+Blockly.Blocks['lists_comprehension'] = {
+  /**
+   * Block for creating a list with any number of elements of any type.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(260);
+    this.vars_ = ['x','y','z'];
+    //this.typeParams = { elmtType: Blockly.TypeVar.getUnusedTypeVar() };
+    var A = Blockly.TypeVar.getUnusedTypeVar();
+    var B = Blockly.TypeVar.getUnusedTypeVar();
+    var C = Blockly.TypeVar.getUnusedTypeVar();
+    var OUT = Blockly.TypeVar.getUnusedTypeVar();
+    this.appendValueInput("DO")
+        .appendField(new Blockly.FieldLabel("List Comprehension","blocklyTextEmph"))
+        .setTypeExpr(OUT);
+    this.appendValueInput('VAR0')
+          .setTypeExpr(new Blockly.TypeExpr ("list", [A]))
+          .setAlign(Blockly.ALIGN_RIGHT)
+          .appendField(this.vars_[0])
+          .appendField('\u2190');
+    this.appendValueInput('VAR1')
+          .setTypeExpr(new Blockly.TypeExpr ("list", [B]))
+          .setAlign(Blockly.ALIGN_RIGHT)
+          .appendField(this.vars_[1])
+          .appendField('\u2190');
+    this.setOutput(true, 'Array');
+    this.setOutputTypeExpr( new Blockly.TypeExpr("list", [OUT]) );
+    this.setMutator(new Blockly.Mutator(['lists_comp_var', 'lists_comp_guard']));
+    this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP);
+    this.varCount_ = 2;
+    this.guardCount_ = 0;
+  },
+  /**
+   * Create XML to represent list inputs.
+   * @return {Element} XML storage element.
+   * @this Blockly.Block
+   */
+  mutationToDom: function() {
+    var container = document.createElement('mutation');
+    container.setAttribute('guardCount', this.guardCount_);
+    container.setAttribute('varCount', this.varCount_);
 
+    for (var i = 0; i < this.varCount_; i++) {
+      var parameter = document.createElement('var');
+      parameter.setAttribute('name', this.vars_[i]);
+      
+      container.appendChild(parameter);
+    }
+
+    return container;
+  },
+  /**
+   * Parse XML to restore the list inputs.
+   * @param {!Element} xmlElement XML storage element.
+   * @this Blockly.Block
+   */
+  domToMutation: function(xmlElement) {
+
+    this.varCount_ = parseInt(xmlElement.getAttribute('varCount'), 10);
+    this.guardCount_ = parseInt(xmlElement.getAttribute('guardCount'), 10);
+
+    for (var x = 0; x < this.varCount_; x++) {
+      this.removeInput('VAR' + x);
+    }
+    for (var x = 0; x < this.guardCount_; x++) {
+      this.removeInput('GUARD' + x);
+    }
+
+    for (var i = 0, childNode; childNode = xmlElement.childNodes[i]; i++) {
+      if (childNode.nodeName.toLowerCase() == 'var') {
+        var name = childNode.getAttribute('name');
+
+        var A = Blockly.TypeVar.getUnusedTypeVar();
+        var input = this.appendValueInput('VAR' + i)
+            .setTypeExpr(new Blockly.TypeExpr ("list", [A]))
+            .setAlign(Blockly.ALIGN_RIGHT)
+            .appendField(name)
+            .appendField('\u2190');
+      }
+    }
+  },
+  /**
+   * Populate the mutator's dialog with this block's components.
+   * @param {!Blockly.Workspace} workspace Mutator's workspace.
+   * @return {!Blockly.Block} Root block in mutator.
+   * @this Blockly.Block
+   */
+  decompose: function(workspace) {
+    var containerBlock =
+        workspace.newBlock('lists_create_with_container');
+    containerBlock.initSvg();
+    var connection = containerBlock.getInput('STACK').connection;
+
+    for (var x = 0; x < this.varCount_; x++) {
+      var itemBlock = workspace.newBlock('lists_comp_var');
+      itemBlock.setFieldValue(this.vars_[x], 'NAME');
+      itemBlock.initSvg();
+      connection.connect(itemBlock.previousConnection);
+      connection = itemBlock.nextConnection;
+    }
+    for (var x = 0; x < this.guardCount_; x++) {
+      var itemBlock = workspace.newBlock('lists_comp_guard');
+      itemBlock.initSvg();
+      connection.connect(itemBlock.previousConnection);
+      connection = itemBlock.nextConnection;
+    }
+
+    return containerBlock;
+  },
+  /**
+   * Reconfigure this block based on the mutator dialog's components.
+   * @param {!Blockly.Block} containerBlock Root block in mutator.
+   * @this Blockly.Block
+   */
+  compose: function(containerBlock) {
+    // Disconnect all input blocks and remove all inputs.
+    for (var x = this.varCount_ - 1; x >= 0; x--) {
+      this.removeInput('VAR' + x);
+    }
+    for (var x = this.guardCount_ - 1; x >= 0; x--) {
+      this.removeInput('GUARD' + x);
+    }
+
+
+
+    this.varCount_ = 0;
+    this.guardCount_ = 0;
+    // Rebuild the block's inputs.
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    while (itemBlock) {
+      if(itemBlock.type == 'lists_comp_var')
+      {
+        var A = Blockly.TypeVar.getUnusedTypeVar();
+        var name = itemBlock.getFieldValue('NAME');
+        this.vars_[this.varCount_] = name;
+        var input = this.appendValueInput('VAR' + this.varCount_)
+            .setTypeExpr(new Blockly.TypeExpr ("list", [A]))
+            .setAlign(Blockly.ALIGN_RIGHT)
+            .appendField(name)
+            .appendField('\u2190');
+
+        // Reconnect any child blocks.
+        if (itemBlock.valueConnection_) {
+          input.connection.connect(itemBlock.valueConnection_);
+        }
+        this.varCount_++;
+      }
+      else if(itemBlock.type == 'lists_comp_guard')
+      {
+          var input = this.appendValueInput('GUARD' + this.guardCount_)
+                          .setTypeExpr(new Blockly.TypeExpr ("Bool"))
+                          .setAlign(Blockly.ALIGN_RIGHT)
+                          .appendField('If');
+          if (itemBlock.valueConnection_) {
+            input.connection.connect(itemBlock.valueConnection_);
+          }
+          this.guardCount_++;
+      }
+
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+    this.renderMoveConnections_();
+  },
+  /**
+   * Store pointers to any connected child blocks.
+   * @param {!Blockly.Block} containerBlock Root block in mutator.
+   * @this Blockly.Block
+   */
+  saveConnections: function(containerBlock) {
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var x = 0;
+    while (itemBlock) {
+      var input = this.getInput('VAR' + x);
+      itemBlock.valueConnection_ = input && input.connection.targetConnection;
+      x++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+  }
+};
+
+Blockly.Blocks['lists_comp_var'] = {
+  /**
+   * Mutator block for procedure argument.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldTextInput('x'), 'NAME')
+        .appendField('\u2190');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setColour(Blockly.Blocks.lists.HUE);
+    this.setTooltip('Assign a binding to a list');
+    this.contextMenu = false;
+  }
+};
+
+Blockly.Blocks['lists_comp_guard'] = {
+  /**
+   * Mutator bolck for adding items.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Blockly.Blocks.lists.HUE);
+    this.appendDummyInput()
+        .appendField("Guard");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip("Guard against a boolean expression");
+    this.contextMenu = false;
+  }
+};
+
+
+
+
+
+Blockly.Blocks['variables_get_lists'] = {
+  /**
+   * Block for variable getter.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.VARIABLES_GET_HELPURL);
+    this.setColour(330);
+    var dropdown = new Blockly.FieldDropdown(this.genMenu, this.createDropdownChangeFunction());
+    dropdown.master = this;
+    this.appendDummyInput()
+        .appendField(dropdown,"VAR");
+    this.setOutput(true);
+    this.setTooltip(Blockly.Msg.VARIABLES_GET_TOOLTIP);
+  },
+  /**
+   * Return all variables referenced by this block.
+   * @return {!Array.<string>} List of variable names.
+   * @this Blockly.Block
+   */
+  getVars: function() {
+    return [this.getFieldValue('VAR')];
+  },
+  /**
+   * Notification that a variable is renaming.
+   * If the name matches one of this block's variables, rename it.
+   * @param {string} oldName Previous name of variable.
+   * @param {string} newName Renamed variable.
+   * @this Blockly.Block
+   */
+  renameVar: function(oldName, newName) {
+    if (Blockly.Names.equals(oldName, this.getFieldValue('VAR'))) {
+      this.setFieldValue(newName, 'VAR');
+    }
+  },
+  /**
+   * Add menu option to create getter/setter block for this setter/getter.
+   * @param {!Array} options List of menu options to add to.
+   * @this Blockly.Block
+   */
+  customContextMenu: function(options) {
+  },
+
+  createDropdownChangeFunction: function() {
+    var self = this;
+    return function(text) {
+    var par = self.getParent();
+    var varList = [];
+    // get type of most immediate parent declaring the variable
+    while(par)
+    {
+      if(par.type == "lists_comprehension")
+      {
+        for(var i =0; i < par.varCount_; i++)
+        {
+          if(par.vars_[i] == text)
+          {
+            var inp = par.getInput("VAR" + i);
+
+            var tp = inp.getTypeExpr().children[0];
+
+            self.setOutputTypeExpr(tp);
+            self.setColourByType(tp);
+
+            self.outputConnection.targetConnection.setTypeExpr(tp); // This actually changes the connector, but not the output expressino of the block
+
+            par.render();
+            self.render();
+
+            return undefined;    
+          }
+        }
+      }
+      par = par.getParent();
+    }
+    return undefined;
+    };
+  },
+
+  genMenu: function() {
+    var def = [["None","None"]];
+
+    if(!this.master)
+      return def; 
+
+    var par = this.master.getParent();
+
+    var varList = [];
+
+    while(par)
+    {
+      if(par.type == "lists_comprehension")
+      {
+        for(var i =0; i < par.varCount_; i++)
+        {
+          varList.push([par.vars_[i], par.vars_[i]]);
+        }
+      }
+      par = par.getParent();
+    }
+    if(varList.length < 1)
+      return def;
+    return varList;
+  }
+};
+
+Blockly.Blocks['lists_numgen'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("[");
+    this.appendValueInput("LEFT")
+        .setTypeExpr(new Blockly.TypeExpr('Number'));
+    this.appendValueInput("RIGHT")
+        .appendField("...")
+        .setTypeExpr(new Blockly.TypeExpr('Number'));
+    this.appendDummyInput()
+        .appendField("]");
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('list',[new Blockly.TypeExpr('Number')]));
+    this.setColour(Blockly.Blocks.lists.HUE);
+    this.setTooltip('Generates a list of numbers between the first and second inputs');
+  }
+};
