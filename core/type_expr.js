@@ -10,6 +10,8 @@ goog.provide('Blockly.TypeVar');
 Blockly.TypeExpr = function(name, children /* = [] */ ) {
   this.name = name;
   this.children = arguments.length == 2 ? children : [];
+  // this.inputs = [new Blockly.TypeExpr('NumberSmall'), new Blockly.TypeExpr('NumberSmall')];
+  this.inputs = [];
 }
 
 Blockly.TypeExpr.prototype.isTypeVar = function() {

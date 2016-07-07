@@ -394,12 +394,26 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
 
     // Compute minimum input size.
     input.renderHeight = Blockly.BlockSvg.MIN_BLOCK_Y;
+   
+    
     // The width is currently only needed for inline value inputs.
     if (isInline && input.type == Blockly.INPUT_VALUE) {
       input.renderWidth = Blockly.BlockSvg.TAB_WIDTH +
           Blockly.BlockSvg.SEP_SPACE_X * 1.25;
     } else {
       input.renderWidth = 0;
+    }
+
+    //FFC Stefan
+    if(isInline && input.connection && input.connection.typeExpr && input.connection.typeExpr.name == "Function_" && !input.connection.isConnected())
+    {
+      for(var l = 0; l < input.connection.typeExpr.children.length - 1; l++)
+      {
+        var t = input.connection.typeExpr.children[l];
+        var h = Blockly.BlockSvg.getTypeExprHeight(t);
+        input.renderHeight += 16;
+      }
+      input.renderWidth += 10
     }
     // Expand input size if there is a connection.
     if (input.connection && input.connection.isConnected()) {
@@ -413,6 +427,7 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
       input.renderHeight = Math.max(input.renderHeight, 
                                     Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr));
     }
+
  
     // Blocks have a one pixel shadow that should sometimes overhang.
     if (!isInline && i == inputList.length - 1) {
@@ -704,46 +719,19 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
         if (input.type == Blockly.INPUT_VALUE) {
           inlineSteps.push('M', (cursorX - Blockly.BlockSvg.SEP_SPACE_X) +
                            ',' + (cursorY + Blockly.BlockSvg.INLINE_PADDING_Y));
+          if(!input.connection.isConnected()) // Experimental
           inlineSteps.push('h', Blockly.BlockSvg.TAB_WIDTH - 2 -
                            input.renderWidth);
           // Stefan
           // Sorin
           inlineSteps.push(Blockly.BlockSvg.getDownPath(input.connection));
           var tabHeight = Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);
-          // inlineSteps.push(Blockly.BlockSvg.TAB_PATH_DOWN);
           inlineSteps.push('v', input.renderHeight + 1 -
                                 tabHeight);
+          if(!input.connection.isConnected()) // Experimental
           inlineSteps.push('h', input.renderWidth + 2 -
                            Blockly.BlockSvg.TAB_WIDTH);
           inlineSteps.push('z');
-          if (this.RTL) {
-            // Highlight right edge, around back of tab, and bottom.
-            highlightInlineSteps.push('M',
-                (cursorX - Blockly.BlockSvg.SEP_SPACE_X - 2.5 +
-                 Blockly.BlockSvg.TAB_WIDTH - input.renderWidth) + ',' +
-                (cursorY + Blockly.BlockSvg.INLINE_PADDING_Y + 0.5));
-            highlightInlineSteps.push(
-                Blockly.BlockSvg.TAB_PATH_DOWN_HIGHLIGHT_RTL);
-            highlightInlineSteps.push('v',
-                input.renderHeight - Blockly.BlockSvg.TAB_HEIGHT + 2.5);
-            highlightInlineSteps.push('h',
-                input.renderWidth - Blockly.BlockSvg.TAB_WIDTH + 2);
-          } else {
-           //  // Highlight right edge, bottom.
-           //  highlightInlineSteps.push('M',
-           //      (cursorX - Blockly.BlockSvg.SEP_SPACE_X + 0.5) + ',' +
-           //      (cursorY + Blockly.BlockSvg.INLINE_PADDING_Y + 0.5));
-           //  highlightInlineSteps.push('v', input.renderHeight + 1);
-           //  highlightInlineSteps.push('h', Blockly.BlockSvg.TAB_WIDTH - 2 -
-           //                                 input.renderWidth);
-           //  // Short highlight glint at bottom of tab.
-           //  highlightInlineSteps.push('M',
-           //      (cursorX - input.renderWidth - Blockly.BlockSvg.SEP_SPACE_X +
-           //       0.9) + ',' + (cursorY + Blockly.BlockSvg.INLINE_PADDING_Y +
-           //       Blockly.BlockSvg.TAB_HEIGHT - 0.7));
-           //  highlightInlineSteps.push('l',
-           //      (Blockly.BlockSvg.TAB_WIDTH * 0.46) + ',-2.1');
-          }
           // Create inline input connection.
           if (this.RTL) {
             connectionX = -cursorX -
@@ -754,6 +742,22 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
                 Blockly.BlockSvg.TAB_WIDTH - Blockly.BlockSvg.SEP_SPACE_X -
                 input.renderWidth - 1;
           }
+
+          // TODO FFC
+          // input.connection.typeExpr.inputs.length = 3;
+          if(input.connection.typeExpr.children.length > 0 && input.connection.typeExpr.name == "Function_" && !input.connection.isConnected())
+          {
+            inlineSteps.push('v', 2);
+            for(var i = 0; i < input.connection.typeExpr.children.length - 1; i++)
+            {
+              var t = input.connection.typeExpr.children[i];
+              var down = Blockly.BlockSvg.getShapeForType(t.name).down;
+
+              inlineSteps.push(down);
+              inlineSteps.push('v', 5);
+            }
+          }
+
           connectionY = cursorY + Blockly.BlockSvg.INLINE_PADDING_Y + 1;
           input.connection.setOffsetInBlock(connectionX, connectionY);
 
@@ -1047,6 +1051,32 @@ Blockly.BlockSvg.typeVarShapes_ = {
     }
   },
 
+  Function_ : {
+    down: function (self, steps, updown) {
+      Blockly.BlockSvg.renderTypeExpr(self.children[self.children.length - 1], steps, updown);
+    },
+    up: function (self, steps, updown) {
+      Blockly.BlockSvg.renderTypeExpr(self.children[self.children.length - 1], steps, updown);
+    },
+    height: function(self) {
+      var h = 14;
+      for(var i = 0; i < self.children.length - 1; i++)
+      {
+        var t = self.children[i];
+        var h_ = Blockly.BlockSvg.getTypeExprHeight(t);
+        h += 2;
+      }
+      return h; 
+    },
+    offsetsY: function(self) {
+      return [0];
+    }
+  },
+
+
+
+
+
   pair : {
     down: function (self, steps, updown) {
       steps.push('l 0,3 -12,0 0,3 12,0');
@@ -1136,6 +1166,14 @@ Blockly.BlockSvg.typeVarShapes_ = {
     height: 20,
     blockColour: Blockly.BlockSvg.NUMBER_COLOUR
   },
+  NumberSmall : { 
+    down: 'l 0,5 a 3,3,0,0,0,0,6 l 0,3',
+    up: 'l 0,-3 a 3,3,0,0,1,0,-6 l 0,-5',
+    height: 20,
+    blockColour: Blockly.BlockSvg.NUMBER_COLOUR
+  },
+
+
 
   Text : {
     down: 

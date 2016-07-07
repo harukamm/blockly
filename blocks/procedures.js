@@ -615,6 +615,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
         field = new Blockly.FieldLabel(this.arguments_[i]);
         var input = this.appendValueInput('ARG' + i)
             .setAlign(Blockly.ALIGN_RIGHT)
+            .setTypeExpr(Blockly.TypeVar.getUnusedTypeVar())
             .appendField(field, 'ARGNAME' + i);
         input.init();
       }
@@ -625,7 +626,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       i++;
     }
     // Add 'with:' if there are parameters, remove otherwise.
-    var topRow = this.getInput('TOPROW');
+    /* var topRow = this.getInput('TOPROW');
     if (topRow) {
       if (this.arguments_.length) {
         if (!this.getField('WITH')) {
@@ -638,6 +639,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
         }
       }
     }
+   */
   },
   /**
    * Create XML to represent the (non-editable) name and arguments.

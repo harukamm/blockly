@@ -930,3 +930,97 @@ Blockly.Blocks['lists_numgen'] = {
     this.setTooltip('Generates a list of numbers between the first and second inputs');
   }
 };
+
+
+
+
+
+
+
+Blockly.Blocks['take_func_test'] = {
+  /**
+   * Block for comparison operator.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(210);
+    this.setOutput(true, 'Boolean');
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Picture'));
+
+    var A = Blockly.TypeVar.getUnusedTypeVar();
+    this.appendValueInput('A')
+        .setTypeExpr(new Blockly.TypeExpr('Function_', 
+              [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Bool') ]  ));
+    this.appendValueInput('B')
+        .setTypeExpr(new Blockly.TypeExpr('Number'))
+    this.setInputsInline(true);
+    // Assign 'this' to a variable for use in the tooltip closure below.
+  }
+};
+
+Blockly.Blocks['func_test'] = {
+  /**
+   * Block for comparison operator.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(210);
+    this.setOutput(true, 'Boolean');
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Function_', 
+              [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Bool') ]  ));
+
+    this.appendDummyInput()
+        .appendField('Niemand');
+    this.appendValueInput('A')
+        .setTypeExpr(new Blockly.TypeExpr('Number'));
+    this.appendValueInput('B')
+        .setTypeExpr(new Blockly.TypeExpr('Number'))
+    this.appendValueInput('A')
+        .setTypeExpr(new Blockly.TypeExpr('Number'));
+
+    // Assign 'this' to a variable for use in the tooltip closure below.
+  }
+};
+
+Blockly.Blocks['procedures_getVar'] = {
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.VARIABLES_GET_HELPURL);
+    this.setColour(330);
+    var dropdown = new Blockly.FieldDropdown(this.genMenu, this.createDropdownChangeFunction());
+    dropdown.master = this;
+    this.appendDummyInput()
+        .appendField(dropdown,"VAR");
+    this.setOutput(true);
+    this.setTooltip(Blockly.Msg.VARIABLES_GET_TOOLTIP);
+  },
+
+  customContextMenu: function(options) {
+  },
+
+  createDropdownChangeFunction: function() {
+    var self = this;
+    return function(text) {
+   
+    return undefined;
+    };
+  },
+
+  genMenu: function() {
+    var def = [["None","None"]];
+
+    if(!this.master)
+      return def; 
+
+    var varList = [];
+    var par = this.master.getParent();
+    var vars = Blockly.Variables.getVariablesUp(par);
+    vars.forEach(function(v){
+      varList.push([v,v]);
+    });
+
+    if(varList.length < 1)
+      return def;
+    return varList;
+  }
+};
+

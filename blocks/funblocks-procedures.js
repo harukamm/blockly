@@ -179,7 +179,29 @@ Blockly.Blocks['procedures_letFunc'] = {
   updateParams_: Blockly.Blocks['procedures_defnoreturn'].updateParams_,
   mutationToDom: Blockly.Blocks['procedures_defnoreturn'].mutationToDom,
   domToMutation: Blockly.Blocks['procedures_defnoreturn'].domToMutation,
-  decompose: Blockly.Blocks['procedures_defnoreturn'].decompose,
+
+  decompose: function(workspace) {
+    var containerBlock = workspace.newBlock('procedures_mutatorcontainer_nostatements');
+    containerBlock.initSvg();
+
+    // Parameter list.
+    var connection = containerBlock.getInput('STACK').connection;
+    for (var i = 0; i < this.arguments_.length; i++) {
+      var paramBlock = workspace.newBlock('procedures_mutatorarg');
+      paramBlock.initSvg();
+      paramBlock.setFieldValue(this.arguments_[i], 'NAME');
+      // Store the old location.
+      paramBlock.oldLocation = i;
+      connection.connect(paramBlock.previousConnection);
+      connection = paramBlock.nextConnection;
+    }
+    // Initialize procedure's callers with blank IDs.
+    Blockly.Procedures.mutateCallers(this);
+    return containerBlock;
+  },
+
+
+
   compose: Blockly.Blocks['procedures_defnoreturn'].compose,
   dispose: Blockly.Blocks['procedures_defnoreturn'].dispose,
   /**
@@ -200,5 +222,20 @@ Blockly.Blocks['procedures_letFunc'] = {
 };
 
 
+
+Blockly.Blocks['procedures_mutatorcontainer_nostatements'] = {
+  /**
+   * Mutator block for procedure container.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE);
+    this.appendStatementInput('STACK');
+    this.setColour(Blockly.Blocks.procedures.HUE);
+    this.setTooltip(Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP);
+    this.contextMenu = false;
+  }
+};
 
 
