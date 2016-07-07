@@ -1024,3 +1024,25 @@ Blockly.Blocks['procedures_getVar'] = {
   }
 };
 
+
+Blockly.Blocks['cwAnimationOf'] = {
+  /**
+   * Block for comparison operator.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(210);
+    this.setOutput(false);
+
+    var A = Blockly.TypeVar.getUnusedTypeVar();
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Animation Of', 'blocklyTextEmph'));
+    this.appendValueInput('FUNC')
+        .setTypeExpr(new Blockly.TypeExpr('Function_', 
+              [new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Picture') ]  ));
+    this.setInputsInline(true);
+    // Assign 'this' to a variable for use in the tooltip closure below.
+  }
+};
+
+
