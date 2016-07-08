@@ -191,14 +191,12 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     // xmlList.push(block);
   }
   if (Blockly.Blocks['procedures_letVar']) {
-    // <block type="procedures_defreturn" gap="16"></block>
     var block = goog.dom.createDom('block');
     block.setAttribute('type', 'procedures_letVar');
     block.setAttribute('gap', 16);
-    xmlList.push(block);
+    // xmlList.push(block);
   }
   if (Blockly.Blocks['procedures_letFunc']) {
-    // <block type="procedures_defreturn" gap="16"></block>
     var block = goog.dom.createDom('block');
     block.setAttribute('type', 'procedures_letFunc');
     block.setAttribute('gap', 16);

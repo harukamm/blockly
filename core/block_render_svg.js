@@ -413,7 +413,7 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
         var h = Blockly.BlockSvg.getTypeExprHeight(t);
         input.renderHeight += 16;
       }
-      input.renderWidth += 10
+      input.renderWidth += 20
     }
     // Expand input size if there is a connection.
     if (input.connection && input.connection.isConnected()) {
@@ -1060,12 +1060,12 @@ Blockly.BlockSvg.typeVarShapes_ = {
       Blockly.BlockSvg.renderTypeExpr(self.children[self.children.length - 1], steps, updown);
     },
     height: function(self) {
-      var h = 14;
-      for(var i = 0; i < self.children.length - 1; i++)
+      var h = 24;
+      for(var i = 0; i < self.children.length; i++)
       {
         var t = self.children[i];
         var h_ = Blockly.BlockSvg.getTypeExprHeight(t);
-        h += 2;
+        h += 0;
       }
       return h; 
     },

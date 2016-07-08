@@ -520,7 +520,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
 
     if (defBlockMain)
     {
-      if (defBlockMain.type == "procedures_letVar")
+      if (defBlockMain.type == "procedures_letFunc")
       {
         var tp = defBlockMain.getInput("RETURN").connection.getTypeExpr();
         this.setOutputTypeExpr(tp);

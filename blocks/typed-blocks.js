@@ -1031,7 +1031,7 @@ Blockly.Blocks['cwAnimationOf'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.setColour(210);
+    this.setColour(0);
     this.setOutput(false);
 
     var A = Blockly.TypeVar.getUnusedTypeVar();

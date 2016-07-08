@@ -218,7 +218,60 @@ Blockly.Blocks['procedures_letFunc'] = {
   getVars: Blockly.Blocks['procedures_defnoreturn'].getVars,
   renameVar: Blockly.Blocks['procedures_defnoreturn'].renameVar,
   customContextMenu: Blockly.Blocks['procedures_defnoreturn'].customContextMenu,
-  callType_: 'procedures_callreturn'
+  callType_: 'procedures_callreturn',
+
+
+  onchange: function(changeEvent) {
+    var name = this.getFieldValue('NAME');
+    var defBlock = this;
+    var workspace = Blockly.getMainWorkspace();
+    var eventBlock = workspace.getBlockById(changeEvent.blockId);
+    if(!eventBlock || eventBlock.blockId != this.blockId)
+      return; // Only care about events on the parent this block
+
+    var parentBlock = null;
+    if(changeEvent.oldParentId)
+      parentBlock = workspace.getBlockById(changeEvent.oldParentId);
+    else if(changeEvent.newParentId)
+      parentBlock = workspace.getBlockById(changeEvent.newParentId);
+
+    if(!parentBlock || parentBlock.type != 'procedures_letFunc')
+      return; 
+
+    if(parentBlock.getFieldValue('NAME') != name)
+      return; // Only event when parentblock is this block
+
+    if(changeEvent.type == Blockly.Events.MOVE && changeEvent.newInputName)
+    {
+      // Plug in new block
+      var callers = Blockly.Procedures.getCallers(name, workspace);
+      var tp = defBlock.getInput("RETURN").connection.getTypeExpr();
+      callers.forEach(function(block)
+          {
+            if(block.getProcedureCall() == name)
+            {
+              if(block.outputConnection.typeExpr.name != tp.name)
+              {
+                // block.outputConnection.bumpAwayFrom_(block.outputConnection.targetConnection);
+                block.unplug();
+                block.moveBy(-20,-20);
+
+                block.setOutputTypeExpr(tp);
+                block.setColourByType(tp);
+                if(block.outputConnection.typeExpr)
+                  block.outputConnection.typeExpr.unify(tp);
+
+                block.render();
+              }
+            }
+          });
+    }
+    else if(changeEvent.type == Blockly.Events.MOVE && changeEvent.oldInputName)
+    {
+    }
+    // TODO disconnection, but in connection.js
+  }
+
 };
 
 

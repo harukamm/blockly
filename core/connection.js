@@ -623,6 +623,30 @@ Blockly.Connection.prototype.disconnect = function() {
     childBlock.updateDisabled();
   }
 
+  if(parentBlock.type == 'procedures_letFunc')
+  {
+    var name = parentBlock.getFieldValue("NAME");
+
+    var callers = Blockly.Procedures.getCallers(name, workspace);
+    var tp = parentBlock.getInput("RETURN").connection.getTypeExpr();
+    callers.forEach(function(block)
+    {
+      var conn = block.outputConnection.targetConnection;
+      var isConnected = block.outputConnection.isConnected();
+
+      block.setOutputTypeExpr(tp);
+
+      if(isConnected)
+      {
+        block.outputConnection.disconnect();
+        block.outputConnection.connect(conn);
+      }
+      block.render();
+
+    });
+
+  }
+
 };
 
 /**
