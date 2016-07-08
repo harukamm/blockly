@@ -42,6 +42,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     this.setColour(Blockly.Blocks.procedures.HUE);
     this.setTooltip(Blockly.Msg.PROCEDURES_DEFRETURN_TOOLTIP);
     this.arguments_ = [];
+    this.argTypes_ = [];
     this.setStatements_(false);
     this.statementConnection_ = null;
   },
@@ -49,7 +50,21 @@ Blockly.Blocks['procedures_letFunc'] = {
   validate: Blockly.Blocks['procedures_defnoreturn'].validate,
   updateParams_: Blockly.Blocks['procedures_defnoreturn'].updateParams_,
   mutationToDom: Blockly.Blocks['procedures_defnoreturn'].mutationToDom,
-  domToMutation: Blockly.Blocks['procedures_defnoreturn'].domToMutation,
+  domToMutation: function(xmlElement) {
+    this.arguments_ = [];
+    for (var i = 0, childNode; childNode = xmlElement.childNodes[i]; i++) {
+      if (childNode.nodeName.toLowerCase() == 'arg') {
+        this.arguments_.push(childNode.getAttribute('name'));
+        this.argTypes_.push(Blockly.TypeVar.getUnusedTypeVar());
+      }
+    }
+    this.updateParams_();
+    Blockly.Procedures.mutateCallers(this);
+
+    // Show or hide the statement input.
+    this.setStatements_(xmlElement.getAttribute('statements') !== 'false');
+  },
+
 
   decompose: function(workspace) {
     var containerBlock = workspace.newBlock('procedures_mutatorcontainer_nostatements');
@@ -71,9 +86,23 @@ Blockly.Blocks['procedures_letFunc'] = {
     return containerBlock;
   },
 
+  compose: function(containerBlock) {
+    // Parameter list.
+    this.arguments_ = [];
+    this.paramIds_ = [];
+    var paramBlock = containerBlock.getInputTargetBlock('STACK');
+    while (paramBlock) {
+      this.arguments_.push(paramBlock.getFieldValue('NAME'));
+      this.argTypes_.push(Blockly.TypeVar.getUnusedTypeVar());
+      // TODO, make sure argTypes_ do not get garbage collected !
+      this.paramIds_.push(paramBlock.id);
+      paramBlock = paramBlock.nextConnection &&
+          paramBlock.nextConnection.targetBlock();
+    }
+    this.updateParams_();
+    Blockly.Procedures.mutateCallers(this);
+  },
 
-
-  compose: Blockly.Blocks['procedures_defnoreturn'].compose,
   dispose: Blockly.Blocks['procedures_defnoreturn'].dispose,
   /**
    * Return the signature of this procedure definition.
@@ -158,6 +187,71 @@ Blockly.Blocks['procedures_mutatorcontainer_nostatements'] = {
     this.setColour(Blockly.Blocks.procedures.HUE);
     this.setTooltip(Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP);
     this.contextMenu = false;
+  }
+};
+
+Blockly.Blocks['procedures_getVar'] = {
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.VARIABLES_GET_HELPURL);
+    this.setColour(330);
+    var dropdown = new Blockly.FieldDropdown(this.genMenu, this.createDropdownChangeFunction());
+    dropdown.master = this;
+    this.appendDummyInput()
+        .appendField(dropdown,"VAR");
+    this.setOutput(true);
+    this.setTooltip(Blockly.Msg.VARIABLES_GET_TOOLTIP);
+  },
+
+  customContextMenu: function(options) {
+  },
+
+  createDropdownChangeFunction: function() {
+    var self = this;
+    return function(text) {
+    var par = self.getParent();
+    var varList = [];
+    // get type of most immediate parent declaring the variable
+    while(par)
+    {
+      if(par.type == "procedures_letFunc")
+      {
+        for(var i =0; i < par.arguments_.length; i++)
+        {
+          if(par.arguments_[i] == text)
+          {
+            var tp = par.argTypes_[i];
+            
+            par.argTypes_[i] = self.outputConnection.typeExpr;
+            //self.setOutputTypeExpr(tp);
+            //self.setColourByType(tp);
+          
+
+            return undefined;    
+          }
+        }
+      }
+      par = par.getParent();
+    }
+    return undefined;
+    };
+  },
+
+  genMenu: function() {
+    var def = [["None","None"]];
+
+    if(!this.master)
+      return def; 
+
+    var varList = [];
+    var par = this.master.getParent();
+    var vars = Blockly.Variables.getVariablesUp(par);
+    vars.forEach(function(v){
+      varList.push([v,v]);
+    });
+
+    if(varList.length < 1)
+      return def;
+    return varList;
   }
 };
 

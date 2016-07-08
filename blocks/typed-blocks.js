@@ -982,48 +982,6 @@ Blockly.Blocks['func_test'] = {
   }
 };
 
-Blockly.Blocks['procedures_getVar'] = {
-  init: function() {
-    this.setHelpUrl(Blockly.Msg.VARIABLES_GET_HELPURL);
-    this.setColour(330);
-    var dropdown = new Blockly.FieldDropdown(this.genMenu, this.createDropdownChangeFunction());
-    dropdown.master = this;
-    this.appendDummyInput()
-        .appendField(dropdown,"VAR");
-    this.setOutput(true);
-    this.setTooltip(Blockly.Msg.VARIABLES_GET_TOOLTIP);
-  },
-
-  customContextMenu: function(options) {
-  },
-
-  createDropdownChangeFunction: function() {
-    var self = this;
-    return function(text) {
-   
-    return undefined;
-    };
-  },
-
-  genMenu: function() {
-    var def = [["None","None"]];
-
-    if(!this.master)
-      return def; 
-
-    var varList = [];
-    var par = this.master.getParent();
-    var vars = Blockly.Variables.getVariablesUp(par);
-    vars.forEach(function(v){
-      varList.push([v,v]);
-    });
-
-    if(varList.length < 1)
-      return def;
-    return varList;
-  }
-};
-
 
 Blockly.Blocks['cwAnimationOf'] = {
   /**

@@ -601,6 +601,9 @@ Blockly.Blocks['procedures_callnoreturn'] = {
    * @this Blockly.Block
    */
   updateShape_: function() {
+    var defBlockMain = Blockly.Procedures.getDefinition(this.getProcedureCall(),
+          Blockly.getMainWorkspace()); 
+
     for (var i = 0; i < this.arguments_.length; i++) {
       var field = this.getField('ARGNAME' + i);
       if (field) {
@@ -615,7 +618,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
         field = new Blockly.FieldLabel(this.arguments_[i]);
         var input = this.appendValueInput('ARG' + i)
             .setAlign(Blockly.ALIGN_RIGHT)
-            .setTypeExpr(Blockly.TypeVar.getUnusedTypeVar())
+            .setTypeExpr(defBlockMain.argTypes_[i])
             .appendField(field, 'ARGNAME' + i);
         input.init();
       }
@@ -625,21 +628,12 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       this.removeInput('ARG' + i);
       i++;
     }
-    // Add 'with:' if there are parameters, remove otherwise.
-    /* var topRow = this.getInput('TOPROW');
-    if (topRow) {
-      if (this.arguments_.length) {
-        if (!this.getField('WITH')) {
-          topRow.appendField(Blockly.Msg.PROCEDURES_CALL_BEFORE_PARAMS, 'WITH');
-          topRow.init();
-        }
-      } else {
-        if (this.getField('WITH')) {
-          topRow.removeField('WITH');
-        }
-      }
+    // set input types correctly
+    
+    for(var i = 0; i < this.arguments_.length; i++)
+    {
+      this.getInput('ARG' + i).setTypeExpr(defBlockMain.argTypes_[i]);
     }
-   */
   },
   /**
    * Create XML to represent the (non-editable) name and arguments.
