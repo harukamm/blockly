@@ -626,6 +626,7 @@ Blockly.Connection.prototype.disconnect = function() {
   if(parentBlock.type == 'procedures_letFunc')
   {
     var name = parentBlock.getFieldValue("NAME");
+    var workspace = Blockly.getMainWorkspace();
 
     var callers = Blockly.Procedures.getCallers(name, workspace);
     var tp = parentBlock.getInput("RETURN").connection.getTypeExpr();
