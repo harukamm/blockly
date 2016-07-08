@@ -757,7 +757,7 @@ Blockly.Css.CONTENT = [
   '}',
 
   '.blocklyTypeVarPath {',
-   '  stroke-width: 3px;',
+   '  stroke-width: 2px;',
    '  fill: none;',
    '}',
  

@@ -602,6 +602,7 @@ Blockly.BlockSvg.prototype.renderMoveConnections_ = function() {
     var conn = this.inputList[i].connection;
     if (conn) {
       conn.moveToOffset(blockTL);
+      conn.renderTypeVarHighlights();
       if (conn.isConnected()) {
         conn.tighten_();
       }
@@ -764,7 +765,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
           if (input.connection.isConnected()) {
             input.connection.tighten_();
           }
-          input.connection.renderTypeVarHighlights();
+          // input.connection.renderTypeVarHighlights();
 
         }
       }
@@ -820,7 +821,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
             input.connection.targetBlock().getHeightWidth().width -
             Blockly.BlockSvg.TAB_WIDTH + 1);
       }
-      input.connection.renderTypeVarHighlights();
+      // input.connection.renderTypeVarHighlights();
     } else if (row.type == Blockly.DUMMY_INPUT) {
       // External naked field.
       var input = row[0];
