@@ -603,6 +603,8 @@ Blockly.Blocks['procedures_callnoreturn'] = {
   updateShape_: function() {
     var defBlockMain = Blockly.Procedures.getDefinition(this.getProcedureCall(),
           Blockly.getMainWorkspace()); 
+    if(!defBlockMain)
+      return;
 
     for (var i = 0; i < this.arguments_.length; i++) {
       var field = this.getField('ARGNAME' + i);
@@ -618,7 +620,6 @@ Blockly.Blocks['procedures_callnoreturn'] = {
         field = new Blockly.FieldLabel(this.arguments_[i]);
         var input = this.appendValueInput('ARG' + i)
             .setAlign(Blockly.ALIGN_RIGHT)
-            .setTypeExpr(defBlockMain.argTypes_[i])
             .appendField(field, 'ARGNAME' + i);
         input.init();
       }
@@ -628,8 +629,8 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       this.removeInput('ARG' + i);
       i++;
     }
+
     // set input types correctly
-    
     for(var i = 0; i < this.arguments_.length; i++)
     {
       this.getInput('ARG' + i).setTypeExpr(defBlockMain.argTypes_[i]);
