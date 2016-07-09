@@ -129,7 +129,8 @@ Blockly.Blocks['numNumber'] = {
     field.setValidator(Blockly.FieldNumber.prototype.basicNumberValidator);
     this.appendDummyInput()
         .appendField(field, 'NUMBER');
-    this.setOutput(true, 'Number');
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
     this.setTooltip(Blockly.Msg.MATH_NUMBER_TOOLTIP);
   }
 };
@@ -169,15 +170,13 @@ Blockly.Blocks['math_arithmetic_typed'] = {
          [Blockly.Msg.MATH_POWER_SYMBOL, 'POWER']];
     this.setHelpUrl(Blockly.Msg.MATH_ARITHMETIC_HELPURL);
     this.setColour(230);
-    this.setOutput(true, 'Number');
+    this.setOutput(true);
     // Sorin
-    this.setOutputTypeExpr(new Blockly.TypeExpr('int'));
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
     this.appendValueInput('A')
-        .setTypeExpr(new Blockly.TypeExpr('int'))
-        .setCheck('Number');
+        .setTypeExpr(new Blockly.TypeExpr('Number'));
     this.appendValueInput('B')
-        .setTypeExpr(new Blockly.TypeExpr('int'))
-        .setCheck('Number')
+        .setTypeExpr(new Blockly.TypeExpr('Number'))
         .appendField(new Blockly.FieldDropdown(OPERATORS), 'OP');
     this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
