@@ -589,6 +589,50 @@ Blockly.Connection.prototype.disconnect = function() {
   // Stefan
   // Anthony
 
+  // Handle calling blocks separately
+  if(childBlock.type == 'procedures_callreturn')
+  {
+    var defBlock = Blockly.Procedures.getDefinition(childBlock.getProcedureCall(),
+        Blockly.getMainWorkspace());
+    var tp = defBlock.getInput("RETURN").connection.getTypeExpr();
+    childBlock.setOutputTypeExpr(tp);
+
+    return;
+  }
+  if(parentBlock.type == 'procedures_letFunc')
+  {
+    var name = parentBlock.getFieldValue("NAME");
+    var workspace = Blockly.getMainWorkspace();
+
+    var callers = Blockly.Procedures.getCallers(name, workspace);
+
+    // If it is not connected anymore make it polymorphic
+    if(!parentBlock.getInput("RETURN").connection.isConnected())
+    {
+      parentBlock.getInput("RETURN").setTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
+      parentBlock.render();
+    }
+
+    var tp = parentBlock.getInput("RETURN").connection.getTypeExpr();
+
+    callers.forEach(function(block)
+    {
+      var conn = block.outputConnection.targetConnection;
+      var isConnected = block.outputConnection.isConnected();
+
+      block.setOutputTypeExpr(tp);
+
+      if(isConnected)
+      {
+        block.outputConnection.disconnect();
+        block.outputConnection.connect(conn);
+      }
+      block.render();
+
+    });
+    return;
+  }
+
   var workspace = parentBlock.workspace;
   Blockly.Events.disable();
   // Reconstruct parent and child blocks to restore type variables 
@@ -598,7 +642,7 @@ Blockly.Connection.prototype.disconnect = function() {
     // Export top-level ancestor to xml
     var rootDom = Blockly.Xml.blockToDom( rootBlock );
     // Re-construct block but without rendering it
-    var newRootBlock = Blockly.Xml.domToBlockHeadless_(rootDom, workspace);
+    var newRootBlock = Blockly.Xml.domToBlockHeadless_(rootDom, workspace); // This has too many side effects for function blocks ~ Stefan
     // Copy connection types from new block to old
     rootBlock.copyConnectionTypes_( newRootBlock, true );
     // Delete temporary block
@@ -622,32 +666,6 @@ Blockly.Connection.prototype.disconnect = function() {
   if (childBlock.rendered) {
     childBlock.updateDisabled();
   }
-
-  if(parentBlock.type == 'procedures_letFunc')
-  {
-    var name = parentBlock.getFieldValue("NAME");
-    var workspace = Blockly.getMainWorkspace();
-
-    var callers = Blockly.Procedures.getCallers(name, workspace);
-    var tp = parentBlock.getInput("RETURN").connection.getTypeExpr();
-    callers.forEach(function(block)
-    {
-      var conn = block.outputConnection.targetConnection;
-      var isConnected = block.outputConnection.isConnected();
-
-      block.setOutputTypeExpr(tp);
-
-      if(isConnected)
-      {
-        block.outputConnection.disconnect();
-        block.outputConnection.connect(conn);
-      }
-      block.render();
-
-    });
-
-  }
-
 };
 
 /**
