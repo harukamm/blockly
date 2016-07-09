@@ -956,7 +956,7 @@ Blockly.Flyout.prototype.filterForCapacity_ = function() {
   // Only allow one top level program block
   var workspaceBlocks = Blockly.getMainWorkspace().getTopBlocks(false);
   var programBlocks = 0;
-  var programBlockList = ["logic_negate", "cwDrawingOf"];
+  var programBlockList = ["cwAnimationOf", "cwDrawingOf"];
   for(var j = 0, blockW; blockW = workspaceBlocks[j]; j++)
   {
     if(programBlockList.indexOf(blockW.type) > -1)
