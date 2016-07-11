@@ -723,7 +723,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
         if (input.type == Blockly.INPUT_VALUE) {
           inlineSteps.push('M', (cursorX - Blockly.BlockSvg.SEP_SPACE_X) +
                            ',' + (cursorY + Blockly.BlockSvg.INLINE_PADDING_Y));
-          if(!input.connection.isConnected()) // Experimental
+          // if(!input.connection.isConnected()) // Experimental
           inlineSteps.push('h', Blockly.BlockSvg.TAB_WIDTH - 2 -
                            input.renderWidth);
           // Stefan
@@ -732,7 +732,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
           var tabHeight = Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);
           inlineSteps.push('v', input.renderHeight + 1 -
                                 tabHeight);
-          if(!input.connection.isConnected()) // Experimental
+          // if(!input.connection.isConnected()) // Experimental
           inlineSteps.push('h', input.renderWidth + 2 -
                            Blockly.BlockSvg.TAB_WIDTH);
           inlineSteps.push('z');
@@ -748,7 +748,6 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
           }
 
           // TODO FFC
-          // input.connection.typeExpr.inputs.length = 3;
           if(input.connection.typeExpr.children.length > 0 && input.connection.typeExpr.name == "Function_" && !input.connection.isConnected())
           {
             inlineSteps.push('v', 2);
@@ -797,7 +796,6 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
       }
       // Stefan
       this.renderFields_(input.fieldRow, fieldX, fieldY);
-      // steps.push(Blockly.BlockSvg.TAB_PATH_DOWN);
       steps.push(Blockly.BlockSvg.getDownPath(input.connection));
       var tabHeight = Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);
       var v = row.height - tabHeight;
