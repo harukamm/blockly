@@ -274,6 +274,9 @@ Blockly.BlockSvg.ABSTRACT_COLOUR = "#888888";
  *   If true, also render block's parent, grandparent, etc.  Defaults to true.
  */
 Blockly.BlockSvg.prototype.render = function(opt_bubble) {
+  if(!this.workspace) // TODO fix, why does this occur ?
+    return;
+
   Blockly.Field.startCache();
   this.rendered = true;
 

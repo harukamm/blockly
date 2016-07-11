@@ -226,6 +226,11 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
   /* Unify type expressions */
   var unifyResult;
   if (parentConnection.typeExpr && childConnection.typeExpr) {
+    if(parentConnection.typeExpr.name == 'Function_')
+    {
+      // Stefan, exclude Function_, we already check it in checkType_ properly
+      parentConnection.typeExpr = parentConnection.typeExpr.children[parentConnection.typeExpr.children.length - 1];
+    }
     unifyResult = parentConnection.typeExpr.unify(childConnection.typeExpr);
     if (unifyResult === false) {
       throw 'Attempt to connect incompatible types.';
@@ -738,16 +743,46 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   if(isStatement)
     return true; // Stefan, Temp Fix
 
+  if(otherConnection.typeExpr.name == 'Function_')
+  {
+     var thisTp = otherConnection.typeExpr;
+     var thisArrows = thisTp.children;
+     var otherArrows = [];
+    
+     for (var i = 0, input; input = this.sourceBlock_.inputList[i]; i++) {
+       if(!input.name)
+         continue;
+       if(input.name=='')
+         continue;
+       if(!input.connection)
+         continue;
+       if(input.connection.isConnected())
+         continue;
+       otherArrows.push(input.connection.typeExpr);
+     }
+     otherArrows.push(this.sourceBlock_.outputConnection.typeExpr);
+
+     if(thisArrows.length != otherArrows.length)
+       return false;
+
+     for(var i = 0; i < thisArrows.length; i++){
+        if(!thisArrows[i].unify(otherArrows[i]))
+           return false;
+      }
+     return true;
+  }
+
   var unifyResult = true;
   if (this.typeExpr && otherConnection.typeExpr) {
     unifyResult = this.typeExpr.unify(otherConnection.typeExpr);
+    return unifyResult;
   }
   // STEFAN, TODO CHANGE IF TYPES DONT MATCH ANYMORE
   else if (!this.typeExpr && otherConnection.typeExpr) {
-    // return false;
+//    return false;
   }
   else if (this.typeExpr && !otherConnection.typeExpr) {
-    // return false;
+//    return false;
   }
 
   if (!this.check_ || !otherConnection.check_) {

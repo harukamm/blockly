@@ -964,9 +964,10 @@ Blockly.Blocks['func_test'] = {
    */
   init: function() {
     this.setColour(210);
-    this.setOutput(true, 'Boolean');
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Function_', 
-              [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Bool') ]  ));
+    this.setOutput(true);
+    // this.setOutputTypeExpr(new Blockly.TypeExpr('Function_', 
+    //          [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Bool') ]  ));
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Bool'));
 
     this.appendDummyInput()
         .appendField('Niemand');
