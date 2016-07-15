@@ -583,7 +583,7 @@ Blockly.Blocks['lists_comprehension'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.setColour(260);
+    this.setColour(Blockly.Blocks.lists.HUE);
     this.vars_ = ['x','y','z'];
     var A = Blockly.TypeVar.getUnusedTypeVar();
     var B = Blockly.TypeVar.getUnusedTypeVar();
