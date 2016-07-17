@@ -19,6 +19,13 @@
 */
 
 // TODO, move blocks over to Haskell
+'use strict';
+
+goog.provide('Blockly.Blocks.typed-blocks');
+
+goog.require('Blockly.Blocks');
+
+var listsHUE = 260;
 
 Blockly.Blocks['logic_boolean_typed'] = {
   /**
@@ -583,7 +590,7 @@ Blockly.Blocks['lists_comprehension'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.setColour(Blockly.Blocks.lists.HUE);
+    this.setColour(listsHUE);
     this.vars_ = ['x','y','z'];
     var A = Blockly.TypeVar.getUnusedTypeVar();
     var B = Blockly.TypeVar.getUnusedTypeVar();
@@ -779,7 +786,7 @@ Blockly.Blocks['lists_comp_var'] = {
         .appendField('\u2190');
     this.setPreviousStatement(true);
     this.setNextStatement(true);
-    this.setColour(Blockly.Blocks.lists.HUE);
+    this.setColour(listsHUE);
     this.setTooltip('Assign a binding to a list');
     this.contextMenu = false;
   }
@@ -791,7 +798,7 @@ Blockly.Blocks['lists_comp_guard'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.setColour(Blockly.Blocks.lists.HUE);
+    this.setColour(listsHUE);
     this.appendDummyInput()
         .appendField("Guard");
     this.setPreviousStatement(true);
@@ -925,7 +932,7 @@ Blockly.Blocks['lists_numgen'] = {
     this.setInputsInline(true);
     this.setOutput(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('list',[new Blockly.TypeExpr('Number')]));
-    this.setColour(Blockly.Blocks.lists.HUE);
+    this.setColour(listsHUE);
     this.setTooltip('Generates a list of numbers between the first and second inputs');
   }
 };
