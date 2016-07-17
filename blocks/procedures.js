@@ -603,8 +603,6 @@ Blockly.Blocks['procedures_callnoreturn'] = {
   updateShape_: function() {
     var defBlockMain = Blockly.Procedures.getDefinition(this.getProcedureCall(),
           Blockly.getMainWorkspace()); 
-    if(!defBlockMain)
-      return;
 
     for (var i = 0; i < this.arguments_.length; i++) {
       var field = this.getField('ARGNAME' + i);
@@ -620,7 +618,8 @@ Blockly.Blocks['procedures_callnoreturn'] = {
         field = new Blockly.FieldLabel(this.arguments_[i]);
         var input = this.appendValueInput('ARG' + i)
             .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField(field, 'ARGNAME' + i);
+            .appendField(field, 'ARGNAME' + i)
+            .setTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
         input.init();
       }
     }
@@ -628,6 +627,12 @@ Blockly.Blocks['procedures_callnoreturn'] = {
     while (this.getInput('ARG' + i)) {
       this.removeInput('ARG' + i);
       i++;
+    }
+
+    if(!defBlockMain){
+      // This probably occurs when the whole workspace hasn't loaded then, then
+      // we can't find our block :/
+      return;
     }
 
     // set input types correctly
@@ -644,6 +649,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
   mutationToDom: function() {
     var container = document.createElement('mutation');
     container.setAttribute('name', this.getProcedureCall());
+
     for (var i = 0; i < this.arguments_.length; i++) {
       var parameter = document.createElement('arg');
       parameter.setAttribute('name', this.arguments_[i]);

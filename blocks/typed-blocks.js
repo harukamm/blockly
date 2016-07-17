@@ -21,7 +21,7 @@
 // TODO, move blocks over to Haskell
 'use strict';
 
-goog.provide('Blockly.Blocks.typed-blocks');
+goog.provide('Blockly.Blocks.typedBlocks');
 
 goog.require('Blockly.Blocks');
 

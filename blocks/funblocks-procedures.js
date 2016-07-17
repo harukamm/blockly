@@ -16,7 +16,7 @@
 
 'use strict';
 
-goog.provide('Blockly.Blocks.funblocks-procedures');
+goog.provide('Blockly.Blocks.funblocksProcedures');
 
 goog.require('Blockly.Blocks');
 
