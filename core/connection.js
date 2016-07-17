@@ -229,11 +229,19 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
     if(parentConnection.typeExpr.name == 'Function_')
     {
       // Stefan, exclude Function_, we already check it in checkType_ properly
+      var oldTp = parentConnection.typeExpr; 
       parentConnection.typeExpr = parentConnection.typeExpr.children[parentConnection.typeExpr.children.length - 1];
+      unifyResult = parentConnection.typeExpr.unify(childConnection.typeExpr);
+      if (unifyResult === false) {
+        throw 'Attempt to connect incompatible types.';
+      }
+      parentConnection.typeExpr = oldTp;
     }
-    unifyResult = parentConnection.typeExpr.unify(childConnection.typeExpr);
-    if (unifyResult === false) {
-      throw 'Attempt to connect incompatible types.';
+    else{
+      unifyResult = parentConnection.typeExpr.unify(childConnection.typeExpr);
+      if (unifyResult === false) {
+        throw 'Attempt to connect incompatible types.';
+      }
     }
 
     var workspace = parentConnection.getSourceBlock().workspace;
