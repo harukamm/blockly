@@ -86,6 +86,8 @@ Blockly.Blocks['procedures_letFunc'] = {
     var header = this.appendDummyInput("HEADER")
                      .appendField("Let")
                      .appendField(nameField, 'NAME');
+    if(this.arguments_.length > 0)
+      header.appendField(' ');
     for (var i = 0; i < this.arguments_.length; i++) {
       var field = new Blockly.FieldVarInput(this.arguments_[i]);
       var oldField = new Blockly.FieldParameterFlydown(this.arguments_[i],true,
@@ -308,16 +310,15 @@ Blockly.Blocks['procedures_getVar'] = {
   }
 };
 
-Blockly.Blocks['block_variable'] = {
+Blockly.Blocks['vars_local'] = {
   init: function() {
     this.setColour(150);
-    this.appendDummyInput('TOPROW')
-        .appendField('Red', 'NAME');
+    this.appendDummyInput()
+        .appendField('x', 'NAME');
     this.setOutput(true);
     this.setOutputTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
   },
   domToMutation: function(xmlElement) {
-    console.log(xmlElement);
     var name = xmlElement.getAttribute('NAME');
     this.setFieldValue('NAME',name);
   }
