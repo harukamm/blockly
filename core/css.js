@@ -232,6 +232,15 @@ Blockly.Css.CONTENT = [
 
   '.blocklyFieldVarInput>rect {',
     'fill: #FFF;',
+    'fill-opacity: .0;',
+
+    'stroke: #FFF;',
+    'stroke-width: 2;',
+    'stroke-opacity: 0.0',
+  '}',
+
+  '.blocklyFieldVarInput>path{',
+    'fill: #FFF;',
     'fill-opacity: .4;',
 
     'stroke: #FFF;',
@@ -239,7 +248,9 @@ Blockly.Css.CONTENT = [
     'stroke-opacity: 0.6',
   '}',
 
-  '.blocklyFieldVarInput:hover>rect {',
+
+
+  '.blocklyFieldVarInput:hover>path {',
     'stroke: #FFFF00;',
     'stroke-width: 2;',
   '}',

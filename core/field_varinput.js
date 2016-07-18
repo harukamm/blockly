@@ -61,6 +61,81 @@ Blockly.FieldVarInput.prototype.updateEditable = function() {
 
 };
 
+Blockly.FieldVarInput.prototype.getPath = function(width)
+{
+  var width_ = width+2;
+  return 'M -6,2 a 6,6,0,0,0,0,12 l 0 4 l '+ width_ + ' 0 l 0 -20 l -' + width_ + ' 0 z';
+};
+
+Blockly.FieldVarInput.prototype.init = function() {
+  if (this.fieldGroup_) {
+    // Field has already been initialized once.
+    return;
+  }
+  // Build the DOM.
+  this.fieldGroup_ = Blockly.createSvgElement('g', {}, null);
+  if (!this.visible_) {
+    this.fieldGroup_.style.display = 'none';
+  }
+
+  this.borderRect_ = Blockly.createSvgElement('rect',
+      {'rx': 4,
+       'ry': 4,
+       'x': -Blockly.BlockSvg.SEP_SPACE_X / 2,
+       'y': 0,
+       'height': 16}, this.fieldGroup_, this.sourceBlock_.workspace);
+
+  this.borderRect_ = Blockly.createSvgElement('path',
+       {'class': 'blocklyFieldVarInput',
+       'd': this.getPath(20)},
+       this.fieldGroup_);
+
+
+
+  /** @type {!Element} */
+  this.textElement_ = Blockly.createSvgElement('text',
+      {'class': 'blocklyText', 'y': this.size_.height - 12.5},
+      this.fieldGroup_);
+
+    this.updateEditable();
+  this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_);
+  this.mouseUpWrapper_ =
+      Blockly.bindEvent_(this.fieldGroup_, 'mouseup', this, this.onMouseUp_);
+  this.mouseDownWrapper_ =
+      Blockly.bindEvent_(this.fieldGroup_, 'mousedown', this, this.onMouseDown_); 
+
+  // Force a render.
+  this.updateTextNode_();
+};
+
+Blockly.FieldVarInput.prototype.render_ = function() {
+  if (this.visible_ && this.textElement_) {
+    var key = this.textElement_.textContent + '\n' +
+        this.textElement_.className.baseVal;
+    if (Blockly.Field.cacheWidths_ && Blockly.Field.cacheWidths_[key]) {
+      var width = Blockly.Field.cacheWidths_[key];
+    } else {
+      try {
+        var width = this.textElement_.getComputedTextLength();
+      } catch (e) {
+        // MSIE 11 is known to throw "Unexpected call to method or property
+        // access." if Blockly is hidden.
+        var width = this.textElement_.textContent.length * 8;
+      }
+      if (Blockly.Field.cacheWidths_) {
+        Blockly.Field.cacheWidths_[key] = width;
+      }
+    }
+    if (this.borderRect_) {
+      this.borderRect_.setAttribute('d', this.getPath(width + Blockly.BlockSvg.SEP_SPACE_X));
+    }
+  } else {
+    var width = 0;
+  }
+  this.size_.width = width;
+};
+
+
 
 
 /**
@@ -88,6 +163,7 @@ Blockly.FieldVarInput.prototype.setValue = function(text) {
   Blockly.Field.prototype.setValue.call(this, text);
 };
 
+Blockly.FieldVarInput.prototype.showEditor_ = function(){};
 
 Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
 

@@ -619,12 +619,12 @@ Blockly.Blocks['lists_comprehension'] = {
     this.appendValueInput('VAR0')
           .setTypeExpr(new Blockly.TypeExpr ("list", [A]))
           .setAlign(Blockly.ALIGN_RIGHT)
-          .appendField(this.vars_[0])
+          .appendField(new Blockly.FieldVarInput(this.vars_[0]))
           .appendField('\u2190');
     this.appendValueInput('VAR1')
           .setTypeExpr(new Blockly.TypeExpr ("list", [B]))
           .setAlign(Blockly.ALIGN_RIGHT)
-          .appendField(this.vars_[1])
+          .appendField(new Blockly.FieldVarInput(this.vars_[1]))
           .appendField('\u2190');
     this.setOutput(true, 'Array');
     this.setOutputTypeExpr( new Blockly.TypeExpr("list", [OUT]) );
@@ -677,7 +677,7 @@ Blockly.Blocks['lists_comprehension'] = {
         var input = this.appendValueInput('VAR' + i)
             .setTypeExpr(new Blockly.TypeExpr ("list", [A]))
             .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField(name)
+            .appendField(new Blockly.FieldVarInput(name))
             .appendField('\u2190');
       }
     }
@@ -748,7 +748,7 @@ Blockly.Blocks['lists_comprehension'] = {
         var input = this.appendValueInput('VAR' + this.varCount_)
             .setTypeExpr(new Blockly.TypeExpr ("list", [A]))
             .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField(name)
+            .appendField(new Blockly.FieldVarInput(name))
             .appendField('\u2190');
 
         // Reconnect any child blocks.

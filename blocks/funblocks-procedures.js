@@ -310,11 +310,11 @@ Blockly.Blocks['procedures_getVar'] = {
 
 Blockly.Blocks['block_variable'] = {
   init: function() {
-    this.setColour(210);
+    this.setColour(150);
     this.appendDummyInput('TOPROW')
         .appendField('Red', 'NAME');
     this.setOutput(true);
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
+    this.setOutputTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
   },
   domToMutation: function(xmlElement) {
     console.log(xmlElement);

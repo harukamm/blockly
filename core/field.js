@@ -139,18 +139,20 @@ Blockly.Field.prototype.init = function() {
   if (!this.visible_) {
     this.fieldGroup_.style.display = 'none';
   }
+
   this.borderRect_ = Blockly.createSvgElement('rect',
       {'rx': 4,
        'ry': 4,
        'x': -Blockly.BlockSvg.SEP_SPACE_X / 2,
        'y': 0,
        'height': 16}, this.fieldGroup_, this.sourceBlock_.workspace);
+
   /** @type {!Element} */
   this.textElement_ = Blockly.createSvgElement('text',
       {'class': 'blocklyText', 'y': this.size_.height - 12.5},
       this.fieldGroup_);
 
-  this.updateEditable();
+    this.updateEditable();
   this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_);
   this.mouseUpWrapper_ =
       Blockly.bindEvent_(this.fieldGroup_, 'mouseup', this, this.onMouseUp_);
