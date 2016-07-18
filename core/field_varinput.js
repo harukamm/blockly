@@ -55,7 +55,6 @@ goog.inherits(Blockly.FieldVarInput, Blockly.Field);
 
 
 Blockly.FieldVarInput.prototype.updateEditable = function() {
-  console.log('dum dum');
   Blockly.addClass_(/** @type {!Element} */ (this.fieldGroup_),
                       'blocklyFieldVarInput');
 
