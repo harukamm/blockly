@@ -37,10 +37,9 @@ Blockly.Blocks['procedures_letFunc'] = {
         "bar",
         Blockly.Procedures.rename);
     nameField.setSpellcheck(false);
-    this.appendDummyInput()
+    this.appendDummyInput("HEADER")
         .appendField("Let")
-        .appendField(nameField, 'NAME')
-        .appendField('', 'PARAMS');
+        .appendField(nameField, 'NAME');
     this.appendValueInput('RETURN')
         .setTypeExpr(A);
     this.setMutator(new Blockly.Mutator(['procedures_mutatorarg']));
@@ -53,7 +52,56 @@ Blockly.Blocks['procedures_letFunc'] = {
   },
   setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
   validate: Blockly.Blocks['procedures_defnoreturn'].validate,
-  updateParams_: Blockly.Blocks['procedures_defnoreturn'].updateParams_,
+  updateParams_: function() {
+    // Check for duplicated arguments.
+    var badArg = false;
+    var hash = {};
+    for (var i = 0; i < this.arguments_.length; i++) {
+      if (hash['arg_' + this.arguments_[i].toLowerCase()]) {
+        badArg = true;
+        break;
+      }
+      hash['arg_' + this.arguments_[i].toLowerCase()] = true;
+    }
+    if (badArg) {
+      this.setWarningText(Blockly.Msg.PROCEDURES_DEF_DUPLICATE_WARNING);
+    } else {
+      this.setWarningText(null);
+    }
+
+    var procName = this.getFieldValue('NAME');
+    var bodyInput = this.inputList[this.inputList.length - 1]; 
+    // Remove header
+    var thisBlock = this;
+    Blockly.FieldParameterFlydown.withChangeHanderDisabled(
+      function() {thisBlock.removeInput('HEADER');}
+    );
+    this.inputList = [];
+    // Readd header
+    var nameField = new Blockly.FieldTextInput(
+        "bar",
+        Blockly.Procedures.rename);
+    nameField.setSpellcheck(false);
+
+    var header = this.appendDummyInput("HEADER")
+                     .appendField("Let")
+                     .appendField(nameField, 'NAME');
+    for (var i = 0; i < this.arguments_.length; i++) {
+      var field = new Blockly.FieldVarInput(this.arguments_[i]);
+      var oldField = new Blockly.FieldParameterFlydown(this.arguments_[i],true,
+                            Blockly.FieldFlydown.DISPLAY_RIGHT, function(o){});
+        header.appendField(field);
+    }
+    this.inputList = this.inputList.concat(bodyInput);
+ 
+
+
+    // The params field is deterministic based on the mutation,
+    // no need to fire a change event.
+    Blockly.Events.disable();
+    // this.setFieldValue(paramString, 'PARAMS');
+    Blockly.Events.enable();
+  },
   mutationToDom: Blockly.Blocks['procedures_defnoreturn'].mutationToDom,
   domToMutation: function(xmlElement) {
     this.arguments_ = [];
@@ -258,6 +306,22 @@ Blockly.Blocks['procedures_getVar'] = {
       return def;
     return varList;
   }
+};
+
+Blockly.Blocks['block_variable'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput('TOPROW')
+        .appendField('Red', 'NAME');
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
+  },
+  domToMutation: function(xmlElement) {
+    console.log(xmlElement);
+    var name = xmlElement.getAttribute('NAME');
+    this.setFieldValue('NAME',name);
+  }
+
 };
 
 

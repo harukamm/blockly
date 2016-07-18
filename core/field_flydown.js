@@ -88,7 +88,7 @@ Blockly.FieldFlydown.prototype.showEditor_ = function() {
 Blockly.FieldFlydown.prototype.init = function(block) {
   Blockly.FieldFlydown.superClass_.init.call(this, block);
 
-  Blockly.Flydown.workspaceInit( block.workspace );  // Set up Flydown for this workspace
+  Blockly.Flydown.workspaceInit( Blockly.getMainWorkspace() );  // Set up Flydown for this workspace
   
    /* Bind mouse handlers */
   this.mouseOverWrapper_ =
@@ -114,7 +114,7 @@ Blockly.FieldFlydown.prototype.onMouseOver_ = function(e) {
 
 Blockly.FieldFlydown.prototype.onMouseOut_ = function(e) {
   // Clear any pending timer event to show flydown
-//  console.log( "FieldFlydown onmouseout" );
+  console.log( "FieldFlydown onmouseout" );
   if( Blockly.FieldFlydown.showPid_ != 0 ) {
     window.clearTimeout(Blockly.FieldFlydown.showPid_);
     Blockly.FieldFlydown.showPid_ = 0;

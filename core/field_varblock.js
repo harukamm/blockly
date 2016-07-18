@@ -19,14 +19,14 @@
  */
 
 /**
- * @fileoverview Field.  Used for editable titles, variables, etc.
+ * @fileoverview FieldVar.  Used for editable titles, variables, etc.
  * This is an abstract class that defines the UI on the block.  Actual
- * instances would be Blockly.FieldTextInput, Blockly.FieldDropdown, etc.
+ * instances would be Blockly.FieldVarTextInput, Blockly.FieldVarDropdown, etc.
  * @author fraser@google.com (Neil Fraser)
  */
 'use strict';
 
-goog.provide('Blockly.Field');
+goog.provide('Blockly.FieldVar');
 
 goog.require('goog.asserts');
 goog.require('goog.dom');
@@ -44,7 +44,7 @@ goog.require('goog.userAgent');
  *     text, or null to abort the change.
  * @constructor
  */
-Blockly.Field = function(text, opt_validator) {
+Blockly.FieldVar = function(text, opt_validator) {
   this.size_ = new goog.math.Size(0, 25);
   this.setValue(text);
   this.setValidator(opt_validator);
@@ -55,14 +55,14 @@ Blockly.Field = function(text, opt_validator) {
  * @type {Object}
  * @private
  */
-Blockly.Field.cacheWidths_ = null;
+Blockly.FieldVar.cacheWidths_ = null;
 
 /**
  * Number of current references to cache.
  * @type {number}
  * @private
  */
-Blockly.Field.cacheReference_ = 0;
+Blockly.FieldVar.cacheReference_ = 0;
 
 
 /**
@@ -70,68 +70,68 @@ Blockly.Field.cacheReference_ = 0;
  * Static labels are usually unnamed.
  * @type {string=}
  */
-Blockly.Field.prototype.name = undefined;
+Blockly.FieldVar.prototype.name = undefined;
 
 /**
  * Maximum characters of text to display before adding an ellipsis.
  * @type {number}
  */
-Blockly.Field.prototype.maxDisplayLength = 50;
+Blockly.FieldVar.prototype.maxDisplayLength = 50;
 
 /**
  * Visible text to display.
  * @type {string}
  * @private
  */
-Blockly.Field.prototype.text_ = '';
+Blockly.FieldVar.prototype.text_ = '';
 
 /**
  * Block this field is attached to.  Starts as null, then in set in init.
  * @type {Blockly.Block}
  * @private
  */
-Blockly.Field.prototype.sourceBlock_ = null;
+Blockly.FieldVar.prototype.sourceBlock_ = null;
 
 /**
  * Is the field visible, or hidden due to the block being collapsed?
  * @type {boolean}
  * @private
  */
-Blockly.Field.prototype.visible_ = true;
+Blockly.FieldVar.prototype.visible_ = true;
 
 /**
  * Validation function called when user edits an editable field.
  * @type {Function}
  * @private
  */
-Blockly.Field.prototype.validator_ = null;
+Blockly.FieldVar.prototype.validator_ = null;
 
 /**
  * Non-breaking space.
  * @const
  */
-Blockly.Field.NBSP = '\u00A0';
+Blockly.FieldVar.NBSP = '\u00A0';
 
 /**
  * Editable fields are saved by the XML renderer, non-editable fields are not.
  */
-Blockly.Field.prototype.EDITABLE = true;
+Blockly.FieldVar.prototype.EDITABLE = true;
 
 /**
  * Attach this field to a block.
  * @param {!Blockly.Block} block The block containing this field.
  */
-Blockly.Field.prototype.setSourceBlock = function(block) {
-  goog.asserts.assert(!this.sourceBlock_, 'Field already bound to a block.');
+Blockly.FieldVar.prototype.setSourceBlock = function(block) {
+  goog.asserts.assert(!this.sourceBlock_, 'FieldVar already bound to a block.');
   this.sourceBlock_ = block;
 };
 
 /**
  * Install this field on a block.
  */
-Blockly.Field.prototype.init = function() {
+Blockly.FieldVar.prototype.init = function() {
   if (this.fieldGroup_) {
-    // Field has already been initialized once.
+    // FieldVar has already been initialized once.
     return;
   }
   // Build the DOM.
@@ -164,7 +164,7 @@ Blockly.Field.prototype.init = function() {
 /**
  * Dispose of all DOM objects belonging to this editable field.
  */
-Blockly.Field.prototype.dispose = function() {
+Blockly.FieldVar.prototype.dispose = function() {
   if (this.mouseUpWrapper_) {
     Blockly.unbindEvent_(this.mouseUpWrapper_);
     this.mouseUpWrapper_ = null;
@@ -180,7 +180,7 @@ Blockly.Field.prototype.dispose = function() {
 /**
  * Add or remove the UI indicating if this field is editable or not.
  */
-Blockly.Field.prototype.updateEditable = function() {
+Blockly.FieldVar.prototype.updateEditable = function() {
   if (!this.EDITABLE || !this.sourceBlock_) {
     return;
   }
@@ -203,7 +203,7 @@ Blockly.Field.prototype.updateEditable = function() {
  * Gets whether this editable field is visible or not.
  * @return {boolean} True if visible.
  */
-Blockly.Field.prototype.isVisible = function() {
+Blockly.FieldVar.prototype.isVisible = function() {
   return this.visible_;
 };
 
@@ -211,7 +211,7 @@ Blockly.Field.prototype.isVisible = function() {
  * Sets whether this editable field is visible or not.
  * @param {boolean} visible True if visible.
  */
-Blockly.Field.prototype.setVisible = function(visible) {
+Blockly.FieldVar.prototype.setVisible = function(visible) {
   if (this.visible_ == visible) {
     return;
   }
@@ -227,7 +227,7 @@ Blockly.Field.prototype.setVisible = function(visible) {
  * Sets a new validation function for editable fields.
  * @param {Function} handler New validation function, or null.
  */
-Blockly.Field.prototype.setValidator = function(handler) {
+Blockly.FieldVar.prototype.setValidator = function(handler) {
   this.validator_ = handler;
 };
 
@@ -235,7 +235,7 @@ Blockly.Field.prototype.setValidator = function(handler) {
  * Gets the validation function for editable fields.
  * @return {Function} Validation function, or null.
  */
-Blockly.Field.prototype.getValidator = function() {
+Blockly.FieldVar.prototype.getValidator = function() {
   return this.validator_;
 };
 
@@ -244,7 +244,7 @@ Blockly.Field.prototype.getValidator = function() {
  * Used for measuring the size and for positioning.
  * @return {!Element} The group element.
  */
-Blockly.Field.prototype.getSvgRoot = function() {
+Blockly.FieldVar.prototype.getSvgRoot = function() {
   return /** @type {!Element} */ (this.fieldGroup_);
 };
 
@@ -253,12 +253,12 @@ Blockly.Field.prototype.getSvgRoot = function() {
  * Saves the computed width in a property.
  * @private
  */
-Blockly.Field.prototype.render_ = function() {
+Blockly.FieldVar.prototype.render_ = function() {
   if (this.visible_ && this.textElement_) {
     var key = this.textElement_.textContent + '\n' +
         this.textElement_.className.baseVal;
-    if (Blockly.Field.cacheWidths_ && Blockly.Field.cacheWidths_[key]) {
-      var width = Blockly.Field.cacheWidths_[key];
+    if (Blockly.FieldVar.cacheWidths_ && Blockly.FieldVar.cacheWidths_[key]) {
+      var width = Blockly.FieldVar.cacheWidths_[key];
     } else {
       try {
         var width = this.textElement_.getComputedTextLength();
@@ -267,8 +267,8 @@ Blockly.Field.prototype.render_ = function() {
         // access." if Blockly is hidden.
         var width = this.textElement_.textContent.length * 8;
       }
-      if (Blockly.Field.cacheWidths_) {
-        Blockly.Field.cacheWidths_[key] = width;
+      if (Blockly.FieldVar.cacheWidths_) {
+        Blockly.FieldVar.cacheWidths_[key] = width;
       }
     }
     if (this.borderRect_) {
@@ -285,10 +285,10 @@ Blockly.Field.prototype.render_ = function() {
  * Start caching field widths.  Every call to this function MUST also call
  * stopCache.  Caches must not survive between execution threads.
  */
-Blockly.Field.startCache = function() {
-  Blockly.Field.cacheReference_++;
-  if (!Blockly.Field.cacheWidths_) {
-    Blockly.Field.cacheWidths_ = {};
+Blockly.FieldVar.startCache = function() {
+  Blockly.FieldVar.cacheReference_++;
+  if (!Blockly.FieldVar.cacheWidths_) {
+    Blockly.FieldVar.cacheWidths_ = {};
   }
 };
 
@@ -296,10 +296,10 @@ Blockly.Field.startCache = function() {
  * Stop caching field widths.  Unless caching was already on when the
  * corresponding call to startCache was made.
  */
-Blockly.Field.stopCache = function() {
-  Blockly.Field.cacheReference_--;
-  if (!Blockly.Field.cacheReference_) {
-    Blockly.Field.cacheWidths_ = null;
+Blockly.FieldVar.stopCache = function() {
+  Blockly.FieldVar.cacheReference_--;
+  if (!Blockly.FieldVar.cacheReference_) {
+    Blockly.FieldVar.cacheWidths_ = null;
   }
 };
 
@@ -307,7 +307,7 @@ Blockly.Field.stopCache = function() {
  * Returns the height and width of the field.
  * @return {!goog.math.Size} Height and width.
  */
-Blockly.Field.prototype.getSize = function() {
+Blockly.FieldVar.prototype.getSize = function() {
   if (!this.size_.width) {
     this.render_();
   }
@@ -320,7 +320,7 @@ Blockly.Field.prototype.getSize = function() {
  * @return {!goog.math.Size} Height and width.
  * @private
  */
-Blockly.Field.prototype.getScaledBBox_ = function() {
+Blockly.FieldVar.prototype.getScaledBBox_ = function() {
   var bBox = this.borderRect_.getBBox();
   // Create new object, as getBBox can return an uneditable SVGRect in IE.
   return new goog.math.Size(bBox.width * this.sourceBlock_.workspace.scale,
@@ -331,7 +331,7 @@ Blockly.Field.prototype.getScaledBBox_ = function() {
  * Get the text from this field.
  * @return {string} Current text.
  */
-Blockly.Field.prototype.getText = function() {
+Blockly.FieldVar.prototype.getText = function() {
   return this.text_;
 };
 
@@ -339,7 +339,7 @@ Blockly.Field.prototype.getText = function() {
  * Set the text in this field.  Trigger a rerender of the source block.
  * @param {*} text New text.
  */
-Blockly.Field.prototype.setText = function(text) {
+Blockly.FieldVar.prototype.setText = function(text) {
   if (text === null) {
     // No change if null.
     return;
@@ -362,7 +362,7 @@ Blockly.Field.prototype.setText = function(text) {
  * Update the text node of this field to display the current text.
  * @private
  */
-Blockly.Field.prototype.updateTextNode_ = function() {
+Blockly.FieldVar.prototype.updateTextNode_ = function() {
   if (!this.textElement_) {
     // Not rendered yet.
     return;
@@ -375,14 +375,14 @@ Blockly.Field.prototype.updateTextNode_ = function() {
   // Empty the text element.
   goog.dom.removeChildren(/** @type {!Element} */ (this.textElement_));
   // Replace whitespace with non-breaking spaces so the text doesn't collapse.
-  text = text.replace(/\s/g, Blockly.Field.NBSP);
+  text = text.replace(/\s/g, Blockly.FieldVar.NBSP);
   if (this.sourceBlock_.RTL && text) {
     // The SVG is LTR, force text to be RTL.
     text += '\u200F';
   }
   if (!text) {
     // Prevent the field from disappearing if empty.
-    text = Blockly.Field.NBSP;
+    text = Blockly.FieldVar.NBSP;
   }
   var textNode = document.createTextNode(text);
   this.textElement_.appendChild(textNode);
@@ -396,7 +396,7 @@ Blockly.Field.prototype.updateTextNode_ = function() {
  * the language-neutral values.  Subclasses (such as dropdown) may define this.
  * @return {string} Current text.
  */
-Blockly.Field.prototype.getValue = function() {
+Blockly.FieldVar.prototype.getValue = function() {
   return this.getText();
 };
 
@@ -405,7 +405,7 @@ Blockly.Field.prototype.getValue = function() {
  * the language-neutral values.  Subclasses (such as dropdown) may define this.
  * @param {string} newText New text.
  */
-Blockly.Field.prototype.setValue = function(newText) {
+Blockly.FieldVar.prototype.setValue = function(newText) {
   if (newText === null) {
     // No change if null.
     return;
@@ -426,7 +426,7 @@ Blockly.Field.prototype.setValue = function(newText) {
  * @param {!Event} e Mouse up event.
  * @private
  */
-Blockly.Field.prototype.onMouseUp_ = function(e) {
+Blockly.FieldVar.prototype.onMouseUp_ = function(e) {
   if ((goog.userAgent.IPHONE || goog.userAgent.IPAD) &&
       !goog.userAgent.isVersionOrHigher('537.51.2') &&
       e.layerX !== 0 && e.layerY !== 0) {
@@ -445,7 +445,7 @@ Blockly.Field.prototype.onMouseUp_ = function(e) {
   }
 };
 
-Blockly.Field.prototype.onMouseDown_ = function(e){
+Blockly.FieldVar.prototype.onMouseDown_ = function(e){
 };
 
 /**
@@ -453,8 +453,8 @@ Blockly.Field.prototype.onMouseDown_ = function(e){
  * @param {string|!Element} newTip Text for tooltip or a parent element to
  *     link to for its tooltip.
  */
-Blockly.Field.prototype.setTooltip = function(newTip) {
-  // Non-abstract sub-classes may wish to implement this.  See FieldLabel.
+Blockly.FieldVar.prototype.setTooltip = function(newTip) {
+  // Non-abstract sub-classes may wish to implement this.  See FieldVarLabel.
 };
 
 /**
@@ -463,6 +463,6 @@ Blockly.Field.prototype.setTooltip = function(newTip) {
  * @return {!goog.math.Coordinate} Object with .x and .y properties.
  * @private
  */
-Blockly.Field.prototype.getAbsoluteXY_ = function() {
+Blockly.FieldVar.prototype.getAbsoluteXY_ = function() {
   return goog.style.getPageOffset(this.borderRect_);
 };

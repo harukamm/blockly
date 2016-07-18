@@ -230,6 +230,25 @@ Blockly.Css.CONTENT = [
     'fill-opacity: .6;',
   '}',
 
+  '.blocklyFieldVarInput>rect {',
+    'fill: #FFF;',
+    'fill-opacity: .4;',
+
+    'stroke: #FFF;',
+    'stroke-width: 2;',
+    'stroke-opacity: 0.6',
+  '}',
+
+  '.blocklyFieldVarInput:hover>rect {',
+    'stroke: #FFFF00;',
+    'stroke-width: 2;',
+  '}',
+
+  '.blocklyFieldVarInput>text {',
+    'fill: #000;',
+  '}',
+
+
   '.blocklyNonEditableText>text,',
   '.blocklyEditableText>text {',
     'fill: #000;',
@@ -321,6 +340,12 @@ Blockly.Css.CONTENT = [
     'fill: #ddd;',
     'fill-opacity: .8;',
   '}',
+
+  '.blocklyFlydownBackground {',
+    'fill: #FF7F50;',
+    'fill-opacity: .8;',
+  '}',
+
 
   '.blocklyScrollbarBackground {',
     'opacity: 0;',
