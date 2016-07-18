@@ -226,6 +226,23 @@ Blockly.Blocks['lists_length'] = {
   }
 };
 
+Blockly.Blocks['lists_cons'] = {
+  init: function() {
+    var a = Blockly.TypeVar.getUnusedTypeVar();
+    this.setColour(210);
+    this.appendValueInput('ITEM')
+        .setTypeExpr(a);
+    this.appendValueInput('LST')
+        .setTypeExpr(new Blockly.TypeExpr('list',[a]))
+        .appendField(new Blockly.FieldLabel(":","blocklyTextEmph") );
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
+    this.setInputsInline(true);
+  }
+};
+
+
+
 Blockly.Blocks['lists_create_with_typed'] = {
   /**
    * Block for creating a list with any number of elements of any type.
