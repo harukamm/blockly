@@ -216,9 +216,13 @@ Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
 
   var svgRootOld = this.sourceBlock_.getSvgRoot();
   var xyOld = Blockly.getSvgXY_(svgRootOld, targetWorkspace);
-  
-  xyOld.x = e.clientX;
-  xyOld.y = e.clientY;
+ 
+
+  var element = document.getElementsByClassName('blocklyWorkspace')[0];
+  var rect = element.getBoundingClientRect();
+
+  xyOld.x = e.clientX - rect.left;
+  xyOld.y = e.clientY - rect.top;
 
   var scrollX = this.workspace_.scrollX;
   var scale = this.workspace_.scale;
