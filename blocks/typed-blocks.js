@@ -139,6 +139,7 @@ Blockly.Blocks['numNumber'] = {
     this.setOutput(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
     this.setTooltip(Blockly.Msg.MATH_NUMBER_TOOLTIP);
+    this.functionName = "";
   }
 };
 
@@ -160,6 +161,7 @@ Blockly.Blocks['numNumberPerc'] = {
     // Sorin
     this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
     this.setTooltip(Blockly.Msg.MATH_NUMBER_TOOLTIP);
+    this.functionName = "";
   }
 };
 
@@ -211,6 +213,7 @@ Blockly.Blocks['lists_path'] = {
         .appendField(new Blockly.FieldLabel("Path","blocklyTextEmph") );
     this.setOutput(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Picture'));
+    this.functionName = "path";
   }
 };
 
@@ -223,6 +226,7 @@ Blockly.Blocks['lists_length'] = {
         .appendField(new Blockly.FieldLabel("Length","blocklyTextEmph") );
     this.setOutput(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
+    this.functionName = "length";
   }
 };
 
@@ -238,6 +242,7 @@ Blockly.Blocks['lists_cons'] = {
     this.setOutput(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
     this.setInputsInline(true);
+    this.functionName = ":";
   }
 };
 
@@ -390,6 +395,7 @@ Blockly.Blocks['pair_create_typed'] = {
         .setTypeExpr(B)
     this.setOutput(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr ("pair", [A, B]));
+    this.functionName = ",";
   }
 };
 
@@ -583,6 +589,7 @@ Blockly.Blocks['text_typed'] = {
     this.setOutput(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Text'));
     this.setTooltip("Gives the given text");
+    this.functionName = "";
   },
   /**
    * Create an image of an open or closed quote.
@@ -1023,7 +1030,20 @@ Blockly.Blocks['cwAnimationOf'] = {
         .setTypeExpr(new Blockly.TypeExpr('Function_', 
               [new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Picture') ]  ));
     this.setInputsInline(true);
+    this.functionName = "";
     // Assign 'this' to a variable for use in the tooltip closure below.
+  }
+};
+
+Blockly.Blocks['circTest'] = {
+  init: function() {
+    this.setColour(160);
+    this.appendValueInput('NUM')
+        .setTypeExpr(new Blockly.TypeExpr('Number'))
+        .appendField(new Blockly.FieldLabel("Circle","blocklyTextEmph") );
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Picture'));
+    this.functionName = "circle";
   }
 };
 
