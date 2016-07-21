@@ -795,6 +795,7 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
      var otherArrows = [];
    
      var conned = 0;
+     var ghosts = 0;
      var totalCons = 0;
      for (var i = 0, input; input = this.sourceBlock_.inputList[i]; i++) {
        if(!input.name)
@@ -805,11 +806,14 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
          continue;
        if(input.connection.isConnected())
          conned++;
+       if(input.connection.isConnected() && input.connection.targetBlock().isShadow())
+         ghosts++;
        totalCons++;
        otherArrows.push(input.connection.typeExpr);
      }
-     if(conned != 0 && conned != totalCons)
-       return false; // Function is partially applied. We don't want
+     if(ghosts==totalCons || conned == 0){} // ghost connections are allowed, we will remove them later
+     else
+       return false; // We don't want partially applied functions
 
      otherArrows.push(this.sourceBlock_.outputConnection.typeExpr);
 
