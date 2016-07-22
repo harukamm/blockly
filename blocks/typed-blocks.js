@@ -1332,4 +1332,95 @@ Blockly.Blocks['type_constructor'] = {
   }
 };
 
+Blockly.Blocks['type_case'] = {
+  init: function() {
+    this.setColour(190);
+    var a = Blockly.TypeVar.getUnusedTypeVar();
+    this.a = a;
+    this.appendValueInput('INPUT')
+        .appendField('Case of')
+        .appendField('Maybe', 'NAME')
+        .setTypeExpr(new Blockly.TypeExpr('Maybe'));
+    var f = new Blockly.FieldVarInput('a');
+    f.type = 'Number';
+    this.appendValueInput('TP0')
+        .appendField('Just')
+        .appendField(' ')
+        .appendField(f)
+        .setTypeExpr(a);
+    this.appendValueInput('TP1')
+        .appendField('Nothing')
+        .setTypeExpr(a);
+    this.setOutput(true);
+
+    this.setOutputTypeExpr(a);
+    this.itemCount_ = 2;
+  },
+
+  mutationToDom: function() {
+    var container = document.createElement('mutation');
+    container.setAttribute('items', this.itemCount_);
+    container.setAttribute('name', this.getFieldValue('NAME'));
+
+    for (var i = 0; i < this.itemCount_; i++) {
+
+      var prodDom = document.createElement('product');
+      var inp = this.getInput('TP' + i);
+      var constructorName = inp.fieldRow[0];
+      var its = 0;
+      for(var j = 1; j < inp.fieldRow.length; j++){
+        if(inp.fieldRow[j].getValue() == '' || inp.fieldRow[j].getValue() == ' ') continue; // Skip spaces
+        var tp = inp.fieldRow[j].type;
+        its++;
+
+        var typeDom = document.createElement('type');
+        typeDom.setAttribute('name',tp);
+        prodDom.appendChild(typeDom);
+      }
+      prodDom.setAttribute('items',its); 
+      prodDom.setAttribute('constructor',constructorName); 
+      container.appendChild(prodDom);
+    }
+    return container;
+  },
+
+  domToMutation: function(xmlElement) {
+
+    for (var x = 0; x < this.itemCount_; x++) {
+      this.removeInput('TP' + x);
+    }
+
+    this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+    this.setFieldValue(xmlElement.getAttribute('name'), 'NAME');
+
+    for (var i = 0, productNode; productNode = xmlElement.childNodes[i]; i++) {
+      if (productNode.nodeName.toLowerCase() == 'product') {
+        var constructor = productNode.getAttribute('CONSTRUCTOR');
+
+        var input = this.appendValueInput('TP' + i)
+            .setTypeExpr(this.a);
+        input.appendField(constructor);
+        
+        for(var j = 0, typeNode; typeNode = productNode.childNodes[j]; j++){
+          input.appendField(' ');
+          input.appendField(new Blockly.FieldVarInput(String.fromCharCode(97 + j)));
+        }
+
+      }
+    }
+  },
+
+  saveConnections: function(containerBlock) {
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var x = 0;
+    while (itemBlock) {
+      var input = this.getInput('TP' + x);
+      itemBlock.valueConnection_ = input && input.connection.targetConnection;
+      x++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+  }
+};
+
 

@@ -27,20 +27,79 @@ goog.require('Blockly.Workspace');
 Blockly.FunBlocks.dataFlyoutCategory = function(workspace){
 
   var xmlList = [];
-  var staticBlocks = ["type_number", "type_text", "type_bool", "type_product", "type_sum"];
+  var staticBlocks = ["type_sum", "type_number", "type_text", "type_bool", "type_product"];
   staticBlocks.forEach(function(blockName){
     Blockly.FunBlocks.addBlockToXML(blockName, xmlList);
   });
 
-  /*'<xml>' +
-         '<block type="block_variable">' +
-           '<field name="NAME">' +
-             name +
-           '</field>' +
-         '</block>' +
-       '</xml>';*/
+  // Generate a case for each data type
+  Blockly.FunBlocks.generateCases(xmlList);
 
   // Generate all constructor
+  Blockly.FunBlocks.generateConstructors(xmlList);
+  return xmlList;
+};
+
+
+
+Blockly.FunBlocks.addBlockToXML = function(blockName, xmlList){
+  if (Blockly.Blocks[blockName]) {
+    var block = goog.dom.createDom('block');
+    block.setAttribute('type', blockName);
+    block.setAttribute('gap', 16);
+    xmlList.push(block);
+
+  }
+};
+
+
+Blockly.FunBlocks.generateCases = function(xmlList){
+  var blocks = Blockly.getMainWorkspace().getTopBlocks();
+  blocks.forEach(function(block){
+    if (block.type == 'type_sum')
+    {
+      var name = block.getFieldValue('NAME');
+      var mutation = goog.dom.createDom('mutation');
+      mutation.setAttribute('name',block.getFieldValue('NAME'));
+      var count = 0;
+      for(var i = 0; i < block.itemCount_; i++) {
+        var product = block.getInputTargetBlock('PROD' + i);
+        if(!product) continue; // Maybe error here 
+        var prodDom = goog.dom.createDom('product');
+        prodDom.setAttribute('constructor', product.getFieldValue('CONSTRUCTOR'));
+
+        // Get product types
+        var typeCount = 0;
+        for(var j = 0; j < product.itemCount_; j++)
+        {
+          var typeBlock = product.getInputTargetBlock('TP' + j);
+          if(!typeBlock)
+            continue;
+          var typeDom = goog.dom.createDom('type');
+          var typeName = typeBlock.getFieldValue('NAME');
+          typeDom.setAttribute('name',name);
+          prodDom.appendChild(typeDom);
+          typeCount++;
+        }
+        prodDom.setAttribute('items',typeCount);
+        mutation.appendChild(prodDom); 
+        count++;
+      }
+      mutation.setAttribute('items',count);
+      var block = goog.dom.createDom('block');
+      block.setAttribute('type','type_case');
+      block.setAttribute('gap',16);
+      block.appendChild(mutation);
+
+      xmlList.push(block);
+    }
+  });
+
+
+}
+
+
+Blockly.FunBlocks.generateConstructors = function(xmlList){
   var blocks = Blockly.getMainWorkspace().getAllBlocks(false);
   blocks.forEach(function(block){
     if(block.type == 'type_product')
@@ -79,47 +138,4 @@ Blockly.FunBlocks.dataFlyoutCategory = function(workspace){
       }
     }
   });
-
-
-
-
-
-
-  // Test
-  var block = goog.dom.createDom('block');
-    block.setAttribute('type', 'type_constructor');
-    block.setAttribute('items', 10);
-    block.setAttribute('output', 'Text');
-    block.setAttribute('gap', 16);
-
-    var mutation = goog.dom.createDom('mutation');
-    mutation.setAttribute('items',2);
-
-    var n = goog.dom.createDom('type');
-    n.setAttribute('name','Color');
-    var s = goog.dom.createDom('type');
-    s.setAttribute('name','Bool');
-    mutation.appendChild(n);
-    mutation.appendChild(s);
-
-    block.appendChild(mutation);
-    xmlList.push(block);
-
-
-  return xmlList;
 };
-
-
-
-Blockly.FunBlocks.addBlockToXML = function(blockName, xmlList){
-  if (Blockly.Blocks[blockName]) {
-    var block = goog.dom.createDom('block');
-    block.setAttribute('type', blockName);
-    block.setAttribute('gap', 16);
-    xmlList.push(block);
-
-  }
-};
-
-
-
