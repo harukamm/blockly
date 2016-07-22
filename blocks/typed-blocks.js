@@ -1040,7 +1040,7 @@ Blockly.Blocks['type_number'] = {
     this.setOutput(false);
     var A = Blockly.TypeVar.getUnusedTypeVar();
     this.appendDummyInput()
-        .appendField(new Blockly.FieldLabel('Number', 'blocklyTextEmph'));
+        .appendField(new Blockly.FieldLabel('Number', 'blocklyTextEmph'), 'NAME');
     this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
   }
 };
@@ -1051,7 +1051,7 @@ Blockly.Blocks['type_text'] = {
     this.setOutput(false);
     var A = Blockly.TypeVar.getUnusedTypeVar();
     this.appendDummyInput()
-        .appendField(new Blockly.FieldLabel('Text', 'blocklyTextEmph'));
+        .appendField(new Blockly.FieldLabel('Text', 'blocklyTextEmph'), 'NAME');
     this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
   }
 };
@@ -1062,7 +1062,7 @@ Blockly.Blocks['type_bool'] = {
     this.setOutput(false);
     var A = Blockly.TypeVar.getUnusedTypeVar();
     this.appendDummyInput()
-        .appendField(new Blockly.FieldLabel('Bool', 'blocklyTextEmph'));
+        .appendField(new Blockly.FieldLabel('Bool', 'blocklyTextEmph'), 'NAME');
     this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
   }
 };
@@ -1261,6 +1261,74 @@ Blockly.Blocks['circTest'] = {
     this.setOutput(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Picture'));
     this.functionName = "circle";
+  }
+};
+
+
+
+
+
+Blockly.Blocks['type_constructor'] = {
+  init: function() {
+    this.setColour(90);
+    this.typeParams = { elmtType: Blockly.TypeVar.getUnusedTypeVar() };
+    this.appendDummyInput()
+        .appendField('RGBA', 'NAME')
+    this.appendValueInput('TP0')
+        .setTypeExpr(new Blockly.TypeExpr('Number'))
+    this.appendValueInput('TP1')
+        .setTypeExpr(new Blockly.TypeExpr('String'));
+    this.setOutput(true);
+
+    this.setInputsInline(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Product'));
+    this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP);
+    this.itemCount_ = 2;
+  },
+
+  mutationToDom: function() {
+    var container = document.createElement('mutation');
+    container.setAttribute('items', this.itemCount_);
+    container.setAttribute('name', this.getFieldValue('NAME'));
+    container.setAttribute('output', this.outputConnection.typeExpr.name);
+
+    for (var i = 0; i < this.itemCount_; i++) {
+      var parameter = document.createElement('type');
+      parameter.setAttribute('name', this.getInput("TP" + i).connection.typeExpr.name);
+      
+      container.appendChild(parameter);
+    }
+    return container;
+  },
+  domToMutation: function(xmlElement) {
+    for (var x = 0; x < this.itemCount_; x++) {
+      this.removeInput('TP' + x);
+    }
+
+    this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+    this.setFieldValue(xmlElement.getAttribute('name'), 'NAME');
+    this.setOutputTypeExpr(new Blockly.TypeExpr( xmlElement.getAttribute('output') ));
+
+    for (var i = 0, childNode; childNode = xmlElement.childNodes[i]; i++) {
+      if (childNode.nodeName.toLowerCase() == 'type') {
+        var typename = childNode.getAttribute('name');
+
+        var input = this.appendValueInput('TP' + i)
+            .setTypeExpr(new Blockly.TypeExpr (typename));
+      }
+    }
+  },
+
+  saveConnections: function(containerBlock) {
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var x = 0;
+    while (itemBlock) {
+      var input = this.getInput('TP' + x);
+      itemBlock.valueConnection_ = input && input.connection.targetConnection;
+      x++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
   }
 };
 
