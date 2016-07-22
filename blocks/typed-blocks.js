@@ -1366,7 +1366,7 @@ Blockly.Blocks['type_case'] = {
 
       var prodDom = document.createElement('product');
       var inp = this.getInput('TP' + i);
-      var constructorName = inp.fieldRow[0];
+      var constructorName = inp.fieldRow[0].getValue();
       var its = 0;
       for(var j = 1; j < inp.fieldRow.length; j++){
         if(inp.fieldRow[j].getValue() == '' || inp.fieldRow[j].getValue() == ' ') continue; // Skip spaces
@@ -1395,11 +1395,11 @@ Blockly.Blocks['type_case'] = {
 
     for (var i = 0, productNode; productNode = xmlElement.childNodes[i]; i++) {
       if (productNode.nodeName.toLowerCase() == 'product') {
-        var constructor = productNode.getAttribute('CONSTRUCTOR');
+        var constructorName = productNode.getAttribute('constructor');
 
         var input = this.appendValueInput('TP' + i)
             .setTypeExpr(this.a);
-        input.appendField(constructor);
+        input.appendField(constructorName);
         
         for(var j = 0, typeNode; typeNode = productNode.childNodes[j]; j++){
           input.appendField(' ');
