@@ -38,9 +38,9 @@ Blockly.Blocks['logic_boolean_typed'] = {
          [Blockly.Msg.LOGIC_BOOLEAN_FALSE, 'FALSE']];
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
     this.setColour(210);
-    this.setOutput(true, 'Boolean');
+    this.setOutput(true, 'Bool');
     // Sorin
-    this.setOutputTypeExpr(new Blockly.TypeExpr('bool'));
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Bool'));
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(BOOLEANS), 'BOOL');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
@@ -70,9 +70,9 @@ Blockly.Blocks['logic_compare_typed'] = {
         ];
     this.setHelpUrl(Blockly.Msg.LOGIC_COMPARE_HELPURL);
     this.setColour(210);
-    this.setOutput(true, 'Boolean');
+    this.setOutput(true, 'Bool');
     // Sorin
-    this.setOutputTypeExpr(new Blockly.TypeExpr('bool'));
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Bool'));
     var A = Blockly.TypeVar.getUnusedTypeVar();
     this.appendValueInput('A')
         .setTypeExpr(A);
@@ -107,8 +107,8 @@ Blockly.Blocks['logic_ternary_typed'] = {
     this.setColour(210);
     var A = Blockly.TypeVar.getUnusedTypeVar();
     this.appendValueInput('IF')
-        .setCheck('Boolean')
-        .setTypeExpr(new Blockly.TypeExpr('bool'))
+        .setCheck('Bool')
+        .setTypeExpr(new Blockly.TypeExpr('Bool'))
         .appendField(Blockly.Msg.LOGIC_TERNARY_CONDITION);
     this.appendValueInput('THEN')
         .setTypeExpr(A)
@@ -1396,7 +1396,9 @@ Blockly.Blocks['type_case'] = {
     }
 
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
-    this.setFieldValue(xmlElement.getAttribute('name'), 'NAME');
+    var name = xmlElement.getAttribute('name');
+    this.setFieldValue(name, 'NAME');
+    this.getInput('INPUT').setTypeExpr(new Blockly.TypeExpr(name));
 
     for (var i = 0, productNode; productNode = xmlElement.childNodes[i]; i++) {
       if (productNode.nodeName.toLowerCase() == 'product') {
