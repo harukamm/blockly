@@ -414,9 +414,9 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
       {
         var t = input.connection.typeExpr.children[l];
         var h = Blockly.BlockSvg.getTypeExprHeight(t);
-        input.renderHeight += 16;
+        input.renderHeight += h;
       }
-      input.renderWidth += 20
+      input.renderWidth += 30;
     }
     // Expand input size if there is a connection.
     if (input.connection && input.connection.isConnected()) {
@@ -756,7 +756,10 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
               var t = input.connection.typeExpr.children[i];
               var down = Blockly.BlockSvg.getShapeForType(t.name).down;
 
-              inlineSteps.push(down);
+
+              Blockly.BlockSvg.renderTypeExpr(t, inlineSteps, 'down');
+
+              // inlineSteps.push(down);
               inlineSteps.push('v', 5);
             }
           }

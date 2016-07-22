@@ -406,18 +406,22 @@ Blockly.RenderedConnection.prototype.connect_ = function(childConnection) {
 // Stefan
 // Sorin
 Blockly.Connection.prototype.renderTypeVarHighlights = function() {
-
   if (this.typeVarPaths_) {
     for (var i = 0; i < this.typeVarPaths_.length; i++) {
       goog.dom.removeNode(this.typeVarPaths_[i]);
       delete this.typeVarPaths_[i];
     }
   }
+
+  // Stefan, TODO - Fix
+  if(this.typeExpr && this.typeExpr.name == 'Function_') return; // Don't draw on functions, its buggy
+
   this.typeVarPaths_ = [];
   var xy = this.sourceBlock_.getRelativeToSurfaceXY();
   var x = this.x_ - xy.x;
   var y = this.y_ - xy.y;
   var typeVarHighlights = Blockly.BlockSvg.typeVarHighlights(this.typeExpr);
+
   for (var i = 0; i < typeVarHighlights.length; i++) {
     var highlight = typeVarHighlights[i];
     this.typeVarPaths_.push(
