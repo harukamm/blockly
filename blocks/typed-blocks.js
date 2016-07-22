@@ -1023,7 +1023,224 @@ Blockly.Blocks['cwAnimationOf'] = {
         .setTypeExpr(new Blockly.TypeExpr('Function_', 
               [new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Picture') ]  ));
     this.setInputsInline(true);
-    // Assign 'this' to a variable for use in the tooltip closure below.
+  }
+};
+
+Blockly.Blocks['type_number'] = {
+  init: function() {
+    this.setColour(60);
+    this.setOutput(false);
+    var A = Blockly.TypeVar.getUnusedTypeVar();
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Number', 'blocklyTextEmph'));
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
+  }
+};
+
+Blockly.Blocks['type_text'] = {
+  init: function() {
+    this.setColour(60);
+    this.setOutput(false);
+    var A = Blockly.TypeVar.getUnusedTypeVar();
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Text', 'blocklyTextEmph'));
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
+  }
+};
+
+Blockly.Blocks['type_bool'] = {
+  init: function() {
+    this.setColour(60);
+    this.setOutput(false);
+    var A = Blockly.TypeVar.getUnusedTypeVar();
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Bool', 'blocklyTextEmph'));
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+// Product of types
+Blockly.Blocks['type_product'] = {
+  init: function() {
+    this.setColour(260);
+    this.typeParams = { elmtType: Blockly.TypeVar.getUnusedTypeVar() };
+    this.appendValueInput('TP0')
+        .setTypeExpr(new Blockly.TypeExpr('Type'))
+        .appendField(new Blockly.FieldTextInput('Constructor'), 'CONSTRUCTOR')
+    this.appendValueInput('TP1')
+        .setTypeExpr(new Blockly.TypeExpr('Type'));
+    this.appendValueInput('TP2')
+        .setTypeExpr(new Blockly.TypeExpr('Type'));
+    this.setOutput(true);
+
+    this.setInputsInline(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Product'));
+    this.setMutator(new Blockly.Mutator(['lists_create_with_item']));
+    this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP);
+    this.itemCount_ = 3;
+  },
+  mutationToDom: function() {
+    var container = document.createElement('mutation');
+    container.setAttribute('items', this.itemCount_);
+    return container;
+  },
+  domToMutation: function(xmlElement) {
+    for (var x = 0; x < this.itemCount_; x++) {
+      this.removeInput('TP' + x);
+    }
+    this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+    for (var x = 0; x < this.itemCount_; x++) {
+      var input = this.appendValueInput('TP' + x)
+                      .setTypeExpr(new Blockly.TypeExpr('Type'));
+      if (x == 0) {
+        input.appendField(new Blockly.FieldTextInput('Constructor'), 'CONSTRUCTOR')
+      }
+    }
+  },
+  decompose: function(workspace) {
+    var containerBlock =
+        workspace.newBlock('lists_create_with_container');
+    containerBlock.initSvg();
+    var connection = containerBlock.getInput('STACK').connection;
+    for (var x = 0; x < this.itemCount_; x++) {
+      var itemBlock = workspace.newBlock('lists_create_with_item');
+      itemBlock.initSvg();
+      connection.connect(itemBlock.previousConnection);
+      connection = itemBlock.nextConnection;
+    }
+    return containerBlock;
+  },
+  compose: function(containerBlock) {
+    if (this.itemCount_ == 0) {
+    } else {
+      for (var x = this.itemCount_ - 1; x >= 0; x--) {
+        this.removeInput('TP' + x);
+      }
+    }
+    this.itemCount_ = 0;
+    // Rebuild the block's inputs.
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    while (itemBlock) {
+      var input = this.appendValueInput('TP' + this.itemCount_)
+                      .setTypeExpr(new Blockly.TypeExpr('Type'));
+      if (this.itemCount_ == 0) {
+        input.appendField(new Blockly.FieldTextInput('Constructor'), 'CONSTRUCTOR')
+      }
+      // Reconnect any child blocks.
+      if (itemBlock.valueConnection_) {
+        input.connection.connect(itemBlock.valueConnection_);
+      }
+      this.itemCount_++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+    this.renderMoveConnections_();
+  },
+  saveConnections: function(containerBlock) {
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var x = 0;
+    while (itemBlock) {
+      var input = this.getInput('TP' + x);
+      itemBlock.valueConnection_ = input && input.connection.targetConnection;
+      x++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+  }
+};
+
+/* 
+ * Custom user data type
+ * Mutator allows mutable products to be added
+ */
+Blockly.Blocks['type_sum'] = {
+  init: function() {
+    this.setColour(260);
+    this.typeParams = { elmtType: Blockly.TypeVar.getUnusedTypeVar() };
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldTextInput('UserType'), 'NAME');
+    this.appendValueInput('PROD0')
+        .setTypeExpr(new Blockly.TypeExpr('Product'))
+    this.appendValueInput('PROD1')
+        .setTypeExpr(new Blockly.TypeExpr('Product'));
+    this.appendValueInput('PROD2')
+        .setTypeExpr(new Blockly.TypeExpr('Product'));
+    this.setOutput(false);
+    this.setMutator(new Blockly.Mutator(['lists_create_with_item']));
+    this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP);
+    this.itemCount_ = 3;
+  },
+  mutationToDom: function() {
+    var container = document.createElement('mutation');
+    container.setAttribute('items', this.itemCount_);
+    return container;
+  },
+  domToMutation: function(xmlElement) {
+    for (var x = 0; x < this.itemCount_; x++) {
+      this.removeInput('PROD' + x);
+    }
+    this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+    for (var x = 0; x < this.itemCount_; x++) {
+      var input = this.appendValueInput('PROD' + x)
+                      .setTypeExpr(new Blockly.TypeExpr('Product'));
+    }
+  },
+  decompose: function(workspace) {
+    var containerBlock =
+        workspace.newBlock('lists_create_with_container');
+    containerBlock.initSvg();
+    var connection = containerBlock.getInput('STACK').connection;
+    for (var x = 0; x < this.itemCount_; x++) {
+      var itemBlock = workspace.newBlock('lists_create_with_item');
+      itemBlock.initSvg();
+      connection.connect(itemBlock.previousConnection);
+      connection = itemBlock.nextConnection;
+    }
+    return containerBlock;
+  },
+  compose: function(containerBlock) {
+    if (this.itemCount_ == 0) {
+    } else {
+      for (var x = this.itemCount_ - 1; x >= 0; x--) {
+        this.removeInput('PROD' + x);
+      }
+    }
+    this.itemCount_ = 0;
+    // Rebuild the block's inputs.
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    while (itemBlock) {
+      var input = this.appendValueInput('PROD' + this.itemCount_)
+                      .setTypeExpr(new Blockly.TypeExpr('Product'));
+      // Reconnect any child blocks.
+      if (itemBlock.valueConnection_) {
+        input.connection.connect(itemBlock.valueConnection_);
+      }
+      this.itemCount_++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+    this.renderMoveConnections_();
+  },
+  saveConnections: function(containerBlock) {
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var x = 0;
+    while (itemBlock) {
+      var input = this.getInput('PROD' + x);
+      itemBlock.valueConnection_ = input && input.connection.targetConnection;
+      x++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
   }
 };
 

@@ -1220,6 +1220,22 @@ Blockly.BlockSvg.typeVarShapes_ = {
     blockColour: Blockly.BlockSvg.ABSTRACT_COLOUR
   },
 
+  Type : { 
+    down: 'l 0,5 -8,0 0,15 8,0 0,5',
+    up: 'l 0,-5 -8,0 0,-15 8,0 0,-5',
+    highlight: 'm 0,5 l -8,0 0,15 8,0 m 0,5',
+    height: 25,
+    blockColour: 60
+  },
+
+  Product : { 
+    down: ' l 0,5 -8,0 0,15 8,0 0,5',
+    up: 'l 0,-5 -8,0 0,-15 8,0 0,-5',
+    highlight: 'm 0,5 l -8,0 0,15 8,0 m 0,5',
+    height: 25,
+    blockColour: Blockly.BlockSvg.ABSTRACT_COLOUR
+  },
+
   original : {
     down: 
     'v 5 c 0,10 -' + Blockly.BlockSvg.TAB_WIDTH +
