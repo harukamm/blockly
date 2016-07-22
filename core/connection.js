@@ -226,9 +226,33 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
   /* Unify type expressions */
   var unifyResult;
   if (parentConnection.typeExpr && childConnection.typeExpr) {
+    // Stefan
     if(parentConnection.typeExpr.name == 'Function_')
     {
-      // Stefan, exclude Function_, we already check it in checkType_ properly
+      // Disconnect any shadow blocks, if it has any
+      for (var i = 0, input; input = childConnection.sourceBlock_.inputList[i]; i++) {
+       
+        if(!input.name)
+          continue;
+        if(input.name=='')
+          continue;
+        if(!input.connection)
+          continue;
+        var orphanBlock = input.connection.targetBlock();
+        if(orphanBlock && orphanBlock.isShadow())
+        {
+          // dispose here
+          // OWARI
+          input.connection.shadowDomBackup_ = input.connection.shadowDom_;
+          input.connection.shadowDom_ = null;
+          console.log(orphanBlock);
+          orphanBlock.dispose();
+          orphanBlock = null;
+        }
+      }
+
+
+      //  exclude Function_, we already check it in checkType_ properly
       var oldTp = parentConnection.typeExpr; 
       parentConnection.typeExpr = parentConnection.typeExpr.children[parentConnection.typeExpr.children.length - 1];
       unifyResult = parentConnection.typeExpr.unify(childConnection.typeExpr);
@@ -599,6 +623,17 @@ Blockly.Connection.prototype.disconnect = function() {
   this.disconnectInternal_(parentBlock, childBlock);
   parentConnection.respawnShadow_();
 
+  if(parentConnection.shadowDomBackup_)
+  {
+    // Stefan
+    // TODO figure out where to put this. 
+    // We want to restore the shadow block after the block gets disconnected.
+    // But doing so here results in the shadow block staying connected
+    // parentConnection.shadowDom_ = parentConnection.shadowDomBackup_;
+    // parentConnection.respawnShadow_();
+  }
+
+
   // Stefan
   // Anthony
 
@@ -679,6 +714,8 @@ Blockly.Connection.prototype.disconnect = function() {
   if (childBlock.rendered) {
     childBlock.updateDisabled();
   }
+
+  
 };
 
 /**
@@ -756,7 +793,10 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
      var thisTp = otherConnection.typeExpr;
      var thisArrows = thisTp.children;
      var otherArrows = [];
-    
+   
+     var conned = 0;
+     var ghosts = 0;
+     var totalCons = 0;
      for (var i = 0, input; input = this.sourceBlock_.inputList[i]; i++) {
        if(!input.name)
          continue;
@@ -765,9 +805,16 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
        if(!input.connection)
          continue;
        if(input.connection.isConnected())
-         continue;
+         conned++;
+       if(input.connection.isConnected() && input.connection.targetBlock().isShadow())
+         ghosts++;
+       totalCons++;
        otherArrows.push(input.connection.typeExpr);
      }
+     if(ghosts==totalCons || conned == 0){} // ghost connections are allowed, we will remove them later
+     else
+       return false; // We don't want partially applied functions
+
      otherArrows.push(this.sourceBlock_.outputConnection.typeExpr);
 
      if(thisArrows.length != otherArrows.length)

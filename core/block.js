@@ -74,6 +74,8 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   /** @type {boolean} */
   this.contextMenu = true;
 
+  this.functionName = '';
+
   /**
    * @type {Blockly.Block}
    * @private
@@ -242,6 +244,17 @@ Blockly.Block.prototype.dispose = function(healStack) {
 
   Blockly.TypeVar.triggerGarbageCollection();
 };
+
+/** Stefan
+ * Returns the name of the function that this Block represents
+ * This is used specifically in CodeWorld for first class function functionality
+ */
+
+Blockly.Block.prototype.getFunctionName = function(){
+  if(this.functionName == '' && this.getFieldValue('NAME') && this.getFieldValue('NAME') != '')
+    return this.getFieldValue('NAME');
+  return this.functionName;
+}
 
 /**
  * Unplug this block from its superior block.  If this block is a statement,
