@@ -1080,14 +1080,13 @@ Blockly.Blocks['type_bool'] = {
 // Product of types
 Blockly.Blocks['type_product'] = {
   init: function() {
-    this.setColour(260);
+    this.setColour(90);
     this.typeParams = { elmtType: Blockly.TypeVar.getUnusedTypeVar() };
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldTextInput('Constructor'), 'CONSTRUCTOR')
     this.appendValueInput('TP0')
         .setTypeExpr(new Blockly.TypeExpr('Type'))
-        .appendField(new Blockly.FieldTextInput('Constructor'), 'CONSTRUCTOR')
     this.appendValueInput('TP1')
-        .setTypeExpr(new Blockly.TypeExpr('Type'));
-    this.appendValueInput('TP2')
         .setTypeExpr(new Blockly.TypeExpr('Type'));
     this.setOutput(true);
 
@@ -1095,7 +1094,7 @@ Blockly.Blocks['type_product'] = {
     this.setOutputTypeExpr(new Blockly.TypeExpr('Product'));
     this.setMutator(new Blockly.Mutator(['lists_create_with_item']));
     this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP);
-    this.itemCount_ = 3;
+    this.itemCount_ = 2;
   },
   mutationToDom: function() {
     var container = document.createElement('mutation');
@@ -1110,9 +1109,6 @@ Blockly.Blocks['type_product'] = {
     for (var x = 0; x < this.itemCount_; x++) {
       var input = this.appendValueInput('TP' + x)
                       .setTypeExpr(new Blockly.TypeExpr('Type'));
-      if (x == 0) {
-        input.appendField(new Blockly.FieldTextInput('Constructor'), 'CONSTRUCTOR')
-      }
     }
   },
   decompose: function(workspace) {
@@ -1141,9 +1137,6 @@ Blockly.Blocks['type_product'] = {
     while (itemBlock) {
       var input = this.appendValueInput('TP' + this.itemCount_)
                       .setTypeExpr(new Blockly.TypeExpr('Type'));
-      if (this.itemCount_ == 0) {
-        input.appendField(new Blockly.FieldTextInput('Constructor'), 'CONSTRUCTOR')
-      }
       // Reconnect any child blocks.
       if (itemBlock.valueConnection_) {
         input.connection.connect(itemBlock.valueConnection_);
@@ -1173,20 +1166,22 @@ Blockly.Blocks['type_product'] = {
  */
 Blockly.Blocks['type_sum'] = {
   init: function() {
-    this.setColour(260);
+    this.setColour(160);
     this.typeParams = { elmtType: Blockly.TypeVar.getUnusedTypeVar() };
     this.appendDummyInput()
         .appendField(new Blockly.FieldTextInput('UserType'), 'NAME');
     this.appendValueInput('PROD0')
+        .appendField('|')
+        .setAlign(Blockly.ALIGN_RIGHT)
         .setTypeExpr(new Blockly.TypeExpr('Product'))
     this.appendValueInput('PROD1')
-        .setTypeExpr(new Blockly.TypeExpr('Product'));
-    this.appendValueInput('PROD2')
+        .appendField('|')
+        .setAlign(Blockly.ALIGN_RIGHT)
         .setTypeExpr(new Blockly.TypeExpr('Product'));
     this.setOutput(false);
     this.setMutator(new Blockly.Mutator(['lists_create_with_item']));
     this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP);
-    this.itemCount_ = 3;
+    this.itemCount_ = 2;
   },
   mutationToDom: function() {
     var container = document.createElement('mutation');
@@ -1200,6 +1195,8 @@ Blockly.Blocks['type_sum'] = {
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
     for (var x = 0; x < this.itemCount_; x++) {
       var input = this.appendValueInput('PROD' + x)
+                      .appendField('|')
+                      .setAlign(Blockly.ALIGN_RIGHT)
                       .setTypeExpr(new Blockly.TypeExpr('Product'));
     }
   },
@@ -1228,6 +1225,8 @@ Blockly.Blocks['type_sum'] = {
     var itemBlock = containerBlock.getInputTargetBlock('STACK');
     while (itemBlock) {
       var input = this.appendValueInput('PROD' + this.itemCount_)
+                      .appendField('|')
+                      .setAlign(Blockly.ALIGN_RIGHT)
                       .setTypeExpr(new Blockly.TypeExpr('Product'));
       // Reconnect any child blocks.
       if (itemBlock.valueConnection_) {
