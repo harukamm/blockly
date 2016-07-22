@@ -43,13 +43,12 @@ goog.require('goog.userAgent');
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldVarInput = function(text, opt_validator) {
+Blockly.FieldVarInput = function(text, opt_validator, typeExpr) {
   Blockly.FieldVarInput.superClass_.constructor.call(this, text,
       opt_validator);
-
-  //Blockly.removeClass_(this.svgGroup_, 'blocklyEditableText');
-  //Blockly.addClass_(this.svgGroup_, 'blocklyFieldVarInput');
-
+  
+  this.typeExpr = typeExpr;
+  this.size_.height += 4;
 };
 goog.inherits(Blockly.FieldVarInput, Blockly.Field);
 
@@ -63,7 +62,7 @@ Blockly.FieldVarInput.prototype.updateEditable = function() {
 Blockly.FieldVarInput.prototype.getPath = function(width)
 {
   var width_ = width+2;
-  return 'M -6,2 a 6,6,0,0,0,0,12 l 0 4 l '+ width_ + ' 0 l 0 -20 l -' + width_ + ' 0 z';
+  return 'M 0,4 a 6,6,0,0,0,0,12 l 0 4 l '+ width_ + ' 0 l 0 -20 l -' + width_ + ' 0 z';
 };
 
 Blockly.FieldVarInput.prototype.init = function() {
@@ -77,13 +76,6 @@ Blockly.FieldVarInput.prototype.init = function() {
     this.fieldGroup_.style.display = 'none';
   }
 
-  this.borderRect_ = Blockly.createSvgElement('rect',
-      {'rx': 4,
-       'ry': 4,
-       'x': -Blockly.BlockSvg.SEP_SPACE_X / 2,
-       'y': 0,
-       'height': 16}, this.fieldGroup_, this.sourceBlock_.workspace);
-
   this.borderRect_ = Blockly.createSvgElement('path',
        {'class': 'blocklyFieldVarInput',
        'd': this.getPath(20)},
@@ -93,7 +85,7 @@ Blockly.FieldVarInput.prototype.init = function() {
 
   /** @type {!Element} */
   this.textElement_ = Blockly.createSvgElement('text',
-      {'class': 'blocklyText', 'y': this.size_.height - 12.5},
+      {'class': 'blocklyText', 'y': this.size_.height - 12.5 - 2, 'x':6},
       this.fieldGroup_);
 
     this.updateEditable();
