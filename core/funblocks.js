@@ -27,20 +27,25 @@ goog.require('Blockly.Workspace');
 Blockly.FunBlocks.dataFlyoutCategory = function(workspace){
 
   var xmlList = [];
-  var staticBlocks = ["type_sum", "type_number", "type_text", "type_bool", "type_product"];
+  var staticBlocks = ["type_sum", "type_number", "type_text", "type_bool"];
   staticBlocks.forEach(function(blockName){
     Blockly.FunBlocks.addBlockToXML(blockName, xmlList);
   });
+
+  // Generate a type block for each user data type
+  Blockly.FunBlocks.addUserTypes(xmlList);
+
+  // Add product block below all the regular types
+  Blockly.FunBlocks.addBlockToXML('type_product', xmlList);
 
   // Generate a case for each data type
   Blockly.FunBlocks.generateCases(xmlList);
 
   // Generate all constructor
   Blockly.FunBlocks.generateConstructors(xmlList);
+
   return xmlList;
 };
-
-
 
 Blockly.FunBlocks.addBlockToXML = function(blockName, xmlList){
   if (Blockly.Blocks[blockName]) {
@@ -51,6 +56,26 @@ Blockly.FunBlocks.addBlockToXML = function(blockName, xmlList){
 
   }
 };
+
+Blockly.FunBlocks.addUserTypes = function(xmlList){
+  var blocks = Blockly.getMainWorkspace().getTopBlocks();
+  blocks.forEach(function(block){
+    if (block.type == 'type_sum')
+    {
+      var name = block.getFieldValue('NAME');
+      var mutation = goog.dom.createDom('mutation');
+      mutation.setAttribute('name',block.getFieldValue('NAME'));
+
+      var block = goog.dom.createDom('block');
+      block.setAttribute('type','type_user');
+      block.setAttribute('gap',16);
+      block.appendChild(mutation);
+
+      xmlList.push(block);
+    }
+  });
+};
+
 
 
 Blockly.FunBlocks.generateCases = function(xmlList){
@@ -94,9 +119,7 @@ Blockly.FunBlocks.generateCases = function(xmlList){
       xmlList.push(block);
     }
   });
-
-
-}
+};
 
 
 Blockly.FunBlocks.generateConstructors = function(xmlList){

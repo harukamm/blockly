@@ -1023,7 +1023,6 @@ Blockly.Blocks['cwAnimationOf'] = {
     this.setColour(0);
     this.setOutput(false);
 
-    var A = Blockly.TypeVar.getUnusedTypeVar();
     this.appendDummyInput()
         .appendField(new Blockly.FieldLabel('Animation Of', 'blocklyTextEmph'));
     this.appendValueInput('FUNC')
@@ -1037,8 +1036,7 @@ Blockly.Blocks['cwAnimationOf'] = {
 Blockly.Blocks['type_number'] = {
   init: function() {
     this.setColour(60);
-    this.setOutput(false);
-    var A = Blockly.TypeVar.getUnusedTypeVar();
+    this.setOutput(true);
     this.appendDummyInput()
         .appendField(new Blockly.FieldLabel('Number', 'blocklyTextEmph'), 'NAME');
     this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
@@ -1048,8 +1046,7 @@ Blockly.Blocks['type_number'] = {
 Blockly.Blocks['type_text'] = {
   init: function() {
     this.setColour(60);
-    this.setOutput(false);
-    var A = Blockly.TypeVar.getUnusedTypeVar();
+    this.setOutput(true);
     this.appendDummyInput()
         .appendField(new Blockly.FieldLabel('Text', 'blocklyTextEmph'), 'NAME');
     this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
@@ -1059,23 +1056,31 @@ Blockly.Blocks['type_text'] = {
 Blockly.Blocks['type_bool'] = {
   init: function() {
     this.setColour(60);
-    this.setOutput(false);
-    var A = Blockly.TypeVar.getUnusedTypeVar();
+    this.setOutput(true);
     this.appendDummyInput()
         .appendField(new Blockly.FieldLabel('Bool', 'blocklyTextEmph'), 'NAME');
     this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
   }
 };
 
-
-
-
-
-
-
-
-
-
+Blockly.Blocks['type_user'] = {
+  init: function() {
+    this.setColour(60);
+    this.setOutput(true);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('User', 'blocklyTextEmph'), 'NAME');
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Type'));
+  },
+  domToMutation: function(xmlElement) {
+    var name = xmlElement.getAttribute('name');
+    this.setFieldValue(name, 'NAME');
+  },
+  mutationToDom: function(){
+    var container = document.createElement('mutation');
+    container.setAttribute('name', this.getFieldValue('NAME'));
+    return container;
+  }
+};
 
 // Product of types
 Blockly.Blocks['type_product'] = {
