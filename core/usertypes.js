@@ -14,40 +14,53 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
+/**
+ * @fileoverview Functions for letting defining user types.
+ * @author stefanjacholke@gmail.com (Stefan Jacholke)
+ */
 'use strict';
 
-goog.provide('Blockly.FunBlocks');
+goog.provide('Blockly.UserTypes');
 
 goog.require('Blockly.Blocks');
 goog.require('Blockly.Field');
 goog.require('Blockly.Names');
 goog.require('Blockly.Workspace');
 
-Blockly.FunBlocks.dataFlyoutCategory = function(workspace){
+
+/**
+ * Returns an xml list of blocks for the types flyout.
+ * @param {!Blockly.Workspace} workspace The workspace, it gets ignored though
+ */
+Blockly.UserTypes.dataFlyoutCategory = function(workspace){
 
   var xmlList = [];
   var staticBlocks = ["type_sum", "type_number", "type_text", "type_bool"];
   staticBlocks.forEach(function(blockName){
-    Blockly.FunBlocks.addBlockToXML(blockName, xmlList);
+    Blockly.UserTypes.addBlockToXML(blockName, xmlList);
   });
 
   // Generate a type block for each user data type
-  Blockly.FunBlocks.addUserTypes(xmlList);
+  Blockly.UserTypes.addUserTypes(xmlList);
 
   // Add product block below all the regular types
-  Blockly.FunBlocks.addBlockToXML('type_product', xmlList);
+  Blockly.UserTypes.addBlockToXML('type_product', xmlList);
 
   // Generate a case for each data type
-  Blockly.FunBlocks.generateCases(xmlList);
+  Blockly.UserTypes.generateCases(xmlList);
 
   // Generate all constructor
-  Blockly.FunBlocks.generateConstructors(xmlList);
+  Blockly.UserTypes.generateConstructors(xmlList);
 
   return xmlList;
 };
 
-Blockly.FunBlocks.addBlockToXML = function(blockName, xmlList){
+/**
+ * Adds the specified block name to the xmlList.
+ * @param {!String} blockName The type of the block
+ * @param {!Object} xmlList List of current blocks
+ */
+Blockly.UserTypes.addBlockToXML = function(blockName, xmlList){
   if (Blockly.Blocks[blockName]) {
     var block = goog.dom.createDom('block');
     block.setAttribute('type', blockName);
@@ -57,7 +70,11 @@ Blockly.FunBlocks.addBlockToXML = function(blockName, xmlList){
   }
 };
 
-Blockly.FunBlocks.addUserTypes = function(xmlList){
+/**
+ * Adds the user specified types on the main workspace to the toolbox.
+ * @param {!Object} xmlList List of current blocks
+ */
+Blockly.UserTypes.addUserTypes = function(xmlList){
   var blocks = Blockly.getMainWorkspace().getTopBlocks();
   blocks.forEach(function(block){
     if (block.type == 'type_sum')
@@ -76,9 +93,11 @@ Blockly.FunBlocks.addUserTypes = function(xmlList){
   });
 };
 
-
-
-Blockly.FunBlocks.generateCases = function(xmlList){
+/**
+ * Adds the a case block for each user defined type to the toolbox 
+ * @param {!Object} xmlList List of current blocks
+ */
+Blockly.UserTypes.generateCases = function(xmlList){
   var blocks = Blockly.getMainWorkspace().getTopBlocks();
   blocks.forEach(function(block){
     if (block.type == 'type_sum')
@@ -121,8 +140,11 @@ Blockly.FunBlocks.generateCases = function(xmlList){
   });
 };
 
-
-Blockly.FunBlocks.generateConstructors = function(xmlList){
+/**
+ * Adds a constructor block for each user defined product type to the toolbox 
+ * @param {!Object} xmlList List of current blocks
+ */
+Blockly.UserTypes.generateConstructors = function(xmlList){
   var blocks = Blockly.getMainWorkspace().getAllBlocks(false);
   blocks.forEach(function(block){
     if(block.type == 'type_product')

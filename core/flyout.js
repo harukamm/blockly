@@ -34,7 +34,7 @@ goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.math.Rect');
 goog.require('goog.userAgent');
-
+goog.require('Blockly.UserTypes');
 
 /**
  * Class for a flyout.
@@ -548,7 +548,7 @@ Blockly.Flyout.prototype.show = function(xmlList) {
   }
   else if(xmlList == "DATATYPE")
   {
-    xmlList = Blockly.FunBlocks.dataFlyoutCategory(this.workspace_.targetWorkspace);
+    xmlList = Blockly.UserTypes.dataFlyoutCategory(this.workspace_.targetWorkspace);
   }
 
   this.svgGroup_.style.display = 'block';
@@ -960,7 +960,7 @@ Blockly.Flyout.prototype.filterForCapacity_ = function() {
   // Only allow one top level program block
   var workspaceBlocks = Blockly.getMainWorkspace().getTopBlocks(false);
   var programBlocks = 0;
-  var programBlockList = ["cwAnimationOf", "cwDrawingOf"];
+  var programBlockList = ["cwAnimationOf", "cwDrawingOf", "cwSimulationOf"];
   for(var j = 0, blockW; blockW = workspaceBlocks[j]; j++)
   {
     if(programBlockList.indexOf(blockW.type) > -1)
