@@ -230,6 +230,24 @@ Blockly.Blocks['lists_length'] = {
   }
 };
 
+Blockly.Blocks['lists_at'] = {
+  init: function() {
+    var a = Blockly.TypeVar.getUnusedTypeVar();
+    this.setColour(210);
+    this.appendValueInput('LST')
+        .setTypeExpr(new Blockly.TypeExpr('list',[a]));
+    this.appendValueInput('POS')
+        .setTypeExpr(new Blockly.TypeExpr('Number'))
+        .appendField(new Blockly.FieldLabel("at","blocklyTextEmph") );
+    this.setOutput(true);
+    this.setInputsInline(true);
+    this.setOutputTypeExpr(a);
+    this.functionName = "at";
+  }
+};
+
+
+
 Blockly.Blocks['lists_cons'] = {
   init: function() {
     var a = Blockly.TypeVar.getUnusedTypeVar();
