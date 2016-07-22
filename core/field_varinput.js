@@ -62,7 +62,20 @@ Blockly.FieldVarInput.prototype.updateEditable = function() {
 Blockly.FieldVarInput.prototype.getPath = function(width)
 {
   var width_ = width+2;
-  return 'M 0,4 a 6,6,0,0,0,0,12 l 0 4 l '+ width_ + ' 0 l 0 -20 l -' + width_ + ' 0 z';
+  var move = 'M 0,4';
+  var type = 'a 6,6,0,0,0,0,12'; 
+  var box = 'l 0 4 l '+ width_ + ' 0 l 0 -20 l -' + width_ + ' 0 z';
+  if(this.typeExpr)
+  {
+    move = 'M 0,-2';
+    type = Blockly.BlockSvg.typeVarShapes_[this.typeExpr.name].down;
+    type += 'M 0,17'
+
+    box = 'l 0 4 l '+ width_ + ' 0 l 0 -22 l -' + width_ + ' 0 z';
+    // type += 'M 0,16';
+  }
+
+  return move + type + box;
 };
 
 Blockly.FieldVarInput.prototype.init = function() {
@@ -78,7 +91,7 @@ Blockly.FieldVarInput.prototype.init = function() {
 
   this.borderRect_ = Blockly.createSvgElement('path',
        {'class': 'blocklyFieldVarInput',
-       'd': this.getPath(20)},
+       'd': this.getPath(this.size_.width)},
        this.fieldGroup_);
 
 
@@ -147,6 +160,7 @@ Blockly.FieldVarInput.prototype.render_ = function() {
     if (this.borderRect_) {
       this.borderRect_.setAttribute('width',
           width + Blockly.BlockSvg.SEP_SPACE_X);
+      this.borderRect_.setAttribute('d',this.getPath(width + Blockly.BlockSvg.SEP_SPACE_X));
     }
   } else {
     var width = 0;
@@ -188,20 +202,26 @@ Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
   this.sourceBlock_.setDragging_(false);
   this.sourceBlock_.onMouseUp_(e);
   this.sourceBlock_.unselect();
- 
+
+  var typenameXml = '';
+  if(this.typeExpr)
+    typenameXml = '<mutation typename="' + this.typeExpr.name + '" name="' + name + '"></mutation>';
+
   var blocksXMLText =
      '<xml>' +
-      '<block type="vars_local">' +
+      '<block type="vars_local">' + typenameXml + 
         '<field name="NAME">' +
           name +
         '</field>' +
       '</block>' +
      '</xml>';
 
-    var blocksDom = Blockly.Xml.textToDom(blocksXMLText);
-    var blocksXMLList = goog.dom.getChildren(blocksDom);
+  var blocksDom = Blockly.Xml.textToDom(blocksXMLText);
+  var blocksXMLList = goog.dom.getChildren(blocksDom);
 
   var curBlock = Blockly.Xml.domToBlock(blocksXMLList[0], Blockly.getMainWorkspace());
+  if(this.typeExpr)
+    curBlock.setOutputTypeExpr(this.typeExpr);
 
   var targetWorkspace = Blockly.getMainWorkspace();
   this.workspace_ = Blockly.getMainWorkspace();
@@ -209,7 +229,6 @@ Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
   var svgRootOld = this.sourceBlock_.getSvgRoot();
   var xyOld = Blockly.getSvgXY_(svgRootOld, targetWorkspace);
  
-
   var element = document.getElementsByClassName('blocklyWorkspace')[0];
   var rect = element.getBoundingClientRect();
 
@@ -222,7 +241,6 @@ Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
   var scrollY = this.workspace_.scrollY;
   scale = this.workspace_.scale;
   xyOld.y += scrollY / scale - scrollY;
-
 
   var svgRootNew = curBlock.getSvgRoot();
   var xyNew = Blockly.getSvgXY_(svgRootNew, targetWorkspace);

@@ -1423,4 +1423,17 @@ Blockly.Blocks['type_case'] = {
   }
 };
 
+Blockly.Blocks['fieldVarInputTest'] = {
+  init: function() {
+    this.setColour(160);
+    this.appendValueInput('NUM')
+        .setTypeExpr(new Blockly.TypeExpr('Number'))
+        .appendField(new Blockly.FieldVarInput('Regal', null, new Blockly.TypeExpr('Picture')));
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Picture'));
+    this.functionName = "circle";
+  }
+};
+
+
 

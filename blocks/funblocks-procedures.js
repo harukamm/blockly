@@ -318,9 +318,12 @@ Blockly.Blocks['vars_local'] = {
     this.setOutput(true);
     this.setOutputTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
   },
+
   domToMutation: function(xmlElement) {
-    var name = xmlElement.getAttribute('NAME');
-    this.setFieldValue('NAME',name);
+    var name = xmlElement.getAttribute('name');
+    var typeName = xmlElement.getAttribute('typename');
+    this.setOutputTypeExpr(new Blockly.TypeExpr(typeName));
+    this.setFieldValue(name, 'NAME');
   }
 
 };
