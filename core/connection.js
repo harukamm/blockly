@@ -827,6 +827,11 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
      return true;
   }
 
+  var thisPrefix = this.sourceBlock_.type.substring(0,4);
+  var otherPrefix = otherConnection.sourceBlock_.type.substring(0,4)
+  if( otherPrefix == 'type' || thisPrefix == 'type') // One of them is a type 
+    return otherPrefix == thisPrefix; // Type blocks may only be connected to type blocks
+
   var unifyResult = true;
   if (this.typeExpr && otherConnection.typeExpr) {
     unifyResult = this.typeExpr.unify(otherConnection.typeExpr);
