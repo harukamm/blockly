@@ -35,16 +35,18 @@ goog.require('Blockly.Workspace');
 Blockly.UserTypes.dataFlyoutCategory = function(workspace){
 
   var xmlList = [];
-  var staticBlocks = ["type_sum", "type_number", "type_text", "type_bool"];
+  var staticBlocks = ["type_sum", "type_product", "type_list"];
   staticBlocks.forEach(function(blockName){
     Blockly.UserTypes.addBlockToXML(blockName, xmlList);
   });
 
+  var userBlocks = ["Bool", "Number", "Color", "Picture", "Text"];
+  userBlocks.forEach(function(name){
+    Blockly.UserTypes.addUserType(name, xmlList);
+  });
+
   // Generate a type block for each user data type
   Blockly.UserTypes.addUserTypes(xmlList);
-
-  // Add product block below all the regular types
-  Blockly.UserTypes.addBlockToXML('type_product', xmlList);
 
   // Generate a case for each data type
   Blockly.UserTypes.generateCases(xmlList);
@@ -70,6 +72,18 @@ Blockly.UserTypes.addBlockToXML = function(blockName, xmlList){
   }
 };
 
+Blockly.UserTypes.addUserType = function(name, xmlList){
+    var mutation = goog.dom.createDom('mutation');
+    mutation.setAttribute('name',name);
+
+    var block = goog.dom.createDom('block');
+    block.setAttribute('type','type_user');
+    block.setAttribute('gap',16);
+    block.appendChild(mutation);
+
+    xmlList.push(block);
+}
+
 /**
  * Adds the user specified types on the main workspace to the toolbox.
  * @param {!Object} xmlList List of current blocks
@@ -80,15 +94,7 @@ Blockly.UserTypes.addUserTypes = function(xmlList){
     if (block.type == 'type_sum')
     {
       var name = block.getFieldValue('NAME');
-      var mutation = goog.dom.createDom('mutation');
-      mutation.setAttribute('name',block.getFieldValue('NAME'));
-
-      var block = goog.dom.createDom('block');
-      block.setAttribute('type','type_user');
-      block.setAttribute('gap',16);
-      block.appendChild(mutation);
-
-      xmlList.push(block);
+      Blockly.UserTypes.addUserType(name, xmlList);
     }
   });
 };
@@ -131,7 +137,7 @@ Blockly.UserTypes.generateCases = function(xmlList){
       }
       mutation.setAttribute('items',count);
       var block = goog.dom.createDom('block');
-      block.setAttribute('type','type_case');
+      block.setAttribute('type','expr_case');
       block.setAttribute('gap',16);
       block.appendChild(mutation);
 
@@ -166,7 +172,7 @@ Blockly.UserTypes.generateConstructors = function(xmlList){
 
         // Create dom
         var block = goog.dom.createDom('block');
-        block.setAttribute('type', 'type_constructor');
+        block.setAttribute('type', 'expr_constructor');
         block.setAttribute('items', 10);
         block.setAttribute('gap', 16);
         var mutation = goog.dom.createDom('mutation');
