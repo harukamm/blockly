@@ -202,6 +202,12 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     block.setAttribute('gap', 16);
     xmlList.push(block);
   }
+  if (Blockly.Blocks['procedures_let']) {
+    var block = goog.dom.createDom('block');
+    block.setAttribute('type', 'procedures_let');
+    block.setAttribute('gap', 16);
+    // xmlList.push(block);
+  }
 
   if (xmlList.length) {
     // Add slightly larger gap between system blocks and user calls.
