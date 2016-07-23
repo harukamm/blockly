@@ -1051,32 +1051,15 @@ Blockly.Blocks['cwAnimationOf'] = {
   }
 };
 
-Blockly.Blocks['type_number'] = {
+Blockly.Blocks['type_list'] = {
   init: function() {
     this.setColour(60);
     this.setOutput(true);
     this.appendDummyInput()
-        .appendField(new Blockly.FieldLabel('Number', 'blocklyTextEmph'), 'NAME');
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
-  }
-};
-
-Blockly.Blocks['type_text'] = {
-  init: function() {
-    this.setColour(60);
-    this.setOutput(true);
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldLabel('Text', 'blocklyTextEmph'), 'NAME');
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
-  }
-};
-
-Blockly.Blocks['type_bool'] = {
-  init: function() {
-    this.setColour(60);
-    this.setOutput(true);
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldLabel('Bool', 'blocklyTextEmph'), 'NAME');
+        .appendField(new Blockly.FieldLabel('List', 'blocklyTextEmph'), 'NAME');
+    this.appendValueInput('TP')
+        .setTypeExpr(new Blockly.TypeExpr('Type'));
+    this.setInputsInline(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
   }
 };
@@ -1291,7 +1274,7 @@ Blockly.Blocks['circTest'] = {
 
 
 
-Blockly.Blocks['type_constructor'] = {
+Blockly.Blocks['expr_constructor'] = {
   init: function() {
     this.setColour(90);
     this.typeParams = { elmtType: Blockly.TypeVar.getUnusedTypeVar() };
@@ -1355,7 +1338,7 @@ Blockly.Blocks['type_constructor'] = {
   }
 };
 
-Blockly.Blocks['type_case'] = {
+Blockly.Blocks['expr_case'] = {
   init: function() {
     this.setColour(190);
     var a = Blockly.TypeVar.getUnusedTypeVar();
@@ -1366,18 +1349,35 @@ Blockly.Blocks['type_case'] = {
         .setTypeExpr(new Blockly.TypeExpr('Maybe'));
     var f = new Blockly.FieldVarInput('a');
     f.type = 'Number';
-    this.appendValueInput('TP0')
+    this.appendValueInput('CS0')
         .appendField('Just')
         .appendField(' ')
         .appendField(f)
         .setTypeExpr(a);
-    this.appendValueInput('TP1')
+    this.appendValueInput('CS1')
         .appendField('Nothing')
         .setTypeExpr(a);
     this.setOutput(true);
 
     this.setOutputTypeExpr(a);
     this.itemCount_ = 2;
+
+  },
+
+  getInputConstructor: function(index){
+    return this.getInput('CS' + index).fieldRow[0].getValue();
+  },
+
+  getInputVars: function(index){
+    var vars = [];
+    var inp = this.getInput('CS' + index);
+    
+    for(var j = 1; j < inp.fieldRow.length; j++){
+      if(inp.fieldRow[j].getValue() == '' || inp.fieldRow[j].getValue() == ' ') continue; // Skip spaces
+
+      vars.push(inp.fieldRow[j].getValue());
+    }
+    return vars;
   },
 
   mutationToDom: function() {
@@ -1388,7 +1388,7 @@ Blockly.Blocks['type_case'] = {
     for (var i = 0; i < this.itemCount_; i++) {
 
       var prodDom = document.createElement('product');
-      var inp = this.getInput('TP' + i);
+      var inp = this.getInput('CS' + i);
       var constructorName = inp.fieldRow[0].getValue();
       var its = 0;
       for(var j = 1; j < inp.fieldRow.length; j++){
@@ -1410,7 +1410,7 @@ Blockly.Blocks['type_case'] = {
   domToMutation: function(xmlElement) {
 
     for (var x = 0; x < this.itemCount_; x++) {
-      this.removeInput('TP' + x);
+      this.removeInput('CS' + x);
     }
 
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
@@ -1422,7 +1422,7 @@ Blockly.Blocks['type_case'] = {
       if (productNode.nodeName.toLowerCase() == 'product') {
         var constructorName = productNode.getAttribute('constructor');
 
-        var input = this.appendValueInput('TP' + i)
+        var input = this.appendValueInput('CS' + i)
             .setTypeExpr(this.a);
         input.appendField(constructorName);
         
@@ -1439,7 +1439,7 @@ Blockly.Blocks['type_case'] = {
     var itemBlock = containerBlock.getInputTargetBlock('STACK');
     var x = 0;
     while (itemBlock) {
-      var input = this.getInput('TP' + x);
+      var input = this.getInput('CS' + x);
       itemBlock.valueConnection_ = input && input.connection.targetConnection;
       x++;
       itemBlock = itemBlock.nextConnection &&
