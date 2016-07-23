@@ -196,7 +196,8 @@ Blockly.FieldVarInput.prototype.setValue = function(text) {
 Blockly.FieldVarInput.prototype.showEditor_ = function(){};
 
 Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
-
+  if(this.sourceBlock_.isInFlyout )
+    return;
   var name = this.getValue();
   Blockly.dragMode_ = Blockly.DRAG_NONE;
   this.sourceBlock_.setDragging_(false);
