@@ -326,6 +326,23 @@ Blockly.Procedures.getDefinition = function(name, workspace) {
   return null;
 };
 
+/**
+ * List all available variables in the current scope
+ */
+Blockly.Procedures.getVarsInScope = function(connection){
+  var vars = [];
 
+  while(connection){
+    if(connection.sourceBlock_.getVars)
+      connection.sourceBlock_.getVars(connection).forEach(function(v){vars.push(v);});
 
+    if(connection.sourceBlock_.outputConnection)
+      connection = connection.sourceBlock_.outputConnection.targetConnection;
+    else
+      connection = null;
 
+    //childBlock = parentBlock;
+    //parentBlock = parentBlock.outputConnection.sourceBlock_
+  }
+  return vars;
+}

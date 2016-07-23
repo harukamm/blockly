@@ -832,6 +832,23 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   if( otherPrefix == 'type' || thisPrefix == 'type') // One of them is a type 
     return otherPrefix == thisPrefix; // Type blocks may only be connected to type blocks
 
+  if(this.sourceBlock_.type == 'vars_local' || otherConnection.sourceBlock == 'vars_local')
+  {
+    var varCon, otherCon;
+    if(this.sourceBlock_.type == 'vars_local'){
+      varCon = this;
+      otherCon = otherConnection;
+    }
+    else{
+      otherCon = this;
+      varCon = otherConnection;
+    }
+    var vars = Blockly.Procedures.getVarsInScope(otherCon);
+    if(vars.indexOf(varCon.sourceBlock_.getFieldValue('NAME')) < 0)
+      return false;
+    // else continue
+  }
+
   var unifyResult = true;
   if (this.typeExpr && otherConnection.typeExpr) {
     unifyResult = this.typeExpr.unify(otherConnection.typeExpr);

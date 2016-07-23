@@ -658,6 +658,16 @@ Blockly.Blocks['lists_comprehension'] = {
     this.varCount_ = 2;
     this.guardCount_ = 0;
   },
+
+  getVars: function(connection){
+    var i = 0;
+    for(i = 0; i < this.varCount_; i++){
+      if(this.getInput('VAR' + i).connection == connection){
+        return [this.vars_[i]];
+      }
+    }
+    return [];
+  },
   /**
    * Create XML to represent list inputs.
    * @return {Element} XML storage element.
@@ -690,6 +700,7 @@ Blockly.Blocks['lists_comprehension'] = {
     for (var x = 0; x < this.guardCount_; x++) {
       this.removeInput('GUARD' + x);
     }
+    this.vars_ = [];
 
     this.varCount_ = parseInt(xmlElement.getAttribute('varcount'), 10);
     this.guardCount_ = parseInt(xmlElement.getAttribute('guardcount'), 10);
@@ -704,6 +715,7 @@ Blockly.Blocks['lists_comprehension'] = {
             .setAlign(Blockly.ALIGN_RIGHT)
             .appendField(new Blockly.FieldVarInput(name))
             .appendField('\u2190');
+        this.vars_.push(name);
       }
     }
 
@@ -757,7 +769,7 @@ Blockly.Blocks['lists_comprehension'] = {
     for (var x = this.guardCount_ - 1; x >= 0; x--) {
       this.removeInput('GUARD' + x);
     }
-
+    this.vars_ = [];
 
 
     this.varCount_ = 0;
@@ -776,6 +788,7 @@ Blockly.Blocks['lists_comprehension'] = {
             .appendField(new Blockly.FieldVarInput(name))
             .appendField('\u2190');
 
+        this.vars_.push(name);
         // Reconnect any child blocks.
         if (itemBlock.valueConnection_) {
           input.connection.connect(itemBlock.valueConnection_);
@@ -1270,10 +1283,6 @@ Blockly.Blocks['circTest'] = {
   }
 };
 
-
-
-
-
 Blockly.Blocks['expr_constructor'] = {
   init: function() {
     this.setColour(90);
@@ -1378,6 +1387,16 @@ Blockly.Blocks['expr_case'] = {
       vars.push(inp.fieldRow[j].getValue());
     }
     return vars;
+  },
+
+  getVars: function(connection){
+    var i = 0;
+    for(i = 0; i < this.itemCount_; i++){
+      if(this.getInput('CS' + i).connection == connection){
+        return this.getInputVars(i);
+      }
+    }
+    return [];
   },
 
   mutationToDom: function() {

@@ -146,7 +146,6 @@ Blockly.Blocks['procedures_letFunc'] = {
     while (paramBlock) {
       this.arguments_.push(paramBlock.getFieldValue('NAME'));
       this.argTypes_.push(Blockly.TypeVar.getUnusedTypeVar());
-      // TODO, make sure argTypes_ do not get garbage collected !
       this.paramIds_.push(paramBlock.id);
       paramBlock = paramBlock.nextConnection &&
           paramBlock.nextConnection.targetBlock();
