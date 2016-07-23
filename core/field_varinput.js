@@ -229,25 +229,27 @@ Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
   var svgRootOld = this.sourceBlock_.getSvgRoot();
   var xyOld = Blockly.getSvgXY_(svgRootOld, targetWorkspace);
  
-  var element = document.getElementsByClassName('blocklyWorkspace')[0];
+  var element = document.getElementById('blocklyDiv');
   var rect = element.getBoundingClientRect();
 
-  xyOld.x = e.clientX - rect.left;
-  xyOld.y = e.clientY - rect.top;
-
-  var scrollX = this.workspace_.scrollX;
+  var mouseX = e.clientX - rect.left;
+  var mouseY = e.clientY - rect.top;
+ 
   var scale = this.workspace_.scale;
-  xyOld.x += scrollX / scale - scrollX;
-  var scrollY = this.workspace_.scrollY;
-  scale = this.workspace_.scale;
-  xyOld.y += scrollY / scale - scrollY;
 
   var svgRootNew = curBlock.getSvgRoot();
   var xyNew = Blockly.getSvgXY_(svgRootNew, targetWorkspace);
-  xyNew.x += targetWorkspace.scrollX / targetWorkspace.scale - targetWorkspace.scrollX;
-  xyNew.y += targetWorkspace.scrollY / targetWorkspace.scale - targetWorkspace.scrollY;
 
-  curBlock.moveBy(xyOld.x - xyNew.x, xyOld.y - xyNew.y);
+  var blockOffsetX = xyNew.x;
+  var blockOffsetY = xyNew.y;
+
+  var offsetX = mouseX - blockOffsetX; 
+  var offsetY = mouseY - blockOffsetY; 
+
+  offsetX /= scale;
+  offsetY /= scale;
+
+  curBlock.moveBy(offsetX, offsetY);
   curBlock.moveBy(-curBlock.getHeightWidth().width/2, -curBlock.getHeightWidth().height/2);
   
   curBlock.onMouseDown_(e);
