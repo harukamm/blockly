@@ -289,6 +289,32 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
           block.typeParams[f] = block.typeParams[f].apply(unifyResult);
         }
       }
+      // Stefan
+      // Also var types
+      if (block.varTypes_) {
+        console.log(block.type);
+        for (var f in block.varTypes_) {
+          block.varTypes_[f] = block.varTypes_[f].apply(unifyResult);
+        }
+      }
+      // Also do FieldVarInputs
+      for(var k = 0; k < block.inputList.length; k++)
+      {
+        var inp = block.inputList[k];
+        for (var l = 0; l < inp.fieldRow.length; l++)
+        {
+          var f = inp.fieldRow[l];
+          if(f instanceof Blockly.FieldVarInput){
+            if(f.typeExpr)
+            {
+              console.log('hooray');
+              f.typeExpr = f.typeExpr.apply(unifyResult);
+              f.render_();
+            }
+          }
+        }
+      }
+
       if( block.outputConnection && block.outputConnection.typeExpr ) {
         /* Update colour of blocks in case their output type has changed */
         block.setColourByType( block.outputConnection.typeExpr );
@@ -681,6 +707,10 @@ Blockly.Connection.prototype.disconnect = function() {
     return;
   }
 
+  // Stefan
+  // TODO
+  // This can be replaced. Each block can define a function resetTypes, which
+  // resets its types
   var workspace = parentBlock.workspace;
   Blockly.Events.disable();
   // Reconstruct parent and child blocks to restore type variables 
@@ -714,7 +744,6 @@ Blockly.Connection.prototype.disconnect = function() {
   if (childBlock.rendered) {
     childBlock.updateDisabled();
   }
-
   
 };
 
