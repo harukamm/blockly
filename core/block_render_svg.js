@@ -754,8 +754,6 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
             for(var i = 0; i < input.connection.typeExpr.children.length - 1; i++)
             {
               var t = input.connection.typeExpr.children[i];
-              var down = Blockly.BlockSvg.getShapeForType(t.name).down;
-
 
               Blockly.BlockSvg.renderTypeExpr(t, inlineSteps, 'down');
 
