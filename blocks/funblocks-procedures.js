@@ -89,7 +89,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     if(this.arguments_.length > 0)
       header.appendField(' ');
     for (var i = 0; i < this.arguments_.length; i++) {
-      var field = new Blockly.FieldVarInput(this.arguments_[i]);
+      var field = new Blockly.FieldVarInput(this.arguments_[i],null,this.argTypes_[i]);
       var oldField = new Blockly.FieldParameterFlydown(this.arguments_[i],true,
                             Blockly.FieldFlydown.DISPLAY_RIGHT, function(o){});
         header.appendField(field);

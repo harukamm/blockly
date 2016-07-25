@@ -257,14 +257,14 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
       parentConnection.typeExpr = parentConnection.typeExpr.children[parentConnection.typeExpr.children.length - 1];
       unifyResult = parentConnection.typeExpr.unify(childConnection.typeExpr);
       if (unifyResult === false) {
-        throw 'Attempt to connect incompatible types.';
+        throw 'Attempt to connect incompatible types. 33';
       }
       parentConnection.typeExpr = oldTp;
     }
     else{
       unifyResult = parentConnection.typeExpr.unify(childConnection.typeExpr);
       if (unifyResult === false) {
-        throw 'Attempt to connect incompatible types.';
+        throw 'Attempt to connect incompatible types. 34';
       }
     }
 

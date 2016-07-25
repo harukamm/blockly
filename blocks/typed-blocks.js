@@ -634,22 +634,20 @@ Blockly.Blocks['lists_comprehension'] = {
   init: function() {
     this.setColour(listsHUE);
     this.vars_ = ['x','y','z'];
-    var A = Blockly.TypeVar.getUnusedTypeVar();
-    var B = Blockly.TypeVar.getUnusedTypeVar();
-    var C = Blockly.TypeVar.getUnusedTypeVar();
+    this.varTypes_ = [Blockly.TypeVar.getUnusedTypeVar(),Blockly.TypeVar.getUnusedTypeVar(),Blockly.TypeVar.getUnusedTypeVar()];
     var OUT = Blockly.TypeVar.getUnusedTypeVar();
     this.appendValueInput("DO")
         .appendField(new Blockly.FieldLabel("List Comprehension","blocklyTextEmph"))
         .setTypeExpr(OUT);
     this.appendValueInput('VAR0')
-          .setTypeExpr(new Blockly.TypeExpr ("list", [A]))
+          .setTypeExpr(new Blockly.TypeExpr ("list", [this.varTypes_[0]]))
           .setAlign(Blockly.ALIGN_RIGHT)
-          .appendField(new Blockly.FieldVarInput(this.vars_[0]))
+          .appendField(new Blockly.FieldVarInput(this.vars_[0],null,this.varTypes_[0]))
           .appendField('\u2190');
     this.appendValueInput('VAR1')
-          .setTypeExpr(new Blockly.TypeExpr ("list", [B]))
+          .setTypeExpr(new Blockly.TypeExpr ("list", [this.varTypes_[1]]))
           .setAlign(Blockly.ALIGN_RIGHT)
-          .appendField(new Blockly.FieldVarInput(this.vars_[1]))
+          .appendField(new Blockly.FieldVarInput(this.vars_[1],null,this.varTypes_[1]))
           .appendField('\u2190');
     this.setOutput(true, 'Array');
     this.setOutputTypeExpr( new Blockly.TypeExpr("list", [OUT]) );
@@ -701,6 +699,7 @@ Blockly.Blocks['lists_comprehension'] = {
       this.removeInput('GUARD' + x);
     }
     this.vars_ = [];
+    this.varTypes_ = [];
 
     this.varCount_ = parseInt(xmlElement.getAttribute('varcount'), 10);
     this.guardCount_ = parseInt(xmlElement.getAttribute('guardcount'), 10);
@@ -709,11 +708,12 @@ Blockly.Blocks['lists_comprehension'] = {
       if (childNode.nodeName.toLowerCase() == 'var') {
         var name = childNode.getAttribute('name');
 
-        var A = Blockly.TypeVar.getUnusedTypeVar();
+        this.varTypes_.push(Blockly.TypeVar.getUnusedTypeVar());
+
         var input = this.appendValueInput('VAR' + i)
-            .setTypeExpr(new Blockly.TypeExpr ("list", [A]))
+            .setTypeExpr(new Blockly.TypeExpr ("list", [this.varTypes_[i]]))
             .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField(new Blockly.FieldVarInput(name))
+            .appendField(new Blockly.FieldVarInput(name, null, this.varTypes_[i]))
             .appendField('\u2190');
         this.vars_.push(name);
       }
@@ -770,7 +770,7 @@ Blockly.Blocks['lists_comprehension'] = {
       this.removeInput('GUARD' + x);
     }
     this.vars_ = [];
-
+    this.varTypes_ = [];
 
     this.varCount_ = 0;
     this.guardCount_ = 0;
@@ -779,13 +779,14 @@ Blockly.Blocks['lists_comprehension'] = {
     while (itemBlock) {
       if(itemBlock.type == 'lists_comp_var')
       {
-        var A = Blockly.TypeVar.getUnusedTypeVar();
+        this.varTypes_.push(Blockly.TypeVar.getUnusedTypeVar());
+
         var name = itemBlock.getFieldValue('NAME');
         this.vars_[this.varCount_] = name;
         var input = this.appendValueInput('VAR' + this.varCount_)
-            .setTypeExpr(new Blockly.TypeExpr ("list", [A]))
+            .setTypeExpr(new Blockly.TypeExpr ("list", [this.varTypes_[this.varCount_]]))
             .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField(new Blockly.FieldVarInput(name))
+            .appendField(new Blockly.FieldVarInput(name, null, this.varTypes_[this.varCount_]))
             .appendField('\u2190');
 
         this.vars_.push(name);
@@ -1412,7 +1413,7 @@ Blockly.Blocks['expr_case'] = {
       var its = 0;
       for(var j = 1; j < inp.fieldRow.length; j++){
         if(inp.fieldRow[j].getValue() == '' || inp.fieldRow[j].getValue() == ' ') continue; // Skip spaces
-        var tp = inp.fieldRow[j].type;
+        var tp = inp.fieldRow[j].typeExpr.name;
         its++;
 
         var typeDom = document.createElement('type');
@@ -1446,8 +1447,10 @@ Blockly.Blocks['expr_case'] = {
         input.appendField(constructorName);
         
         for(var j = 0, typeNode; typeNode = productNode.childNodes[j]; j++){
+          if(typeNode.nodeName.toLowerCase() != 'type') continue;
+          var typeName = typeNode.getAttribute('name');
           input.appendField(' ');
-          input.appendField(new Blockly.FieldVarInput(String.fromCharCode(97 + j)));
+          input.appendField(new Blockly.FieldVarInput(String.fromCharCode(97 + j),null,new Blockly.TypeExpr(typeName)));
         }
 
       }

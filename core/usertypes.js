@@ -127,7 +127,7 @@ Blockly.UserTypes.generateCases = function(xmlList){
             continue;
           var typeDom = goog.dom.createDom('type');
           var typeName = typeBlock.getFieldValue('NAME');
-          typeDom.setAttribute('name',name);
+          typeDom.setAttribute('name',typeName);
           prodDom.appendChild(typeDom);
           typeCount++;
         }

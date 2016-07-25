@@ -68,10 +68,13 @@ Blockly.FieldVarInput.prototype.getPath = function(width)
   if(this.typeExpr)
   {
     move = 'M 0,-2';
-    type = Blockly.BlockSvg.typeVarShapes_[this.typeExpr.name].down;
+
+    //type = Blockly.BlockSvg.typeVarShapes_[this.typeExpr.name].down;
+
+    type = Blockly.BlockSvg.getShapeForType(this.typeExpr.name).down;
     type += 'M 0,17'
 
-    box = 'l 0 4 l '+ width_ + ' 0 l 0 -22 l -' + width_ + ' 0 z';
+    box = 'l 0 4 l ' + width_ + ' 0 l 0 -22 l -' + width_ + ' 0';
     // type += 'M 0,16';
   }
 
@@ -221,8 +224,11 @@ Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
   var blocksXMLList = goog.dom.getChildren(blocksDom);
 
   var curBlock = Blockly.Xml.domToBlock(blocksXMLList[0], Blockly.getMainWorkspace());
+
   if(this.typeExpr)
     curBlock.setOutputTypeExpr(this.typeExpr);
+  console.log(this.typeExpr);
+  curBlock.render();
 
   var targetWorkspace = Blockly.getMainWorkspace();
   this.workspace_ = Blockly.getMainWorkspace();
