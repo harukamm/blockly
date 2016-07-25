@@ -62,29 +62,20 @@ Blockly.FieldVarInput.prototype.updateEditable = function() {
 Blockly.FieldVarInput.prototype.getPath = function(width)
 {
   var width_ = width+4;
-  var move = 'M 0,4';
-  var type = 'a 6,6,0,0,0,0,12'; 
-  var box = 'l 0 4 l '+ width_ + ' 0 l 0 -20 l -' + width_ + ' 0 z';
   
   var inlineSteps = [];
   if(this.typeExpr)
   {
     inlineSteps.push('M 0,-2');
 
-    //type = Blockly.BlockSvg.typeVarShapes_[this.typeExpr.name].down;
-
     Blockly.BlockSvg.renderTypeExpr(this.typeExpr, inlineSteps, 'down');
-    //type = Blockly.BlockSvg.getShapeForType(this.typeExpr.name).down;
 
     var height = Blockly.BlockSvg.getTypeExprHeight(this.typeExpr); 
     this.size_.height = height + 10;
 
     inlineSteps.push('M 0,' + (height - 6) ) ;
 
-
-
     inlineSteps.push('l 0 4 l ' + width_ + ' 0 l 0 -' +height + ' l -' + width_ + ' 0');
-    // type += 'M 0,16';
   }
   else
   {
@@ -93,11 +84,7 @@ Blockly.FieldVarInput.prototype.getPath = function(width)
       inlineSteps.push('l 0 4 l '+ width_ + ' 0 l 0 -20 l -' + width_ + ' 0 z');
   }
 
-  // var pathString = steps.join(' ') + '\n' + inlineSteps.join(' ');
-  console.log(inlineSteps.join(' '));
   return inlineSteps.join(' ');
-
-  return move + type + box;
 };
 
 Blockly.FieldVarInput.prototype.init = function() {
@@ -115,8 +102,6 @@ Blockly.FieldVarInput.prototype.init = function() {
        {'class': 'blocklyFieldVarInput',
        'd': this.getPath(this.size_.width)},
        this.fieldGroup_);
-
-
 
   /** @type {!Element} */
   this.textElement_ = Blockly.createSvgElement('text',
