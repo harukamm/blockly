@@ -1075,6 +1075,12 @@ Blockly.Blocks['type_list'] = {
         .setTypeExpr(new Blockly.TypeExpr('Type'));
     this.setInputsInline(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
+  },
+  getType: function(){
+    if(!this.getInput('TP').connection.isConnected())
+      return new Blockly.TypeExpr('list',[new Blockly.TypeVar.getUnusedTypeVar()]);
+    var targTp = this.getInput('TP').connection.targetBlock().getType();
+    return new Blockly.TypeExpr('list',[targTp]);
   }
 };
 
@@ -1094,6 +1100,9 @@ Blockly.Blocks['type_user'] = {
     var container = document.createElement('mutation');
     container.setAttribute('name', this.getFieldValue('NAME'));
     return container;
+  },
+  getType: function(){
+    return new Blockly.TypeExpr(this.getFieldValue('NAME'));
   }
 };
 
@@ -1309,10 +1318,8 @@ Blockly.Blocks['expr_constructor'] = {
     container.setAttribute('output', this.outputConnection.typeExpr.name);
 
     for (var i = 0; i < this.itemCount_; i++) {
-      var parameter = document.createElement('type');
-      parameter.setAttribute('name', this.getInput("TP" + i).connection.typeExpr.name);
-      
-      container.appendChild(parameter);
+      var tp = this.getInput("TP" + i).connection.typeExpr; 
+      container.appendChild(tp.toDom());
     }
     return container;
   },
@@ -1329,8 +1336,9 @@ Blockly.Blocks['expr_constructor'] = {
       if (childNode.nodeName.toLowerCase() == 'type') {
         var typename = childNode.getAttribute('name');
 
+        var typeExpr = Blockly.TypeExpr.fromDom(childNode);
         var input = this.appendValueInput('TP' + i)
-            .setTypeExpr(new Blockly.TypeExpr (typename));
+            .setTypeExpr(typeExpr);
       }
     }
   },
@@ -1413,11 +1421,10 @@ Blockly.Blocks['expr_case'] = {
       var its = 0;
       for(var j = 1; j < inp.fieldRow.length; j++){
         if(inp.fieldRow[j].getValue() == '' || inp.fieldRow[j].getValue() == ' ') continue; // Skip spaces
-        var tp = inp.fieldRow[j].typeExpr.name;
+        var tp = inp.fieldRow[j].typeExpr
         its++;
 
-        var typeDom = document.createElement('type');
-        typeDom.setAttribute('name',tp);
+        var typeDom = tp.toDom();
         prodDom.appendChild(typeDom);
       }
       prodDom.setAttribute('items',its); 
@@ -1448,9 +1455,9 @@ Blockly.Blocks['expr_case'] = {
         
         for(var j = 0, typeNode; typeNode = productNode.childNodes[j]; j++){
           if(typeNode.nodeName.toLowerCase() != 'type') continue;
-          var typeName = typeNode.getAttribute('name');
+          var tp = Blockly.TypeExpr.fromDom(typeNode);
           input.appendField(' ');
-          input.appendField(new Blockly.FieldVarInput(String.fromCharCode(97 + j),null,new Blockly.TypeExpr(typeName)));
+          input.appendField(new Blockly.FieldVarInput(String.fromCharCode(97 + j),null,tp));
         }
 
       }

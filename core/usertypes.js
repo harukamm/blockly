@@ -125,9 +125,15 @@ Blockly.UserTypes.generateCases = function(xmlList){
           var typeBlock = product.getInputTargetBlock('TP' + j);
           if(!typeBlock)
             continue;
-          var typeDom = goog.dom.createDom('type');
-          var typeName = typeBlock.getFieldValue('NAME');
-          typeDom.setAttribute('name',typeName);
+          var typeDom;
+          if(typeBlock.getType){
+            console.log(typeBlock.getType)
+            typeDom = typeBlock.getType().toDom();
+          } else {
+            typeDom= goog.dom.createDom('type');
+            var typeName = typeBlock.getFieldValue('NAME');
+            typeDom.setAttribute('name',typeName);
+          }
           prodDom.appendChild(typeDom);
           typeCount++;
         }
@@ -166,8 +172,7 @@ Blockly.UserTypes.generateConstructors = function(xmlList){
         for(var i =0; i < block.itemCount_; i++){
           var typeBlock = block.getInputTargetBlock('TP' + i);
           if(!typeBlock) continue;
-          var typeName = typeBlock.getFieldValue('NAME');
-          types.push(typeName);
+          types.push(typeBlock);
         }
 
         // Create dom
@@ -179,10 +184,15 @@ Blockly.UserTypes.generateConstructors = function(xmlList){
         mutation.setAttribute('items',types.length);
         mutation.setAttribute('name',name );
         mutation.setAttribute('output',userTypeName);
-        types.forEach(function(type){
-          var tp = goog.dom.createDom('type');
-          tp.setAttribute('name',type);
-          mutation.appendChild(tp);
+        types.forEach(function(typeBlock){
+          var typeDom;
+          if(typeBlock.getType){
+            typeDom = typeBlock.getType().toDom();
+          } else {
+            typeDom= goog.dom.createDom('type');
+            typeDom.setAttribute(typeBlock.getAttribute('NAME'));
+          }
+          mutation.appendChild(typeDom);
         });
         block.appendChild(mutation);
         xmlList.push(block);
