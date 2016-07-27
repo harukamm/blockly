@@ -121,6 +121,8 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   /** @type {string|Blockly.Comment} */
   this.comment = null;
 
+  this.allowRename = true;
+
   /**
    * @type {!goog.math.Coordinate}
    * @private

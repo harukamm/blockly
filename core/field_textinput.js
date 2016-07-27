@@ -82,7 +82,7 @@ Blockly.FieldTextInput.prototype.setValue = function(text) {
   if (text === null) {
     return;  // No change if null.
   }
-  if (this.sourceBlock_ && this.validator_) {
+  if (this.sourceBlock_ && this.validator_ && this.sourceBlock_.allowRename) {
     var validated = this.validator_(text);
     // If the new text is invalid, validation returns null.
     // In this case we still want to display the illegal result.
@@ -207,6 +207,8 @@ Blockly.FieldTextInput.prototype.onHtmlInputChange_ = function(e) {
  * @private
  */
 Blockly.FieldTextInput.prototype.validate_ = function() {
+  if(!this.sourceBlock_.allowRename)
+    return;
   var valid = true;
   goog.asserts.assertObject(Blockly.FieldTextInput.htmlInput_);
   var htmlInput = Blockly.FieldTextInput.htmlInput_;

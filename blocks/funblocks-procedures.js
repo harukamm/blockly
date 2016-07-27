@@ -49,6 +49,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     this.argTypes_ = [];
     this.setStatements_(false);
     this.statementConnection_ = null;
+    this.allowRename = false;
   },
   setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
   validate: Blockly.Blocks['procedures_defnoreturn'].validate,
@@ -220,6 +221,11 @@ Blockly.Blocks['procedures_letFunc'] = {
     else if(changeEvent.type == Blockly.Events.MOVE && changeEvent.oldInputName)
     {
     }
+  },
+  onCreate: function(){
+    var newName = Blockly.Procedures.findLegalName(this.getFieldValue('NAME'),this);
+    this.setFieldValue(newName /**/, 'NAME');
+    this.allowRename = true;
   }
 
 };

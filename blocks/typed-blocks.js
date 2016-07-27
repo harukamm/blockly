@@ -1110,9 +1110,8 @@ Blockly.Blocks['type_user'] = {
 Blockly.Blocks['type_product'] = {
   init: function() {
     this.setColour(90);
-    this.typeParams = { elmtType: Blockly.TypeVar.getUnusedTypeVar() };
     this.appendDummyInput()
-        .appendField(new Blockly.FieldTextInput('Constructor'), 'CONSTRUCTOR')
+        .appendField(new Blockly.FieldTextInput('Constructor', Blockly.UserTypes.renameProduct), 'CONSTRUCTOR')
     this.appendValueInput('TP0')
         .setTypeExpr(new Blockly.TypeExpr('Type'))
     this.appendValueInput('TP1')
@@ -1124,6 +1123,7 @@ Blockly.Blocks['type_product'] = {
     this.setMutator(new Blockly.Mutator(['lists_create_with_item']));
     this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP);
     this.itemCount_ = 2;
+    this.allowRename = false;
   },
   mutationToDom: function() {
     var container = document.createElement('mutation');
@@ -1186,7 +1186,14 @@ Blockly.Blocks['type_product'] = {
       itemBlock = itemBlock.nextConnection &&
           itemBlock.nextConnection.targetBlock();
     }
+  },
+  onCreate: function(){
+    var newName = Blockly.UserTypes.findConstructorName(this.getFieldValue('CONSTRUCTOR'),this);
+    this.setFieldValue(newName /**/, 'CONSTRUCTOR');
+    this.allowRename = true;
   }
+
+
 };
 
 /* 
@@ -1196,21 +1203,17 @@ Blockly.Blocks['type_product'] = {
 Blockly.Blocks['type_sum'] = {
   init: function() {
     this.setColour(160);
-    this.typeParams = { elmtType: Blockly.TypeVar.getUnusedTypeVar() };
     this.appendDummyInput()
-        .appendField(new Blockly.FieldTextInput('UserType'), 'NAME');
+        .appendField(new Blockly.FieldTextInput('UserType',Blockly.UserTypes.renameType), 'NAME');
     this.appendValueInput('PROD0')
         .appendField('|')
         .setAlign(Blockly.ALIGN_RIGHT)
         .setTypeExpr(new Blockly.TypeExpr('Product'))
-    this.appendValueInput('PROD1')
-        .appendField('|')
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .setTypeExpr(new Blockly.TypeExpr('Product'));
     this.setOutput(false);
     this.setMutator(new Blockly.Mutator(['lists_create_with_item']));
     this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP);
-    this.itemCount_ = 2;
+    this.itemCount_ = 1;
+    this.allowRename = false;
   },
   mutationToDom: function() {
     var container = document.createElement('mutation');
@@ -1278,6 +1281,11 @@ Blockly.Blocks['type_sum'] = {
           itemBlock.nextConnection.targetBlock();
     }
     // Assign 'this' to a variable for use in the tooltip closure below.
+  },
+  onCreate: function(){
+    var newName = Blockly.UserTypes.findTypeName(this.getFieldValue('NAME'),this);
+    this.setFieldValue(newName /**/, 'NAME');
+    this.allowRename = true;
   }
 };
 
@@ -1296,7 +1304,6 @@ Blockly.Blocks['circTest'] = {
 Blockly.Blocks['expr_constructor'] = {
   init: function() {
     this.setColour(90);
-    this.typeParams = { elmtType: Blockly.TypeVar.getUnusedTypeVar() };
     this.appendDummyInput()
         .appendField('RGBA', 'NAME')
     this.appendValueInput('TP0')
