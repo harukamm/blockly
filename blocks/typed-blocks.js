@@ -1305,7 +1305,7 @@ Blockly.Blocks['expr_constructor'] = {
   init: function() {
     this.setColour(90);
     this.appendDummyInput()
-        .appendField('RGBA', 'NAME')
+        .appendField(new Blockly.FieldLabel('Case of', 'blocklyTextEmph'),'NAME')
     this.appendValueInput('TP0')
         .setTypeExpr(new Blockly.TypeExpr('Number'))
     this.appendValueInput('TP1')
@@ -1369,8 +1369,8 @@ Blockly.Blocks['expr_case'] = {
     var a = Blockly.TypeVar.getUnusedTypeVar();
     this.a = a;
     this.appendValueInput('INPUT')
-        .appendField('Case of')
-        .appendField('Maybe', 'NAME')
+        .appendField(new Blockly.FieldLabel('Case of', 'blocklyTextEmph'))
+        .appendField(new Blockly.FieldLabel('Maybe', 'blocklyTextEmph'), 'NAME')
         .setTypeExpr(new Blockly.TypeExpr('Maybe'));
     var f = new Blockly.FieldVarInput('a');
     f.type = 'Number';
