@@ -72,6 +72,8 @@ Blockly.FieldVarInput.prototype.getPath = function(width)
 
     var height = Blockly.BlockSvg.getTypeExprHeight(this.typeExpr); 
     this.size_.height = height + 10;
+    if(height < 23)
+      height = 23;
 
     inlineSteps.push('M 0,' + (height - 6) ) ;
 
@@ -105,7 +107,7 @@ Blockly.FieldVarInput.prototype.init = function() {
 
   /** @type {!Element} */
   this.textElement_ = Blockly.createSvgElement('text',
-      {'class': 'blocklyText', 'y': this.size_.height - 20, 'x':6},
+      {'class': 'blocklyText', 'y': 15, 'x':6},
       this.fieldGroup_);
 
     this.updateEditable();
