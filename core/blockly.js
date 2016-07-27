@@ -269,9 +269,11 @@ Blockly.onKeyDown_ = function(e) {
     if (Blockly.selected &&
         Blockly.selected.isDeletable() && Blockly.selected.isMovable()) {
       if (e.keyCode == 67) {
-        // 'c' for copy.
-        Blockly.hideChaff();
-        Blockly.copy_(Blockly.selected);
+        if(Blockly.Flyout.programBlockList.indexOf(Blockly.selected.type) < 0){
+          // 'c' for copy.
+          Blockly.hideChaff();
+          Blockly.copy_(Blockly.selected);
+        }
       } else if (e.keyCode == 88) {
         // 'x' for cut.
         Blockly.copy_(Blockly.selected);
@@ -373,6 +375,8 @@ Blockly.copy_ = function(block) {
  * @private
  */
 Blockly.duplicate_ = function(block) {
+  if(Blockly.Flyout.programBlockList.indexOf(Blockly.selected.type) >= 0)
+    return;
   // Save the clipboard.
   var clipboardXml = Blockly.clipboardXml_;
   var clipboardSource = Blockly.clipboardSource_;

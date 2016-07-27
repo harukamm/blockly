@@ -948,6 +948,8 @@ Blockly.Flyout.prototype.placeNewBlock_ = function(originBlock) {
  * capacity limit.
  * @private
  */
+
+Blockly.Flyout.programBlockList = ["cwAnimationOf", "cwDrawingOf", "cwSimulationOf"];
 Blockly.Flyout.prototype.filterForCapacity_ = function() {
   var remainingCapacity = this.targetWorkspace_.remainingCapacity();
   var blocks = this.workspace_.getTopBlocks(false);
@@ -962,7 +964,7 @@ Blockly.Flyout.prototype.filterForCapacity_ = function() {
   // Only allow one top level program block
   var workspaceBlocks = Blockly.getMainWorkspace().getTopBlocks(false);
   var programBlocks = 0;
-  var programBlockList = ["cwAnimationOf", "cwDrawingOf", "cwSimulationOf"];
+  var programBlockList = Blockly.Flyout.programBlockList; 
   for(var j = 0, blockW; blockW = workspaceBlocks[j]; j++)
   {
     if(programBlockList.indexOf(blockW.type) > -1)
