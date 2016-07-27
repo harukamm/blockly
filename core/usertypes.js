@@ -127,7 +127,6 @@ Blockly.UserTypes.generateCases = function(xmlList){
             continue;
           var typeDom;
           if(typeBlock.getType){
-            console.log(typeBlock.getType)
             typeDom = typeBlock.getType().toDom();
           } else {
             typeDom= goog.dom.createDom('type');
