@@ -1122,7 +1122,7 @@ Blockly.Blocks['type_product'] = {
 
     this.setInputsInline(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Product'));
-    this.setMutator(new Blockly.Mutator(['lists_create_with_item']));
+    this.setMutator(new Blockly.Mutator(['tp_create_with_field']));
     this.setTooltip('Add a term to an algabraic data type');
     this.itemCount_ = 2;
     this.allowRename = false;
@@ -1144,11 +1144,11 @@ Blockly.Blocks['type_product'] = {
   },
   decompose: function(workspace) {
     var containerBlock =
-        workspace.newBlock('lists_create_with_container');
+        workspace.newBlock('tp_create_with_container_product');
     containerBlock.initSvg();
     var connection = containerBlock.getInput('STACK').connection;
     for (var x = 0; x < this.itemCount_; x++) {
-      var itemBlock = workspace.newBlock('lists_create_with_item');
+      var itemBlock = workspace.newBlock('tp_create_with_field');
       itemBlock.initSvg();
       connection.connect(itemBlock.previousConnection);
       connection = itemBlock.nextConnection;
@@ -1198,6 +1198,64 @@ Blockly.Blocks['type_product'] = {
 
 };
 
+Blockly.Blocks['tp_create_with_container_variants'] = {
+  /**
+   * Mutator block for list container.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Blockly.Blocks.lists.HUE);
+    this.appendDummyInput()
+        .appendField('Sum');
+    this.appendStatementInput('STACK');
+    this.setTooltip('Contains a list of variants which make up the sum type');
+    this.contextMenu = false;
+  }
+};
+
+Blockly.Blocks['tp_create_with_container_product'] = {
+  init: function() {
+    this.setColour(Blockly.Blocks.lists.HUE);
+    this.appendDummyInput()
+        .appendField('Product');
+    this.appendStatementInput('STACK');
+    this.setTooltip('Contains a list of fields that make up the product type');
+    this.contextMenu = false;
+  }
+};
+
+Blockly.Blocks['tp_create_with_field'] = {
+  /**
+   * Mutator bolck for adding items.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Blockly.Blocks.lists.HUE);
+    this.appendDummyInput()
+        .appendField('field');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('A data type');
+    this.contextMenu = false;
+  }
+};
+
+Blockly.Blocks['tp_create_with_variant'] = {
+  /**
+   * Mutator bolck for adding items.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(Blockly.Blocks.lists.HUE);
+    this.appendDummyInput()
+        .appendField('variant');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('A data type');
+    this.contextMenu = false;
+  }
+};
+
 /* 
  * Custom user data type
  * Mutator allows mutable products to be added
@@ -1212,7 +1270,7 @@ Blockly.Blocks['type_sum'] = {
         .setAlign(Blockly.ALIGN_RIGHT)
         .setTypeExpr(new Blockly.TypeExpr('Product'))
     this.setOutput(false);
-    this.setMutator(new Blockly.Mutator(['lists_create_with_item']));
+    this.setMutator(new Blockly.Mutator(['tp_create_with_variant']));
     this.setTooltip('Define a specific data type');
     this.itemCount_ = 1;
     this.allowRename = false;
@@ -1236,11 +1294,11 @@ Blockly.Blocks['type_sum'] = {
   },
   decompose: function(workspace) {
     var containerBlock =
-        workspace.newBlock('lists_create_with_container');
+        workspace.newBlock('tp_create_with_container_variants');
     containerBlock.initSvg();
     var connection = containerBlock.getInput('STACK').connection;
     for (var x = 0; x < this.itemCount_; x++) {
-      var itemBlock = workspace.newBlock('lists_create_with_item');
+      var itemBlock = workspace.newBlock('tp_create_with_variant');
       itemBlock.initSvg();
       connection.connect(itemBlock.previousConnection);
       connection = itemBlock.nextConnection;
