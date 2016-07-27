@@ -1075,6 +1075,7 @@ Blockly.Blocks['type_list'] = {
         .setTypeExpr(new Blockly.TypeExpr('Type'));
     this.setInputsInline(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
+    this.setTooltip('A list data type');
   },
   getType: function(){
     if(!this.getInput('TP').connection.isConnected())
@@ -1091,6 +1092,7 @@ Blockly.Blocks['type_user'] = {
     this.appendDummyInput()
         .appendField(new Blockly.FieldLabel('User', 'blocklyTextEmph'), 'NAME');
     this.setOutputTypeExpr(new Blockly.TypeExpr('Type'));
+    this.setTooltip('A simple data type');
   },
   domToMutation: function(xmlElement) {
     var name = xmlElement.getAttribute('name');
@@ -1121,7 +1123,7 @@ Blockly.Blocks['type_product'] = {
     this.setInputsInline(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Product'));
     this.setMutator(new Blockly.Mutator(['lists_create_with_item']));
-    this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP);
+    this.setTooltip('Add a term to an algabraic data type');
     this.itemCount_ = 2;
     this.allowRename = false;
   },
@@ -1211,7 +1213,7 @@ Blockly.Blocks['type_sum'] = {
         .setTypeExpr(new Blockly.TypeExpr('Product'))
     this.setOutput(false);
     this.setMutator(new Blockly.Mutator(['lists_create_with_item']));
-    this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP);
+    this.setTooltip('Define a specific data type');
     this.itemCount_ = 1;
     this.allowRename = false;
   },
@@ -1314,7 +1316,7 @@ Blockly.Blocks['expr_constructor'] = {
 
     this.setInputsInline(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Product'));
-    this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP);
+    this.setTooltip('Construct a specific data type');
     this.itemCount_ = 2;
   },
 
@@ -1383,7 +1385,7 @@ Blockly.Blocks['expr_case'] = {
         .appendField('Nothing')
         .setTypeExpr(a);
     this.setOutput(true);
-
+    this.setTooltip('Decompose a data type piecewise');
     this.setOutputTypeExpr(a);
     this.itemCount_ = 2;
 
