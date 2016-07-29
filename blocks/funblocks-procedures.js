@@ -91,9 +91,7 @@ Blockly.Blocks['procedures_letFunc'] = {
       header.appendField(' ');
     for (var i = 0; i < this.arguments_.length; i++) {
       var field = new Blockly.FieldVarInput(this.arguments_[i],null,this.argTypes_[i]);
-      var oldField = new Blockly.FieldParameterFlydown(this.arguments_[i],true,
-                            Blockly.FieldFlydown.DISPLAY_RIGHT, function(o){});
-        header.appendField(field);
+      header.appendField(field);
     }
     this.inputList = this.inputList.concat(bodyInput);
  
@@ -141,6 +139,7 @@ Blockly.Blocks['procedures_letFunc'] = {
 
   compose: function(containerBlock) {
     // Parameter list.
+    var oldArgs = this.arguments_;
     this.arguments_ = [];
     this.paramIds_ = [];
     var paramBlock = containerBlock.getInputTargetBlock('STACK');
@@ -153,6 +152,25 @@ Blockly.Blocks['procedures_letFunc'] = {
     }
     this.updateParams_();
     Blockly.Procedures.mutateCallers(this);
+
+
+    // Remove all deleted blocks
+    
+    var thisBlock = this;
+    Blockly.getMainWorkspace().getAllBlocks().forEach(function(block){
+      if(block.parent_ && block.parent_ == thisBlock){
+        var name = block.getFieldValue('NAME');
+        var oldIndex = oldArgs.indexOf(name);
+        if(oldIndex >= thisBlock.arguments_.length){
+          block.dispose();
+          block = null;
+        }
+        else{
+          var newName = thisBlock.arguments_[oldIndex];
+          block.setFieldValue(newName,'NAME');
+        }
+      }
+    });
   },
 
   dispose: Blockly.Blocks['procedures_defnoreturn'].dispose,
