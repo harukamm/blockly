@@ -371,6 +371,7 @@ Blockly.Blocks['vars_local'] = {
         .appendField('x', 'NAME');
     this.setOutput(true);
     this.setOutputTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
+    this.parent_ = null;
   },
 
   domToMutation: function(xmlElement) {
@@ -378,6 +379,21 @@ Blockly.Blocks['vars_local'] = {
     var typeName = xmlElement.getAttribute('typename');
     this.setOutputTypeExpr(new Blockly.TypeExpr(typeName));
     this.setFieldValue(name, 'NAME');
+  },
+
+  isParentInScope: function(p){
+    if(!this.parent_)
+      return true; // Assume it is
+
+    while(p){
+      if(p==this.parent_) 
+        return true;
+      if(p.outputConnection)
+        p = p.outputConnection.targetBlock();
+      else 
+        p = null;
+    }
+    return false;
   }
 
 };

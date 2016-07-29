@@ -230,10 +230,10 @@ Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
   var blocksXMLList = goog.dom.getChildren(blocksDom);
 
   var curBlock = Blockly.Xml.domToBlock(blocksXMLList[0], Blockly.getMainWorkspace());
+  curBlock.parent_ = this.sourceBlock_;
 
   if(this.typeExpr)
     curBlock.setOutputTypeExpr(this.typeExpr);
-  console.log(this.typeExpr);
   curBlock.render();
 
   var targetWorkspace = Blockly.getMainWorkspace();

@@ -863,6 +863,7 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
 
   if(this.sourceBlock_.type == 'vars_local' || otherConnection.sourceBlock == 'vars_local')
   {
+
     var varCon, otherCon;
     if(this.sourceBlock_.type == 'vars_local'){
       varCon = this;
@@ -872,6 +873,11 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
       otherCon = this;
       varCon = otherConnection;
     }
+
+    var varBlock = varCon.sourceBlock_; // Only connect a varBlock if it is in its parent's scope
+    if(varBlock.parent_ && !varBlock.isParentInScope(otherCon.sourceBlock_))
+      return false;
+
     var vars = Blockly.Procedures.getVarsInScope(otherCon);
     if(vars.indexOf(varCon.sourceBlock_.getFieldValue('NAME')) < 0)
       return false;
