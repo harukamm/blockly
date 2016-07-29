@@ -89,6 +89,24 @@ Blockly.Procedures.findLegalName = function(name, block) {
     // Flyouts can have multiple procedures called 'do something'.
     return name;
   }
+
+   // Stefan
+  // Check if names conform to Haskell def requirements
+  // if(/[^a-z_]/.test( text[0] ) )
+  //   return null; // functions may not start with non-alpha numeric chars
+
+  // if(/[^a-zA-Z0-9_]/.test( text ) )
+  //   return null;
+
+  name = name.replace(/[^0-9a-z_]/gi, '')
+
+  if(name == '')
+    name = 'bar';
+
+  name = name.charAt(0).toLowerCase() + name.slice(1); // Make first letter uppercase
+  if(/[^a-z_]/.test( name[0] ) )
+    name = 'f_' + name;
+
   while (!Blockly.Procedures.isLegalName(name, block.workspace, block)) {
     // Collision with another procedure.
     var r = name.match(/^(.*?)(\d+)$/);
@@ -135,16 +153,7 @@ Blockly.Procedures.isLegalName = function(name, workspace, opt_exclude) {
  */
 Blockly.Procedures.rename = function(text) {
 
-  // Stefan
-  // Check if names conform to Haskell def requirements
-  if(/[^a-z_]/.test( text[0] ) )
-    return null; // functions may not start with non-alpha numeric chars
-
-  if(/[^a-zA-Z0-9_]/.test( text ) )
-    return null;
-
-
-
+  
   // Strip leading and trailing whitespace.  Beyond this, all names are legal.
   text = text.replace(/^[\s\xa0]+|[\s\xa0]+$/g, '');
 

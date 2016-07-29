@@ -32,6 +32,8 @@ goog.require('Blockly.Workspace');
  * Returns an xml list of blocks for the types flyout.
  * @param {!Blockly.Workspace} workspace The workspace, it gets ignored though
  */
+Blockly.UserTypes.builtins = ["Bool", "Number", "Color", "Picture", "Text"];
+
 Blockly.UserTypes.dataFlyoutCategory = function(workspace){
 
   var xmlList = [];
@@ -40,7 +42,7 @@ Blockly.UserTypes.dataFlyoutCategory = function(workspace){
     Blockly.UserTypes.addBlockToXML(blockName, xmlList);
   });
 
-  var userBlocks = ["Bool", "Number", "Color", "Picture", "Text"];
+  var userBlocks = Blockly.UserTypes.builtins;
   userBlocks.forEach(function(name){
     Blockly.UserTypes.addUserType(name, xmlList);
   });
@@ -218,6 +220,11 @@ Blockly.UserTypes.isLegalConstructorName = function(name, workspace, opt_exclude
 };
 
 Blockly.UserTypes.isLegalTypeName = function(name, workspace, opt_exclude) {
+
+  
+  if(Blockly.UserTypes.builtins.indexOf(name) >= 0)
+    return false;
+
   var blocks = workspace.getAllBlocks();
   // Iterate through every block and check the name.
   for (var i = 0; i < blocks.length; i++) {
@@ -239,6 +246,20 @@ Blockly.UserTypes.findLegalName = function(name,isLegalFunc, block) {
   if (block.isInFlyout) {
     return name;
   }
+
+
+  // if(/[^A-Z_]/.test( name[0] ) )
+  //   return false; // functions may not start with non-alpha numeric chars
+
+  // if(/[^a-zA-Z0-9_]/.test( name ) )
+  //   return false;
+
+  name = name.replace(/[^0-9a-z_]/gi, '')
+
+  if(name == '')
+    name = 'UserType';
+  if(/[^A-Z_]/.test( name[0] ) )
+    name = name.charAt(0).toUpperCase() + name.slice(1); // Make first letter uppercase
 
   while (!isLegalFunc(name, block.workspace, block)) {
     // Collision with another procedure.
@@ -291,14 +312,8 @@ Blockly.UserTypes.renameType = function(text) {
 
   // Stefan
   // Check if names conform to Haskell def requirements
-  if(/[^A-Z_]/.test( text[0] ) )
-    return null; // functions may not start with non-alpha numeric chars
-
-  if(/[^a-zA-Z0-9_]/.test( text ) )
-    return null;
-
-  if(!Blockly.UserTypes.isLegalTypeName(text, Blockly.getMainWorkspace(), this.sourceBlock_))
-    return null;
+    //if(!Blockly.UserTypes.isLegalTypeName(text, Blockly.getMainWorkspace(), this.sourceBlock_))
+  //  return null;
 
 
 
