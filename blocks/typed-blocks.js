@@ -1013,7 +1013,7 @@ Blockly.Blocks['take_func_test'] = {
     var A = Blockly.TypeVar.getUnusedTypeVar();
     this.appendValueInput('A')
         .setTypeExpr(new Blockly.TypeExpr('Function_', 
-              [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Bool') ]  ));
+              [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Bool') ]  ));
     this.appendValueInput('B')
         .setTypeExpr(new Blockly.TypeExpr('Number'))
     this.setInputsInline(true);
