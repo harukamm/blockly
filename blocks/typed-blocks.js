@@ -408,9 +408,12 @@ Blockly.Blocks['pair_create_typed'] = {
     var B = Blockly.TypeVar.getUnusedTypeVar();
     this.appendValueInput('FIRST')
         .setTypeExpr(A)
-        .appendField(new Blockly.FieldLabel("Pair","blocklyTextEmph") );
+        .appendField(new Blockly.FieldLabel('(') );
     this.appendValueInput('SECOND')
-        .setTypeExpr(B)
+        .appendField(new Blockly.FieldLabel(',') )
+        .setTypeExpr(B);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel(')') );
     this.setOutput(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr ("pair", [A, B]));
     this.setInputsInline(true);
