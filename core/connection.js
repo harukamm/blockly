@@ -292,7 +292,6 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
       // Stefan
       // Also var types
       if (block.varTypes_) {
-        console.log(block.type);
         for (var f in block.varTypes_) {
           block.varTypes_[f] = block.varTypes_[f].apply(unifyResult);
         }
@@ -307,7 +306,6 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
           if(f instanceof Blockly.FieldVarInput){
             if(f.typeExpr)
             {
-              console.log('hooray');
               f.typeExpr = f.typeExpr.apply(unifyResult);
               f.render_();
             }
