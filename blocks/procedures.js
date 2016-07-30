@@ -437,9 +437,14 @@ Blockly.Blocks['procedures_mutatorarg'] = {
    * @private
    * @this Blockly.Block
    */
-  validator_: function(newVar) {
-    newVar = newVar.replace(/[\s\xa0]+/g, ' ').replace(/^ | $/g, '');
-    return newVar || null;
+  validator_: function(name) {
+    name = name.replace(/[\s\xa0]+/g, ' ').replace(/^ | $/g, '');
+    name = name.replace(' ','');
+    name = name.charAt(0).toLowerCase() + name.slice(1); // Make first letter uppercase
+    if(/[^a-z_]/.test( name[0] ) )
+      name = 'x1';
+
+    return name || null;
   }
 };
 
