@@ -213,23 +213,18 @@ Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
   this.sourceBlock_.onMouseUp_(e);
   this.sourceBlock_.unselect();
 
-  var typenameXml = '';
-  if(this.typeExpr)
-    typenameXml = '<mutation typename="' + this.typeExpr.name + '" name="' + name + '"></mutation>';
+  var mutation = goog.dom.createDom('mutation');
+  
+  if(this.typeExpr){
+    var typeDom = this.typeExpr.toDom();
+    mutation.appendChild(typeDom);
+  }
 
-  var blocksXMLText =
-     '<xml>' +
-      '<block type="vars_local">' + typenameXml + 
-        '<field name="NAME">' +
-          name +
-        '</field>' +
-      '</block>' +
-     '</xml>';
+  var container = goog.dom.createDom('block');
+  container.setAttribute('type','vars_local');
+  container.appendChild(mutation);
 
-  var blocksDom = Blockly.Xml.textToDom(blocksXMLText);
-  var blocksXMLList = goog.dom.getChildren(blocksDom);
-
-  var curBlock = Blockly.Xml.domToBlock(blocksXMLList[0], Blockly.getMainWorkspace());
+  var curBlock = Blockly.Xml.domToBlock(container, Blockly.getMainWorkspace());
   curBlock.parent_ = this.sourceBlock_;
 
   if(this.typeExpr)

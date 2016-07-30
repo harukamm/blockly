@@ -394,10 +394,12 @@ Blockly.Blocks['vars_local'] = {
 
   domToMutation: function(xmlElement) {
     var name = xmlElement.getAttribute('name');
-    var typeName = xmlElement.getAttribute('typename'); // TODO
     var parentName = xmlElement.getAttribute('parentName'); // Name of parent function
-    this.setOutputTypeExpr(new Blockly.TypeExpr(typeName));
     this.setFieldValue(name, 'NAME');
+
+    var typeDom = xmlElement.childNodes[0];
+    var type = Blockly.TypeExpr.fromDom(typeDom)
+    this.setOutputTypeExpr(type);
 
     if(parentName){
       Blockly.getMainWorkspace().getTopBlocks().forEach(function(topBlock){
@@ -412,6 +414,9 @@ Blockly.Blocks['vars_local'] = {
     container.setAttribute('name', this.getFieldValue('NAME'));
     if(this.parent_)
     container.setAttribute('parentName', this.parent_.getFieldValue('NAME'));
+
+    var typeDom = this.outputConnection.typeExpr.toDom();
+    container.appendChild(typeDom);
 
     return container;
   },
