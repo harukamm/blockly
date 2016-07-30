@@ -213,15 +213,18 @@ Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
   this.sourceBlock_.onMouseUp_(e);
   this.sourceBlock_.unselect();
 
+  var container = goog.dom.createDom('block');
+  container.setAttribute('type','vars_local');
+
+  var field = goog.dom.createDom('field',null,name);
+  field.setAttribute('name','NAME');
+  container.appendChild(field);
+
   var mutation = goog.dom.createDom('mutation');
-  
   if(this.typeExpr){
     var typeDom = this.typeExpr.toDom();
     mutation.appendChild(typeDom);
   }
-
-  var container = goog.dom.createDom('block');
-  container.setAttribute('type','vars_local');
   container.appendChild(mutation);
 
   var curBlock = Blockly.Xml.domToBlock(container, Blockly.getMainWorkspace());
