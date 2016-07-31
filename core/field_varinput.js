@@ -205,6 +205,9 @@ Blockly.FieldVarInput.prototype.setValue = function(text) {
 Blockly.FieldVarInput.prototype.showEditor_ = function(){};
 
 Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
+  if(e.button!=0)
+    return; // Only proceed on left click
+
   if(this.sourceBlock_.isInFlyout )
     return;
   var name = this.getValue();
