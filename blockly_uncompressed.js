@@ -62,7 +62,6 @@ goog.addDependency("../../../" + dir + "/core/field_angle.js", ['Blockly.FieldAn
 goog.addDependency("../../../" + dir + "/core/field_textinput.js", ['Blockly.FieldTextInput'], ['Blockly.Field', 'Blockly.Msg', 'goog.asserts', 'goog.dom', 'goog.userAgent']);
 goog.addDependency("../../../" + dir + "/core/constants.js", ['Blockly.constants'], []);
 goog.addDependency("../../../" + dir + "/core/field_colour.js", ['Blockly.FieldColour'], ['Blockly.Field', 'goog.dom', 'goog.events', 'goog.style', 'goog.ui.ColorPicker']);
-goog.addDependency("../../../" + dir + "/core/field_varblock.js", ['Blockly.FieldVar'], ['goog.asserts', 'goog.dom', 'goog.math.Size', 'goog.style', 'goog.userAgent']);
 goog.addDependency("../../../" + dir + "/core/xml.js", ['Blockly.Xml'], ['goog.asserts', 'goog.dom']);
 goog.addDependency("../../../" + dir + "/core/field_image.js", ['Blockly.FieldImage'], ['Blockly.Field', 'goog.dom', 'goog.math.Size', 'goog.userAgent']);
 goog.addDependency("../../../" + dir + "/core/field_dropdown.js", ['Blockly.FieldDropdown'], ['Blockly.Field', 'goog.dom', 'goog.events', 'goog.style', 'goog.ui.Menu', 'goog.ui.MenuItem', 'goog.userAgent']);
@@ -1634,7 +1633,6 @@ goog.require('Blockly.FieldLabel');
 goog.require('Blockly.FieldNumber');
 goog.require('Blockly.FieldParameterFlydown');
 goog.require('Blockly.FieldTextInput');
-goog.require('Blockly.FieldVar');
 goog.require('Blockly.FieldVarInput');
 goog.require('Blockly.FieldVariable');
 goog.require('Blockly.Flydown');
