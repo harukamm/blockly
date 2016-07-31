@@ -664,9 +664,11 @@ Blockly.Blocks['lists_comprehension'] = {
   getVars: function(connection){
     var i = 0;
     for(i = 0; i < this.varCount_; i++){
-      if(this.getInput('VAR' + i).connection == connection){
+      if(this.getInput('DO').connection == connection)
+        return this.vars_;
+      if(this.getInput('VAR' + i).connection == connection)
         return [this.vars_[i]];
-      }
+      
     }
     return [];
   },
