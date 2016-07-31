@@ -401,10 +401,11 @@ Blockly.Blocks['vars_local'] = {
     var type = Blockly.TypeExpr.fromDom(typeDom)
     this.setOutputTypeExpr(type);
 
-    if(parentName){
+    var thisBlock = this;
+    if(parentName && !this.parent_){
       Blockly.getMainWorkspace().getTopBlocks().forEach(function(topBlock){
         if(topBlock.getFieldValue('NAME') == parentName)
-          this.parent_ = topBlock;
+          thisBlock.parent_ = topBlock;
       });
     }
   },
