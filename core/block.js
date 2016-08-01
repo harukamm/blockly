@@ -1476,4 +1476,11 @@ Blockly.Block.prototype.allInputsConnected = function(){
 
 };
 
-
+Blockly.Block.prototype.getValueInputNames = function(){
+  var names = []; 
+  this.inputList.forEach(function(input){
+    if(input.type == Blockly.INPUT_VALUE)
+      names.push(input.name);
+  });
+  return names;
+};
