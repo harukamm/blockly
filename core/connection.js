@@ -51,6 +51,7 @@ Blockly.Connection = function(source, type) {
         source.workspace.connectionDBList[Blockly.OPPOSITE_TYPE[type]];
     this.hidden_ = !this.db_;
   }
+  this.originalType_ = null;
 };
 
 /**
@@ -948,6 +949,37 @@ Blockly.Connection.prototype.setTypeExpr = function(t) {
   this.typeExpr = t;
   return this;
 }
+
+
+// Uses same typeExpr, though _POLY_ get turned into a
+// Blockly.TypeVar.getUnusedTypeVar()
+Blockly.Connection.prototype.setTypeExpr_ = function(t) {
+  this.originalType_ = t;
+  this.typeExpr = Blockly.Connection.Clean(this.originalType_);
+  return this;
+}
+
+Blockly.Connection.Clean = function(t){
+
+  var name = t.name;
+  var children = t.children;
+  
+  var tp;
+  if(name == "_POLY_")
+    tp = Blockly.getUnusedTypeVar();
+  else
+    tp = new Blockly.TypeExpr(name);
+  tp.children = [];
+
+  // readd children
+  children.forEach(function(child){
+    tp.children.push(Blockly.Connection.Clean(child));
+  });
+
+  return tp;
+};
+
+
 
 Blockly.Connection.prototype.getTypeExpr = function() {
   return this.typeExpr;
