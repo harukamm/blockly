@@ -440,6 +440,9 @@ Blockly.Connection.prototype.canConnectWithReason_ = function(target) {
   if (!target) {
     return Blockly.Connection.REASON_TARGET_NULL;
   }
+  if(target.arrows) // This is accidentally a block, skip call
+    return Blockly.Connection.CAN_CONNECT;
+
   if (this.isSuperior()) {
     var blockA = this.sourceBlock_;
     var blockB = target.getSourceBlock();
@@ -562,6 +565,20 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
   }
 };
 
+Blockly.Connection.prototype.connect__ = function(otherConnection) {
+  this.checkConnection_(otherConnection);
+  // Determine which block is superior (higher in the source stack).
+  if (this.isSuperior()) {
+    // Superior block.
+    this.connect_(otherConnection);
+  } else {
+    // Inferior block.
+    otherConnection.connect_(this);
+  }
+};
+
+
+
 /**
  * Update two connections to target each other.
  * @param {Blockly.Connection} first The first connection to update.
@@ -648,17 +665,6 @@ Blockly.Connection.prototype.disconnect = function() {
   this.disconnectInternal_(parentBlock, childBlock);
   parentConnection.respawnShadow_();
 
-  if(parentConnection.shadowDomBackup_)
-  {
-    // Stefan
-    // TODO figure out where to put this. 
-    // We want to restore the shadow block after the block gets disconnected.
-    // But doing so here results in the shadow block staying connected
-    // parentConnection.shadowDom_ = parentConnection.shadowDomBackup_;
-    // parentConnection.respawnShadow_();
-  }
-
-
   // Stefan
   // Anthony
 
@@ -714,29 +720,14 @@ Blockly.Connection.prototype.disconnect = function() {
   Blockly.Events.disable();
   // Reconstruct parent and child blocks to restore type variables 
   if( workspace ) {  // workspace is non-null for user-initiated disconnections
-    // Find top-level ancestor block
-    var rootBlock = parentBlock.getRootBlock();
-    // Export top-level ancestor to xml
-    var rootDom = Blockly.Xml.blockToDom( rootBlock );
-    // Re-construct block but without rendering it
-    var newRootBlock = Blockly.Xml.domToBlockHeadless_(rootDom, workspace); // This has too many side effects for function blocks ~ Stefan
-    // Copy connection types from new block to old
-    rootBlock.copyConnectionTypes_( newRootBlock, true );
-    // Delete temporary block
-    newRootBlock.dispose();
-    
-    // Now do child block
-    // Export child block to xml
-    var childDom = Blockly.Xml.blockToDom( childBlock );
-    // Re-construct block but without rendering it
-    var newChildBlock = Blockly.Xml.domToBlockHeadless_(childDom, workspace);
-    
-    // Copy connection types from new block to old
-    childBlock.copyConnectionTypes_( newChildBlock, false );
-    
-    // Delete temporary blocks
-    newChildBlock.dispose();
-    //  Blockly.TypeVar.triggerGarbageCollection(); // Don't think this is necessary
+    parentBlock.initArrows();
+    parentBlock.reconnectInputs();
+
+    childBlock.initArrows();
+    childBlock.reconnectInputs();
+
+    parentBlock.render();
+
   }
   Blockly.Events.enable();
   // Blocks have already been re-rendered in copyConnectionTypes_. Just need to update disabled status.
@@ -862,7 +853,6 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
 
   if(this.sourceBlock_.type == 'vars_local' || otherConnection.sourceBlock == 'vars_local')
   {
-
     var varCon, otherCon;
     if(this.sourceBlock_.type == 'vars_local'){
       varCon = this;
@@ -882,7 +872,6 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
       return false;
     // else continue
   }
-
   var unifyResult = true;
   if (this.typeExpr && otherConnection.typeExpr) {
     unifyResult = this.typeExpr.unify(otherConnection.typeExpr);
@@ -949,35 +938,6 @@ Blockly.Connection.prototype.setTypeExpr = function(t) {
   this.typeExpr = t;
   return this;
 }
-
-
-// Uses same typeExpr, though _POLY_ get turned into a
-// Blockly.TypeVar.getUnusedTypeVar()
-Blockly.Connection.prototype.setTypeExpr_ = function(t) {
-  this.originalType_ = t;
-  this.typeExpr = Blockly.Connection.Clean(this.originalType_);
-  return this;
-}
-
-Blockly.Connection.Clean = function(t){
-
-  var name = t.name;
-  var children = t.children;
-  
-  var tp;
-  if(name == "_POLY_")
-    tp = Blockly.getUnusedTypeVar();
-  else
-    tp = new Blockly.TypeExpr(name);
-  tp.children = [];
-
-  // readd children
-  children.forEach(function(child){
-    tp.children.push(Blockly.Connection.Clean(child));
-  });
-
-  return tp;
-};
 
 
 

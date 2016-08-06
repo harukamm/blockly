@@ -249,6 +249,16 @@ Blockly.Input.prototype.setTypeExpr = function(t) {
   return this;
 };
 
+Blockly.Input.prototype.setTypeExpr_ = function(t) {
+  if (!this.connection) {
+    throw 'This input does not have a connection.';
+  }
+  this.connection.setTypeExpr_(t);
+  return this;
+};
+
+
+
 Blockly.Input.prototype.getTypeExpr = function() {
   if (!this.connection) {
     return null;

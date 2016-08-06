@@ -72,13 +72,13 @@ Blockly.Blocks['logic_compare_typed'] = {
     this.setOutput(true, 'Bool');
     // Sorin
     this.setOutputTypeExpr(new Blockly.TypeExpr('Bool'));
-    var A = Blockly.TypeVar.getUnusedTypeVar();
-    this.appendValueInput('A')
-        .setTypeExpr(A);
+    this.appendValueInput('A');
     this.appendValueInput('B')
-        .setTypeExpr(A)
         .appendField(new Blockly.FieldDropdown(OPERATORS), 'OP');
     this.setInputsInline(true);
+
+    this.arrows = [new Blockly.TypeExpr('_POLY_A'), new Blockly.TypeExpr('_POLY_A'), new Blockly.TypeExpr('Bool')];
+
     // Assign 'this' to a variable for use in the tooltip closure below.
     var thisBlock = this;
     this.setTooltip(function() {

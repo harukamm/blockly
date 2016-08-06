@@ -123,6 +123,9 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
 
   this.allowRename = true;
 
+  // List of typeExpr. The last typeExpr is the output
+  this.arrows = [];
+
   /**
    * @type {!goog.math.Coordinate}
    * @private
@@ -151,6 +154,7 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   // Call an initialization function, if it exists.
   if (goog.isFunction(this.init)) {
     this.init();
+    this.initArrows();
   }
   // Record initial inline state.
   /** @type {boolean|undefined} */
@@ -164,6 +168,97 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
     this.workspace.addChangeListener(this.onchangeWrapper_);
   }
 };
+
+
+
+// Uses same typeExpr, though _POLY_ get turned into a
+// Blockly.TypeVar.getUnusedTypeVar()
+
+Blockly.Block.prototype.initArrows = function(){
+  if(this.arrows.length == 0)
+    return;
+
+  var dic = [];
+  this.arrows.forEach(function(arrow){
+    Blockly.Block.getTypeDic(arrow,dic);
+  });
+
+  var inp = 0;
+  for(var i = 0; i < this.arrows.length; i++){
+
+    // Handle output
+    if(i == this.arrows.length - 1){ // We are at the output
+      if(!this.outputConnection)
+        return; // We are done, there is not output 
+
+      this.setOutputTypeExpr( Blockly.Block.Clean(this.arrows[i],dic));
+      return;
+    }
+
+    // Handle input
+    while(this.inputList[inp].type != Blockly.INPUT_VALUE){
+      inp++; // Skip dummy and statement inputs
+      if(inp>=this.arrows.length) {console.log("yelp"); return; }// Something went wrong
+    }
+
+    this.inputList[inp].setTypeExpr(Blockly.Block.Clean(this.arrows[i],dic));
+
+
+    inp++;
+  }
+};
+
+
+Blockly.Block.getTypeDic = function(t,dic){
+  var name = t.name;
+  var children = t.children;
+
+  if(name.startsWith('_POLY_')){
+    if(!dic[name])
+      dic[name] = Blockly.TypeVar.getUnusedTypeVar();
+  }
+  
+  children.forEach(function(child){
+    Blockly.Connection.Clean(child,dic);
+  });
+};
+
+Blockly.Block.Clean = function(t,dic){
+  var name = t.name;
+  var children = t.children;
+
+  var tp;
+  if(dic[name])
+    tp = dic[name];
+  else
+    tp = new Blockly.TypeExpr(name);
+  tp.children = [];
+  
+  children.forEach(function(child){
+    tp.children.push(Blockly.Connection.Clean(child,dic));
+  });
+  return tp;  
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Obtain a newly created block.
@@ -1475,6 +1570,19 @@ Blockly.Block.prototype.allInputsConnected = function(){
   return true;
 
 };
+
+Blockly.Block.prototype.reconnectInputs = function(){
+  for (var i = 0, input; input = this.inputList[i]; i++) {
+    if (input.type != Blockly.INPUT_VALUE)
+      continue;
+    var bl = input.connection.targetBlock();
+    if(bl){
+      input.connection.connect_(bl.outputConnection);
+    }
+  }
+};
+
+
 
 Blockly.Block.prototype.getValueInputNames = function(){
   var names = []; 
