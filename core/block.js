@@ -187,10 +187,7 @@ Blockly.Block.prototype.initArrows = function(){
   for(var i = 0; i < this.arrows.length; i++){
 
     // Handle output
-    if(i == this.arrows.length - 1){ // We are at the output
-      if(!this.outputConnection)
-        return; // We are done, there is not output 
-
+    if(i == this.arrows.length - 1 && this.outputConnection){ // We are at the output
       this.setOutputTypeExpr( Blockly.Block.Clean(this.arrows[i],dic));
       return;
     }
@@ -198,11 +195,10 @@ Blockly.Block.prototype.initArrows = function(){
     // Handle input
     while(this.inputList[inp].type != Blockly.INPUT_VALUE){
       inp++; // Skip dummy and statement inputs
-      if(inp>=this.arrows.length) {console.log("yelp"); return; }// Something went wrong
+      if(inp>=this.inputList.length) {console.log("yelp"); return; }// Something went wrong
     }
 
     this.inputList[inp].setTypeExpr(Blockly.Block.Clean(this.arrows[i],dic));
-
 
     inp++;
   }

@@ -246,7 +246,6 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
           // OWARI
           input.connection.shadowDomBackup_ = input.connection.shadowDom_;
           input.connection.shadowDom_ = null;
-          console.log(orphanBlock);
           orphanBlock.dispose();
           orphanBlock = null;
         }
@@ -669,48 +668,40 @@ Blockly.Connection.prototype.disconnect = function() {
   // Anthony
 
   // Handle calling blocks separately
-  if(childBlock.type == 'procedures_callreturn')
-  {
-    var defBlock = Blockly.Procedures.getDefinition(childBlock.getProcedureCall(),
-        Blockly.getMainWorkspace());
-    var tp = defBlock.getInput("RETURN").connection.getTypeExpr();
-    childBlock.setOutputTypeExpr(tp);
 
-    return;
-  }
-  if(parentBlock.type == 'procedures_letFunc')
-  {
-    var name = parentBlock.getFieldValue("NAME");
-    var workspace = Blockly.getMainWorkspace();
+  // if(parentBlock.type == 'procedures_letFunc')
+  // {
+  //   var name = parentBlock.getFieldValue("NAME");
+  //   var workspace = Blockly.getMainWorkspace();
 
-    var callers = Blockly.Procedures.getCallers(name, workspace);
+  //   var callers = Blockly.Procedures.getCallers(name, workspace);
 
-    // If it is not connected anymore make it polymorphic
-    if(!parentBlock.getInput("RETURN").connection.isConnected())
-    {
-      parentBlock.getInput("RETURN").setTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
-      parentBlock.render();
-    }
+  //   // If it is not connected anymore make it polymorphic
+  //   if(!parentBlock.getInput("RETURN").connection.isConnected())
+  //   {
+  //     parentBlock.getInput("RETURN").setTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
+  //     parentBlock.render();
+  //   }
 
-    var tp = parentBlock.getInput("RETURN").connection.getTypeExpr();
+  //   var tp = parentBlock.getInput("RETURN").connection.getTypeExpr();
 
-    callers.forEach(function(block)
-    {
-      var conn = block.outputConnection.targetConnection;
-      var isConnected = block.outputConnection.isConnected();
+  //   callers.forEach(function(block)
+  //   {
+  //     var conn = block.outputConnection.targetConnection;
+  //     var isConnected = block.outputConnection.isConnected();
 
-      block.setOutputTypeExpr(tp);
+  //     block.setOutputTypeExpr(tp);
 
-      if(isConnected)
-      {
-        block.outputConnection.disconnect();
-        block.outputConnection.connect(conn);
-      }
-      block.render();
+  //     if(isConnected)
+  //     {
+  //       block.outputConnection.disconnect();
+  //       block.outputConnection.connect(conn);
+  //     }
+  //     block.render();
 
-    });
-    return;
-  }
+  //   });
+  //   return;
+  // }
 
   // Stefan
   // TODO
@@ -719,16 +710,34 @@ Blockly.Connection.prototype.disconnect = function() {
   var workspace = parentBlock.workspace;
   Blockly.Events.disable();
   // Reconstruct parent and child blocks to restore type variables 
-  if( workspace ) {  // workspace is non-null for user-initiated disconnections
+  if( workspace ) {  
+    // Reset the affected two blocks
     parentBlock.initArrows();
     parentBlock.reconnectInputs();
 
     childBlock.initArrows();
     childBlock.reconnectInputs();
 
-    parentBlock.render();
 
+
+    // Reset children with dependent types - local_vars and calling blocks
+    if(childBlock.type == 'procedures_callreturn')
+    {
+      var defBlock = Blockly.Procedures.getDefinition(childBlock.getProcedureCall(),
+          Blockly.getMainWorkspace());
+      defBlock.reset();
+    }
+    if(parentBlock.type == 'procedures_letFunc') {
+      parentBlock.reset();
+    }
+
+
+    childBlock.render();
+    parentBlock.render();
   }
+
+  
+
   Blockly.Events.enable();
   // Blocks have already been re-rendered in copyConnectionTypes_. Just need to update disabled status.
   if (childBlock.rendered) {

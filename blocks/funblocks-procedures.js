@@ -32,7 +32,6 @@ Blockly.Blocks['procedures_letFunc'] = {
    * @this Blockly.Block
    */
   init: function() {
-    var A = Blockly.TypeVar.getUnusedTypeVar();
     var nameField = new Blockly.FieldTextInput(
         "bar",
         Blockly.Procedures.rename);
@@ -40,8 +39,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     this.appendDummyInput("HEADER")
         .appendField("")
         .appendField(nameField, 'NAME');
-    this.appendValueInput('RETURN')
-        .setTypeExpr(A);
+    this.appendValueInput('RETURN');
     this.setMutator(new Blockly.Mutator(['procedures_mutatorarg']));
     this.setColour(Blockly.Blocks.procedures.HUE);
     this.setTooltip(Blockly.Msg.PROCEDURES_DEFRETURN_TOOLTIP);
@@ -50,6 +48,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     this.setStatements_(false);
     this.statementConnection_ = null;
     this.allowRename = false;
+    this.arrows = [new Blockly.TypeExpr('_POLY_A')];
   },
   setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
   validate: Blockly.Blocks['procedures_defnoreturn'].validate,
@@ -244,6 +243,32 @@ Blockly.Blocks['procedures_letFunc'] = {
     var newName = Blockly.Procedures.findLegalName(this.getFieldValue('NAME'),this);
     this.setFieldValue(newName /**/, 'NAME');
     this.allowRename = true;
+  },
+  reset: function(){ // Reset the types of this block and it's callers
+      this.initArrows();
+      this.reconnectInputs();
+      var workspace = Blockly.getMainWorkspace();
+      var name = this.getFieldValue("NAME");
+      var callers = Blockly.Procedures.getCallers(name, workspace);
+      var tp = this.getInput("RETURN").connection.getTypeExpr();
+      var isMono = true;
+      for(var k = 0; k < callers.length; k++){// First pass, if a child is connected, reinvoke the connection to set the types properly
+        var block = callers[k];
+        if(block.outputConnection.isConnected()){
+          var conn = block.outputConnection.targetConnection;
+          block.outputConnection.connect__(conn); // Recon
+          isMono = false;
+          break;
+        }
+      }
+      if(isMono){ // Then we need to make all callers polymorphic
+        for(var k = 0; k < callers.length; k++){
+          var block = callers[k];
+          block.setOutputTypeExpr(tp);
+          block.render();
+        }
+      }
+      this.render();
   }
 
 };
