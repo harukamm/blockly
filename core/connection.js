@@ -714,10 +714,13 @@ Blockly.Connection.prototype.disconnect = function() {
     // Reset the affected two blocks
     parentBlock.initArrows();
     parentBlock.reconnectInputs();
+    if(parentBlock.onTypeChange)
+      parentBlock.onTypeChange();
 
     childBlock.initArrows();
     childBlock.reconnectInputs();
-
+    if(childBlock.onTypeChange)
+      childBlock.onTypeChange();
 
 
     // Reset children with dependent types - local_vars and calling blocks
@@ -730,6 +733,8 @@ Blockly.Connection.prototype.disconnect = function() {
     if(parentBlock.type == 'procedures_letFunc') {
       parentBlock.reset();
     }
+
+    Blockly.Connection.reconnectUpward(parentBlock);
 
 
     childBlock.render();
@@ -744,6 +749,19 @@ Blockly.Connection.prototype.disconnect = function() {
     childBlock.updateDisabled();
   }
   
+};
+
+Blockly.Connection.reconnectUpward = function(block){
+  if(!block)
+    return; 
+  if(!block.outputConnection)
+    return; // We are done
+  if(!block.outputConnection.isConnected())
+    return;
+  block.outputConnection.connect__(block.outputConnection.targetConnection);
+  if(block.onTypeChange)
+    block.onTypeChange();
+  Blockly.Connection.reconnectUpward(block.outputConnection.targetBlock());
 };
 
 /**
