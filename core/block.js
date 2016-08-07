@@ -215,7 +215,7 @@ Blockly.Block.getTypeDic = function(t,dic){
   }
   
   children.forEach(function(child){
-    Blockly.Connection.Clean(child,dic);
+    Blockly.Block.getTypeDic(child,dic);
   });
 };
 
@@ -231,7 +231,7 @@ Blockly.Block.Clean = function(t,dic){
   tp.children = [];
   
   children.forEach(function(child){
-    tp.children.push(Blockly.Connection.Clean(child,dic));
+    tp.children.push(Blockly.Block.Clean(child,dic));
   });
   return tp;  
 };
