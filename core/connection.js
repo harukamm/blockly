@@ -667,60 +667,24 @@ Blockly.Connection.prototype.disconnect = function() {
   // Stefan
   // Anthony
 
-  // Handle calling blocks separately
-
-  // if(parentBlock.type == 'procedures_letFunc')
-  // {
-  //   var name = parentBlock.getFieldValue("NAME");
-  //   var workspace = Blockly.getMainWorkspace();
-
-  //   var callers = Blockly.Procedures.getCallers(name, workspace);
-
-  //   // If it is not connected anymore make it polymorphic
-  //   if(!parentBlock.getInput("RETURN").connection.isConnected())
-  //   {
-  //     parentBlock.getInput("RETURN").setTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
-  //     parentBlock.render();
-  //   }
-
-  //   var tp = parentBlock.getInput("RETURN").connection.getTypeExpr();
-
-  //   callers.forEach(function(block)
-  //   {
-  //     var conn = block.outputConnection.targetConnection;
-  //     var isConnected = block.outputConnection.isConnected();
-
-  //     block.setOutputTypeExpr(tp);
-
-  //     if(isConnected)
-  //     {
-  //       block.outputConnection.disconnect();
-  //       block.outputConnection.connect(conn);
-  //     }
-  //     block.render();
-
-  //   });
-  //   return;
-  // }
-
   // Stefan
-  // TODO
-  // This can be replaced. Each block can define a function resetTypes, which
   // resets its types
   var workspace = parentBlock.workspace;
   Blockly.Events.disable();
   // Reconstruct parent and child blocks to restore type variables 
   if( workspace ) {  
     // Reset the affected two blocks
-    parentBlock.initArrows();
-    parentBlock.reconnectInputs();
-    if(parentBlock.onTypeChange)
-      parentBlock.onTypeChange();
 
+    // The child affects the parent more
     childBlock.initArrows();
     childBlock.reconnectInputs();
     if(childBlock.onTypeChange)
       childBlock.onTypeChange();
+
+    parentBlock.initArrows();
+    parentBlock.reconnectInputs();
+    if(parentBlock.onTypeChange)
+      parentBlock.onTypeChange();
 
 
     // Reset children with dependent types - local_vars and calling blocks
@@ -729,9 +693,6 @@ Blockly.Connection.prototype.disconnect = function() {
       var defBlock = Blockly.Procedures.getDefinition(childBlock.getProcedureCall(),
           Blockly.getMainWorkspace());
       defBlock.reset();
-    }
-    if(parentBlock.type == 'procedures_letFunc') {
-      parentBlock.reset();
     }
 
     Blockly.Connection.reconnectUpward(parentBlock);

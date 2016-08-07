@@ -231,7 +231,8 @@ Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
   container.appendChild(mutation);
 
   var curBlock = Blockly.Xml.domToBlock(container, Blockly.getMainWorkspace());
-  curBlock.parent_ = this.sourceBlock_;
+  curBlock.parentField_ = this;
+  curBlock.parentBlock__ = this.sourceBlock_;
 
   if(this.typeExpr)
     curBlock.setOutputTypeExpr(this.typeExpr);

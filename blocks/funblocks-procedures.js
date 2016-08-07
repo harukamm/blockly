@@ -244,8 +244,10 @@ Blockly.Blocks['procedures_letFunc'] = {
     this.setFieldValue(newName /**/, 'NAME');
     this.allowRename = true;
   },
-  reset: function(){ // Reset the types of this block and it's callers
-      this.initArrows();
+  onTypeChange: function(){ // Reset the types of this block and it's callers
+      // this.initArrows(); // this is already done in connection.js -
+      // disconnect()
+      this.updateParams_();
       this.reconnectInputs();
       var workspace = Blockly.getMainWorkspace();
       var name = this.getFieldValue("NAME");
@@ -268,6 +270,47 @@ Blockly.Blocks['procedures_letFunc'] = {
           block.render();
         }
       }
+
+
+      // Where are my other children (vars_local) ?
+      var thisBlock = this;
+      this.arguments_.forEach(function(varName){
+        var callers = [];  // That correspond to the current variable. TODO make more effective !!
+        Blockly.getMainWorkspace().getAllBlocks().forEach(function(block){
+          if(block.type == "vars_local"){
+            var owner = block.parentBlock__;
+            if(owner == thisBlock && block.getFieldValue("NAME") == varName){
+              callers.push(block);
+            }
+          }
+        });
+
+
+        var isMono = true;
+        for(var k = 0; k < callers.length; k++){// First pass, if a child is connected, reinvoke the connection to set the types properly
+          var block = callers[k];
+          if(block.outputConnection.isConnected()){
+            var conn = block.outputConnection.targetConnection;
+            block.outputConnection.connect__(conn); // Recon
+            isMono = false;
+            break;
+          }
+        }
+        var ind = thisBlock.arguments_.indexOf(varName);
+        var tp = thisBlock.argTypes_[ind];
+        if(isMono){ // Then we need to make all callers polymorphic
+          for(var k = 0; k < callers.length; k++){
+            var block = callers[k];
+//            console.log(tp);
+            block.setOutputTypeExpr(tp);
+            block.render();
+          }
+        }
+
+
+      });
+
+
       this.render();
   }
 
@@ -413,25 +456,42 @@ Blockly.Blocks['vars_local'] = {
     this.appendDummyInput()
         .appendField('x', 'NAME');
     this.setOutput(true);
-    this.setOutputTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
-    this.parent_ = null;
+    this.parentField_ = null;
+    this.parentBlock__ = null;
+    this.parentId = -1; // Which block spawned me?
+    this.localId = -1; // Which field and so on
+    this.arrows = [new Blockly.TypeExpr('_POLY_A')];
+    this.dom_ = null;
   },
 
-  domToMutation: function(xmlElement) {
+  domToMutation: function(xmlElement) {  // TODO, this needs work, what in the case of a list expr or case block? 
     var name = xmlElement.getAttribute('name');
-    var parentName = xmlElement.getAttribute('parentName'); // Name of parent function
+    var parentName = xmlElement.getAttribute('parentId'); // Name of parent function
+    var parentName = xmlElement.getAttribute('localId'); // Name of parent function
     this.setFieldValue(name, 'NAME');
 
     var typeDom = xmlElement.childNodes[0];
-    var type = Blockly.TypeExpr.fromDom(typeDom)
+    var type = Blockly.TypeExpr.fromDom(typeDom);
+    this.dom_ = typeDom;
     this.setOutputTypeExpr(type);
 
     var thisBlock = this;
-    if(parentName && !this.parent_){
-      Blockly.getMainWorkspace().getTopBlocks().forEach(function(topBlock){
-        if(topBlock.getFieldValue('NAME') == parentName)
-          thisBlock.parent_ = topBlock;
-      });
+    // Find parent field here !! TODO
+    // if(parentName && !this.parent_){
+    //   Blockly.getMainWorkspace().getTopBlocks().forEach(function(topBlock){
+    //     if(topBlock.getFieldValue('NAME') == parentName)
+    //       thisBlock.parent_ = topBlock;
+    //   });
+    // }
+  },
+
+  // Overide the base method
+  initArrows: function(){
+    if(!this.dom_){
+      this.setOutputTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
+    }
+    else{
+      this.setOutputTypeExpr(Blockly.TypeExpr.fromDom(this.dom_))
     }
   },
 
@@ -447,6 +507,14 @@ Blockly.Blocks['vars_local'] = {
     return container;
   },
 
+  onTypeChange: function(){
+    if(!this.parentField_)
+      console.log("Hilfe over here plz");
+    //console.log(this.parentField_);
+    if(this.parentField_.sourceBlock_) this.parentField_.sourceBlock_.onTypeChange(); // Why does this occur tho???
+    this.setOutputTypeExpr(this.parentField_.typeExpr);
+    this.render();
+  },
 
   isParentInScope: function(p){
     if(!this.parent_)
