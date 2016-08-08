@@ -62,4 +62,224 @@ Blockly.Blocks['numNumberPerc'] = {
   }
 };
 
+Blockly.Blocks['numAdd'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendValueInput('LEFT');
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('+','blocklyTextEmph'));
+    this.appendValueInput('RIGHT');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+
+Blockly.Blocks['numSub'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendValueInput('LEFT');
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('-','blocklyTextEmph'));
+    this.appendValueInput('RIGHT');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+
+Blockly.Blocks['numMult'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendValueInput('LEFT');
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('*','blocklyTextEmph'));
+    this.appendValueInput('RIGHT');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+
+Blockly.Blocks['numDiv'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendValueInput('LEFT');
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('/','blocklyTextEmph'));
+    this.appendValueInput('RIGHT');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+
+Blockly.Blocks['numExp'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendValueInput('LEFT');
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('^','blocklyTextEmph'));
+    this.appendValueInput('RIGHT');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+
+Blockly.Blocks['numMax'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Maximum','blocklyTextEmph'));
+    this.appendValueInput('LEFT');
+    this.appendValueInput('RIGHT');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+
+Blockly.Blocks['numMin'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Minimum','blocklyTextEmph'));
+    this.appendValueInput('LEFT');
+    this.appendValueInput('RIGHT');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+
+Blockly.Blocks['numQuot'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Quotient','blocklyTextEmph'));
+    this.appendValueInput('LEFT');
+    this.appendValueInput('RIGHT');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+Blockly.Blocks['numRem'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Remainder','blocklyTextEmph'));
+    this.appendValueInput('LEFT');
+    this.appendValueInput('RIGHT');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+Blockly.Blocks['numGCD'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('GCD','blocklyTextEmph'));
+    this.appendValueInput('LEFT');
+    this.appendValueInput('RIGHT');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+Blockly.Blocks['numLCM'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('LCM','blocklyTextEmph'));
+    this.appendValueInput('LEFT');
+    this.appendValueInput('RIGHT');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+Blockly.Blocks['numOpposite'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Opposite','blocklyTextEmph'));
+    this.appendValueInput('NUM');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+Blockly.Blocks['numAbs'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Absolute Value','blocklyTextEmph'));
+    this.appendValueInput('NUM');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+Blockly.Blocks['numRound'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Round','blocklyTextEmph'));
+    this.appendValueInput('NUM');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+Blockly.Blocks['numReciprocal'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Reciprocal','blocklyTextEmph'));
+    this.appendValueInput('NUM');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+Blockly.Blocks['numSqrt'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('_/','blocklyTextEmph'));
+    this.appendValueInput('NUM');
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+
+Blockly.Blocks['numPi'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('Pi','blocklyTextEmph'));
+    this.setOutput(true);
+    this.arrows = [new Blockly.TypeExpr('Number')];
+    this.setInputsInline(true);
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
