@@ -291,7 +291,7 @@ Blockly.Blocks['procedures_letFunc'] = {
           var block = callers[k];
           if(block.outputConnection.isConnected()){
             var conn = block.outputConnection.targetConnection;
-            block.outputConnection.connect__(conn); // Recon
+            try{block.outputConnection.connect__(conn);}catch(e){} // Recon
             isMono = false;
             break;
           }
