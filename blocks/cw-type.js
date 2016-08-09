@@ -443,7 +443,7 @@ Blockly.Blocks['expr_case'] = {
       var its = 0;
       for(var j = 1; j < inp.fieldRow.length; j++){
         if(inp.fieldRow[j].getValue() == '' || inp.fieldRow[j].getValue() == ' ') continue; // Skip spaces
-        var tp = inp.fieldRow[j].typeExpr
+        var tp = inp.fieldRow[j].getType();
         its++;
 
         var typeDom = tp.toDom();
@@ -479,7 +479,7 @@ Blockly.Blocks['expr_case'] = {
           if(typeNode.nodeName.toLowerCase() != 'type') continue;
           var tp = Blockly.TypeExpr.fromDom(typeNode);
           input.appendField(' ');
-          input.appendField(new Blockly.FieldVarInput(String.fromCharCode(97 + j),null,tp));
+          input.appendField(new Blockly.FieldVarInput(String.fromCharCode(97 + j),tp));
         }
 
       }
