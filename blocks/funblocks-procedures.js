@@ -247,6 +247,11 @@ Blockly.Blocks['procedures_letFunc'] = {
   onTypeChange: function(){ // Reset the types of this block and it's callers
       // this.initArrows(); // this is already done in connection.js -
       // disconnect()
+      // TODO - updateParams creates a new fieldvarinput.
+      //        * Ensure that local_vars point to the new field
+      //        * Store type info in argTypes_ and sync
+      //        * Loop through all local_vars, set the argType_ (and field typeExpr) to the
+      //          local_var that is monomorphic
       this.updateParams_();
       this.reconnectInputs();
       var workspace = Blockly.getMainWorkspace();
