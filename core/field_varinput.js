@@ -43,11 +43,12 @@ goog.require('goog.userAgent');
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldVarInput = function(text, opt_validator, typeExpr) {
+Blockly.FieldVarInput = function(text, opt_validator, callFunc, localId) {
   Blockly.FieldVarInput.superClass_.constructor.call(this, text,
       opt_validator);
   
-  this.typeExpr = typeExpr;
+  this.callFunc = callFunc;
+  this.localId = localId;
   this.size_.height += 4;
 };
 goog.inherits(Blockly.FieldVarInput, Blockly.Field);
@@ -59,18 +60,27 @@ Blockly.FieldVarInput.prototype.updateEditable = function() {
 
 };
 
+Blockly.FieldVarInput.prototype.getType = function(){
+  if(typeof callFunc === "function"){
+    return this.callFunc(this.localId);
+  } else {
+    return this.callFunc; // It is a typeExpr here
+  }
+}
+
 Blockly.FieldVarInput.prototype.getPath = function(width)
 {
   var width_ = width+4;
   
   var inlineSteps = [];
-  if(this.typeExpr)
+  var typeExpr = this.getType();
+  if(typeExpr)
   {
     inlineSteps.push('M 0,-2');
 
-    Blockly.BlockSvg.renderTypeExpr(this.typeExpr, inlineSteps, 'down');
+    Blockly.BlockSvg.renderTypeExpr(typeExpr, inlineSteps, 'down');
 
-    var height = Blockly.BlockSvg.getTypeExprHeight(this.typeExpr); 
+    var height = Blockly.BlockSvg.getTypeExprHeight(typeExpr); 
     this.size_.height = height + 10;
     if(height < 23)
       height = 23;
@@ -224,18 +234,18 @@ Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
   container.appendChild(field);
 
   var mutation = goog.dom.createDom('mutation');
-  if(this.typeExpr){
-    var typeDom = this.typeExpr.toDom();
-    mutation.appendChild(typeDom);
-  }
+  if(this.localId) mutation.setAttribute('localId',localId);
+  mutation.setAttribute('parentId',this.sourceBlock_.id);
+  var typeDom = this.getType().toDom();
+  mutation.appendChild(typeDom);
   container.appendChild(mutation);
 
   var curBlock = Blockly.Xml.domToBlock(container, Blockly.getMainWorkspace());
   curBlock.parentField_ = this;
   curBlock.parentBlock__ = this.sourceBlock_;
 
-  if(this.typeExpr)
-    curBlock.setOutputTypeExpr(this.typeExpr);
+  curBlock.setOutputTypeExpr(this.getType());
+
   curBlock.render();
 
   var targetWorkspace = Blockly.getMainWorkspace();

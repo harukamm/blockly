@@ -91,7 +91,7 @@ Blockly.TypeExpr.prototype.apply = function(subst) {
 }
 
 // Copy values over, so that the reference is unchange
-Blockly.TypeExpr.prototype.copyOver(otherTp){
+Blockly.TypeExpr.prototype.copyOver = function(otherTp){
   otherTp.name = this.name;
   otherTp.children = this.children;
 }

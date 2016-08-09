@@ -461,9 +461,7 @@ Blockly.Blocks['vars_local'] = {
     this.appendDummyInput()
         .appendField('x', 'NAME');
     this.setOutput(true);
-    this.parentField_ = null;
-    this.parentBlock__ = null;
-    this.parentId = -1; // Which block spawned me?
+    this.parentId = null; // Which block spawned me?
     this.localId = -1; // Which field and so on
     this.arrows = [new Blockly.TypeExpr('_POLY_A')];
     this.dom_ = null;
@@ -471,8 +469,8 @@ Blockly.Blocks['vars_local'] = {
 
   domToMutation: function(xmlElement) {  // TODO, this needs work, what in the case of a list expr or case block? 
     var name = xmlElement.getAttribute('name');
-    var parentName = xmlElement.getAttribute('parentId'); // Name of parent function
-    var parentName = xmlElement.getAttribute('localId'); // Name of parent function
+    this.parentId = xmlElement.getAttribute('parentId'); // Name of parent function
+    this.localId = Number(xmlElement.getAttribute('localId')); // Name of parent function
     this.setFieldValue(name, 'NAME');
 
     var typeDom = xmlElement.childNodes[0];
@@ -480,7 +478,7 @@ Blockly.Blocks['vars_local'] = {
     this.dom_ = typeDom;
     this.setOutputTypeExpr(type);
 
-    var thisBlock = this;
+    this.parentBlock = Blockly.getMainWorkspace
     // Find parent field here !! TODO
     // if(parentName && !this.parent_){
     //   Blockly.getMainWorkspace().getTopBlocks().forEach(function(topBlock){
@@ -490,21 +488,37 @@ Blockly.Blocks['vars_local'] = {
     // }
   },
 
+  getType: function(){
+    var workspace = Blockly.getMainWorkspace();
+    var parentBlock = workspace.getBlockById(this.parentId);
+    if(parentBlock.getArgType){
+      var tp = parentBlock.getArgType(this.localId);
+      if(tp)
+        return tp;
+    }
+
+    return this.outputConnection.typeExpr; // Current type
+  },
+
   // Overide the base method
   initArrows: function(){
-    if(!this.dom_){
-      this.setOutputTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
-    }
-    else{
-      this.setOutputTypeExpr(Blockly.TypeExpr.fromDom(this.dom_))
-    }
+
+    // this.setOutputTypeExpr(this.getType());
+
+    // if(!this.dom_){
+    //   this.setOutputTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
+    // }
+    // else{
+    //   this.setOutputTypeExpr(Blockly.TypeExpr.fromDom(this.dom_))
+    // }
   },
 
   mutationToDom: function() {
     var container = document.createElement('mutation');
     container.setAttribute('name', this.getFieldValue('NAME'));
     if(this.parent_)
-    container.setAttribute('parentName', this.parent_.getFieldValue('NAME'));
+    container.setAttribute('parentId', this.parentId);
+    container.setAttribute('localId', this.localId);
 
     var typeDom = this.outputConnection.typeExpr.toDom();
     container.appendChild(typeDom);
@@ -513,20 +527,17 @@ Blockly.Blocks['vars_local'] = {
   },
 
   onTypeChange: function(){
-    if(!this.parentField_)
-      console.log("Hilfe over here plz");
-    //console.log(this.parentField_);
-    if(this.parentField_.sourceBlock_) this.parentField_.sourceBlock_.onTypeChange(); // Why does this occur tho???
-    this.setOutputTypeExpr(this.parentField_.typeExpr);
-    this.render();
+    this.setOutputTypeExpr(this.getType());
   },
 
   isParentInScope: function(p){
-    if(!this.parent_)
+
+    var parentBlock = workspace.getBlockById(this.parentId);
+    if(!parentBlock)
       return true; // Assume it is
 
     while(p){
-      if(p==this.parent_) 
+      if(p==parentBlock) 
         return true;
       if(p.outputConnection)
         p = p.outputConnection.targetBlock();
