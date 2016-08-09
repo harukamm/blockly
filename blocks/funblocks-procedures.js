@@ -473,19 +473,11 @@ Blockly.Blocks['vars_local'] = {
   },
 
   onTypeChange: function(){
-    
-    var workspace = Blockly.getMainWorkspace();
-    var parentBlock = workspace.getBlockById(this.parentId);
-    if(parentBlock.onTypeChange)
-    { //console.log('updating parent');
-//      parentBlock.onTypeChange();
-    }
-    //this.setOutputTypeExpr(this.getType());
   },
 
   isParentInScope: function(p){
 
-    var parentBlock = workspace.getBlockById(this.parentId);
+    var parentBlock = Blockly.getMainWorkspace().getBlockById(this.parentId);
     if(!parentBlock)
       return true; // Assume it is
 

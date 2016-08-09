@@ -704,12 +704,13 @@ Blockly.Connection.prototype.disconnect = function() {
     
     Blockly.Connection.reconnectUpward(parentBlock);
 
-
     childBlock.render();
     parentBlock.render();
   }
 
-  
+  // increase coupling :/
+  // need to disconnect local_vars that are contained, but have no path.
+  Blockly.Connection.disconnectVarsDown(childBlock);  
 
   Blockly.Events.enable();
   // Blocks have already been re-rendered in copyConnectionTypes_. Just need to update disabled status.
@@ -718,6 +719,24 @@ Blockly.Connection.prototype.disconnect = function() {
   }
   
 };
+
+// TODO Maybe move refactor into vars_local function?
+Blockly.Connection.disconnectVarsDown = function(block){
+  if(!block)
+    return;
+  block.inputList.forEach(function(inp){
+    if (inp.type == Blockly.INPUT_VALUE) {
+      var subblock = inp.connection.targetBlock();
+      if(subblock && subblock.type == 'vars_local' && !subblock.isParentInScope()){
+        subblock.unplug();
+        var workspace = Blockly.getMainWorkspace();
+        var parentBlock = workspace.getBlockById(subblock.parentId);
+        parentBlock.onTypeChange();
+      }
+      Blockly.Connection.disconnectVarsDown(subblock);
+    }
+  });
+}
 
 Blockly.Connection.reconnectUpward = function(block){
   if(!block)
