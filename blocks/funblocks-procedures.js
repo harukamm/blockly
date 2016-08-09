@@ -89,7 +89,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     if(this.arguments_.length > 0)
       header.appendField(' ');
     for (var i = 0; i < this.arguments_.length; i++) {
-      var field = new Blockly.FieldVarInput(this.arguments_[i],null,this.argTypes_[i]);
+      var field = new Blockly.FieldVarInput(this.arguments_[i],this.getArgType,i);
       header.appendField(field);
     }
     this.inputList = this.inputList.concat(bodyInput);
@@ -99,6 +99,10 @@ Blockly.Blocks['procedures_letFunc'] = {
     // this.setFieldValue(paramString, 'PARAMS');
     Blockly.Events.enable();
   },
+  getArgType: function(localId){
+    return this.argTypes_[localId];
+  },
+
   mutationToDom: Blockly.Blocks['procedures_defnoreturn'].mutationToDom,
   domToMutation: function(xmlElement) {
     this.arguments_ = [];
@@ -252,7 +256,6 @@ Blockly.Blocks['procedures_letFunc'] = {
       //        * Store type info in argTypes_ and sync
       //        * Loop through all local_vars, set the argType_ (and field typeExpr) to the
       //          local_var that is monomorphic
-      this.updateParams_();
       this.reconnectInputs();
       var workspace = Blockly.getMainWorkspace();
       var name = this.getFieldValue("NAME");
@@ -276,8 +279,7 @@ Blockly.Blocks['procedures_letFunc'] = {
         }
       }
 
-
-      // Where are my other children (vars_local) ?
+      // Update local_vars
       var thisBlock = this;
       this.arguments_.forEach(function(varName){
         var callers = [];  // That correspond to the current variable. TODO make more effective !!
@@ -301,21 +303,26 @@ Blockly.Blocks['procedures_letFunc'] = {
             break;
           }
         }
-        var ind = thisBlock.arguments_.indexOf(varName);
-        var tp = thisBlock.argTypes_[ind];
         if(isMono){ // Then we need to make all callers polymorphic
+          var tp = Blockly.TypeVar.getUnusedTypeVar();
           for(var k = 0; k < callers.length; k++){
             var block = callers[k];
-//            console.log(tp);
             block.setOutputTypeExpr(tp);
             block.render();
           }
         }
 
+        // Type unification works well on blocks, so we just copy the type over
+        // now
+        if(callers[0]){
+          var tp = callers[0].outputConnection.typeExpr;
+          var ind = thisBlock.arguments_.indexOf(varName);
+          thisBlock.argTypes_[ind] = tp;
+        }
 
       });
 
-
+      this.updateParams_();
       this.render();
   }
 
@@ -466,7 +473,14 @@ Blockly.Blocks['vars_local'] = {
   },
 
   onTypeChange: function(){
-    this.setOutputTypeExpr(this.getType());
+    
+    var workspace = Blockly.getMainWorkspace();
+    var parentBlock = workspace.getBlockById(this.parentId);
+    if(parentBlock.onTypeChange)
+    { //console.log('updating parent');
+//      parentBlock.onTypeChange();
+    }
+    //this.setOutputTypeExpr(this.getType());
   },
 
   isParentInScope: function(p){

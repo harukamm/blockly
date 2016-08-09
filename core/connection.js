@@ -296,6 +296,12 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
           block.varTypes_[f] = block.varTypes_[f].apply(unifyResult);
         }
       }
+      if (block.argTypes_) {
+        for (var f in block.argTypes_) {
+          block.argTypes_[f] = block.argTypes_[f].apply(unifyResult);
+        }
+      }
+
       // Also do FieldVarInputs
       for(var k = 0; k < block.inputList.length; k++)
       {
@@ -304,11 +310,7 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
         {
           var f = inp.fieldRow[l];
           if(f instanceof Blockly.FieldVarInput){
-            if(f.typeExpr)
-            {
-              f.typeExpr = f.typeExpr.apply(unifyResult);
-              f.render_();
-            }
+            f.render_();
           }
         }
       }
@@ -322,7 +324,10 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
       }
     }
 
-    Blockly.Connection.typeChangeUpward(parentBlock);
+
+
+    if(childBlock.onTypeChange)
+      childBlock.onTypeChange();
 
     // var typeVarBlock;
     // if (this.typeExpr.isTypeVar()) {
@@ -696,7 +701,7 @@ Blockly.Connection.prototype.disconnect = function() {
           Blockly.getMainWorkspace());
       defBlock.reset();
     }
-
+    
     Blockly.Connection.reconnectUpward(parentBlock);
 
 
@@ -730,12 +735,12 @@ Blockly.Connection.reconnectUpward = function(block){
 Blockly.Connection.typeChangeUpward = function(block){
   if(!block)
     return; 
-  if(!block.outputConnection)
-    return; // We are done
 
   if(block.onTypeChange)
     block.onTypeChange();
 
+  if(!block.outputConnection)
+    return; // We are done
   if(!block.outputConnection.isConnected())
     return;
 
