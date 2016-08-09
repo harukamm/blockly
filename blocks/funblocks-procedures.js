@@ -322,59 +322,6 @@ Blockly.Blocks['procedures_letFunc'] = {
 };
 
 
-Blockly.Blocks['procedures_let'] = {
-  /**
-   * Block for defining a procedure with a return value.
-   * @this Blockly.Block
-   */
-  init: function() {
-    var A = Blockly.TypeVar.getUnusedTypeVar();
-    var B = Blockly.TypeVar.getUnusedTypeVar();
-    var nameField = new Blockly.FieldTextInput(
-        "bar",
-        Blockly.Procedures.rename);
-    nameField.setSpellcheck(false);
-    this.appendDummyInput("HEADER")
-        .appendField("Let")
-        .appendField(nameField, 'NAME');
-    this.appendValueInput('RETURN')
-        .appendField('=')
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .setTypeExpr(A);
-    this.appendValueInput('IN')
-        .appendField('in')
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .setTypeExpr(B);
-    this.setOutput(true);
-    this.setOutputTypeExpr(B);
-    this.setMutator(new Blockly.Mutator(['procedures_mutatorarg']));
-    this.setColour(Blockly.Blocks.procedures.HUE);
-    this.setTooltip(Blockly.Msg.PROCEDURES_DEFRETURN_TOOLTIP);
-    this.arguments_ = [];
-    this.argTypes_ = [];
-    this.setStatements_(false);
-    this.statementConnection_ = null;
-  },
-  setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
-  validate:       Blockly.Blocks['procedures_defnoreturn'].validate,
-  updateParams_:  Blockly.Blocks['procedures_letFunc'].updateParams_, 
-  mutationToDom:  Blockly.Blocks['procedures_defnoreturn'].mutationToDom,
-  domToMutation:  Blockly.Blocks['procedures_letFunc'].domToMutation, 
-  getProcedureDef:  Blockly.Blocks['procedures_letFunc'].domToMutation, 
-  decompose:      Blockly.Blocks['procedures_letFunc'].decompose, 
-  compose:        Blockly.Blocks['procedures_letFunc'].compose, 
-  dispose:        Blockly.Blocks['procedures_letFunc'].dispose, 
-  onchange:       Blockly.Blocks['procedures_letFunc'].onchange, 
-  getVars:        Blockly.Blocks['procedures_defnoreturn'].getVars,
-  renameVar:      Blockly.Blocks['procedures_defnoreturn'].renameVar,
-  customContextMenu: function(o){}
-};
-
-
-
-
-
-
 Blockly.Blocks['procedures_mutatorcontainer_nostatements'] = {
   /**
    * Mutator block for procedure container.
