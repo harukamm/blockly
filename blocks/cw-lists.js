@@ -36,12 +36,12 @@ Blockly.Blocks['lists_comprehension'] = {
     this.appendValueInput('VAR0')
           .setTypeExpr(new Blockly.TypeExpr ("list", [this.varTypes_[0]]))
           .setAlign(Blockly.ALIGN_RIGHT)
-          .appendField(new Blockly.FieldVarInput(this.vars_[0],null,this.varTypes_[0]))
+          .appendField(new Blockly.FieldVarInput(this.vars_[0],this.getArgType, 0))
           .appendField('\u2190');
     this.appendValueInput('VAR1')
           .setTypeExpr(new Blockly.TypeExpr ("list", [this.varTypes_[1]]))
           .setAlign(Blockly.ALIGN_RIGHT)
-          .appendField(new Blockly.FieldVarInput(this.vars_[1],null,this.varTypes_[1]))
+          .appendField(new Blockly.FieldVarInput(this.vars_[1],this.getArgType, 1 ))
           .appendField('\u2190');
     this.setOutput(true);
     this.setMutator(new Blockly.Mutator(['lists_comp_var', 'lists_comp_guard']));
@@ -72,11 +72,7 @@ Blockly.Blocks['lists_comprehension'] = {
         {
           var f = inp.fieldRow[l];
           if(f instanceof Blockly.FieldVarInput){
-            if(f.typeExpr)
-            {
-              f.typeExpr = inp.connection.typeExpr.children[0];
-              f.render_();
-            }
+            f.render_();
           }
         }
       }
@@ -84,7 +80,20 @@ Blockly.Blocks['lists_comprehension'] = {
   },
 
   onTypeChange: function(){
+    // set variables to input types
+    var j = 0;
+    var thisBlock = this;
+    this.inputList.forEach(function(inp){
+      if(inp.name.startsWith('VAR')){
+        thisBlock.varTypes_[j] = inp.connection.typeExpr.children[0];
+        j++;
+      }
+    });
     this.resetVarTypes();
+  },
+
+  getArgType: function(localId){
+    return this.varTypes_[localId];
   },
 
   getVars: function(connection){
@@ -145,7 +154,7 @@ Blockly.Blocks['lists_comprehension'] = {
         var input = this.appendValueInput('VAR' + i)
             .setTypeExpr(new Blockly.TypeExpr ("list", [this.varTypes_[i]]))
             .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField(new Blockly.FieldVarInput(name, null, this.varTypes_[i]))
+            .appendField(new Blockly.FieldVarInput(name, this.getArgType, i))
             .appendField('\u2190');
         this.vars_.push(name);
       }
@@ -218,7 +227,7 @@ Blockly.Blocks['lists_comprehension'] = {
         var input = this.appendValueInput('VAR' + this.varCount_)
             .setTypeExpr(new Blockly.TypeExpr ("list", [this.varTypes_[this.varCount_]]))
             .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField(new Blockly.FieldVarInput(name, null, this.varTypes_[this.varCount_]))
+            .appendField(new Blockly.FieldVarInput(name, this.getArgType, this.varCount_))
             .appendField('\u2190');
 
         this.vars_.push(name);

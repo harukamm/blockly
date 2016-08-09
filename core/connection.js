@@ -322,6 +322,8 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
       }
     }
 
+    Blockly.Connection.typeChangeUpward(parentBlock);
+
     // var typeVarBlock;
     // if (this.typeExpr.isTypeVar()) {
     //   typeVarBlock = this.sourceBlock_
@@ -724,6 +726,23 @@ Blockly.Connection.reconnectUpward = function(block){
     block.onTypeChange();
   Blockly.Connection.reconnectUpward(block.outputConnection.targetBlock());
 };
+
+Blockly.Connection.typeChangeUpward = function(block){
+  if(!block)
+    return; 
+  if(!block.outputConnection)
+    return; // We are done
+
+  if(block.onTypeChange)
+    block.onTypeChange();
+
+  if(!block.outputConnection.isConnected())
+    return;
+
+  Blockly.Connection.typeChangeUpward(block.outputConnection.targetBlock());
+};
+
+
 
 /**
  * Disconnect two blocks that are connected by this connection.

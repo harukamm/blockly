@@ -43,9 +43,9 @@ goog.require('goog.userAgent');
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldVarInput = function(text, opt_validator, callFunc, localId) {
+Blockly.FieldVarInput = function(text,callFunc, localId) {
   Blockly.FieldVarInput.superClass_.constructor.call(this, text,
-      opt_validator);
+      null);
   
   this.callFunc = callFunc;
   this.localId = localId;
@@ -61,8 +61,8 @@ Blockly.FieldVarInput.prototype.updateEditable = function() {
 };
 
 Blockly.FieldVarInput.prototype.getType = function(){
-  if(typeof callFunc === "function"){
-    return this.callFunc(this.localId);
+  if(typeof this.callFunc === "function"){
+    return this.callFunc.call(this.sourceBlock_,this.localId);
   } else {
     return this.callFunc; // It is a typeExpr here
   }
@@ -234,7 +234,7 @@ Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
   container.appendChild(field);
 
   var mutation = goog.dom.createDom('mutation');
-  if(this.localId) mutation.setAttribute('localId',localId);
+  if(this.localId) mutation.setAttribute('localId',this.localId);
   mutation.setAttribute('parentId',this.sourceBlock_.id);
   var typeDom = this.getType().toDom();
   mutation.appendChild(typeDom);

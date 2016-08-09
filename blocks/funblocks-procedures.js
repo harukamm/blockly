@@ -478,14 +478,6 @@ Blockly.Blocks['vars_local'] = {
     this.dom_ = typeDom;
     this.setOutputTypeExpr(type);
 
-    this.parentBlock = Blockly.getMainWorkspace
-    // Find parent field here !! TODO
-    // if(parentName && !this.parent_){
-    //   Blockly.getMainWorkspace().getTopBlocks().forEach(function(topBlock){
-    //     if(topBlock.getFieldValue('NAME') == parentName)
-    //       thisBlock.parent_ = topBlock;
-    //   });
-    // }
   },
 
   getType: function(){
