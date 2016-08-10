@@ -1568,7 +1568,6 @@ Blockly.Block.prototype.allInputsConnected = function(){
 };
 
 Blockly.Block.prototype.reconnectInputs = function(exceptBlock){
-  console.log('reconnectInputs');
   for (var i = 0, input; input = this.inputList[i]; i++) {
     if (input.type != Blockly.INPUT_VALUE)
       continue;
