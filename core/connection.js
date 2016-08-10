@@ -689,7 +689,7 @@ Blockly.Connection.prototype.disconnect = function() {
       childBlock.onTypeChange();
 
     parentBlock.initArrows();
-    parentBlock.reconnectInputs();
+    parentBlock.reconnectInputs(childBlock); // Don't reconnect the child !
     if(parentBlock.onTypeChange)
       parentBlock.onTypeChange();
 

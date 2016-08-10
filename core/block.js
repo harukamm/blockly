@@ -1567,14 +1567,18 @@ Blockly.Block.prototype.allInputsConnected = function(){
 
 };
 
-Blockly.Block.prototype.reconnectInputs = function(){
+Blockly.Block.prototype.reconnectInputs = function(exceptBlock){
+  console.log('reconnectInputs');
   for (var i = 0, input; input = this.inputList[i]; i++) {
     if (input.type != Blockly.INPUT_VALUE)
       continue;
     var bl = input.connection.targetBlock();
-    if(bl){
-      input.connection.connect_(bl.outputConnection);
+    if(!bl) continue;
+    if(bl.isShadow()) continue;
+    if(exceptBlock && bl.id == exceptBlock.id){
+      continue;
     }
+    input.connection.connect_(bl.outputConnection);
   }
 };
 

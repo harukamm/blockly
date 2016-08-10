@@ -403,4 +403,14 @@ Blockly.Blocks['fieldVarInputTest'] = {
 };
 
 
+Blockly.Blocks['drawingOfTest'] = {
+  init: function() {
+    this.setColour(160);
+    this.appendDummyInput()
+        .appendField('Drawing Of');
+    this.appendValueInput('PIC');
+    this.arrows = [ new Blockly.TypeExpr('Picture',[])];
+    this.setOutput(false);
+  }
+};
 
