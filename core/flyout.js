@@ -546,9 +546,11 @@ Blockly.Flyout.prototype.show = function(xmlList) {
     xmlList =
         Blockly.Procedures.flyoutCategory(this.workspace_.targetWorkspace);
   }
-  else if(xmlList == "DATATYPE")
-  {
+  else if(xmlList == "DATATYPE"){
     xmlList = Blockly.UserTypes.dataFlyoutCategory(this.workspace_.targetWorkspace);
+  }
+  else if(xmlList == "EVENT"){
+    xmlList = Blockly.UserTypes.eventFlyoutCategory(this.workspace_.targetWorkspace);
   }
 
   this.svgGroup_.style.display = 'block';

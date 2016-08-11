@@ -59,6 +59,16 @@ Blockly.UserTypes.dataFlyoutCategory = function(workspace){
   return xmlList;
 };
 
+Blockly.UserTypes.eventFlyoutCategory = function(workspace){
+
+  var xmlList = [];
+
+  Blockly.UserTypes.generateEventBuiltins(xmlList);
+
+  return xmlList;
+};
+
+
 /**
  * Adds the specified block name to the xmlList.
  * @param {!String} blockName The type of the block
@@ -329,6 +339,111 @@ Blockly.UserTypes.renameType = function(text) {
       block.setFieldValue(text, 'NAME');
   }
   return text;
+};
+
+
+
+Blockly.UserTypes.Product = function(conName, types){
+  this.name = conName;
+  this.types = types;
+};
+
+Blockly.UserTypes.Sum = function(dataTypeName, products){
+  this.name = dataTypeName;
+  this.products = products;
+};
+
+Blockly.UserTypes.Sum.prototype.getType = function(){
+  return new Blockly.TypeExpr(this.name);
+}
+
+// Events
+
+Blockly.UserTypes.generateEventBuiltins = function(xmlList){
+
+  var LeftButton = new Blockly.UserTypes.Product("LeftButton",[]);
+  var RightButton = new Blockly.UserTypes.Product("RightButton",[]);
+  var MiddleButton = new Blockly.UserTypes.Product("MiddleButton",[]);
+  var MouseButton = new Blockly.UserTypes.Sum("MouseButton", [LeftButton,RightButton,MiddleButton]);
+
+
+  var point = new Blockly.TypeExpr("pair",[new Blockly.TypeExpr("Number"), new Blockly.TypeExpr("Number")]);
+  var KeyPress = new Blockly.UserTypes.Product("KeyPress", [new Blockly.TypeExpr("Text") ]);
+  var KeyRelease = new Blockly.UserTypes.Product("KeyRelease", [new Blockly.TypeExpr("Text") ]);
+  var MousePress = new Blockly.UserTypes.Product("MousePress", [new Blockly.TypeExpr("MouseButton"), point]);
+  var MouseRelease = new Blockly.UserTypes.Product("MouseRelease", [ new Blockly.TypeExpr("MouseButton") , point]);
+  var MouseMovement = new Blockly.UserTypes.Product("MouseMovement", [point]);
+  var Event = new Blockly.UserTypes.Sum("Event",[KeyPress, KeyRelease, MousePress, MouseRelease, MouseMovement]);
+
+
+  var bs = [MouseButton, Event];
+
+
+  bs.forEach(function(sum){
+    Blockly.UserTypes.generateConstructors_(sum, xmlList);
+    Blockly.UserTypes.generateCase_(sum, xmlList);
+  });
+
+};
+
+
+Blockly.UserTypes.generateConstructors_ = function(sum, xmlList){
+  var userTypeName = sum.name;
+  sum.products.forEach(function(product){
+
+    var name = product.name; 
+    var types = product.types;
+    
+    // Create dom
+    var block = goog.dom.createDom('block');
+    block.setAttribute('type', 'expr_constructor');
+    block.setAttribute('items', 10);
+    block.setAttribute('gap', 16);
+    var mutation = goog.dom.createDom('mutation');
+    mutation.setAttribute('items',types.length);
+    mutation.setAttribute('name',name );
+    mutation.setAttribute('output',userTypeName);
+    types.forEach(function(type){
+      var typeDom = type.toDom();
+      mutation.appendChild(typeDom);
+    });
+    block.appendChild(mutation);
+    xmlList.push(block);
+  });
+};
+
+Blockly.UserTypes.generateCase_ = function(sum,xmlList){
+  var name = sum.name;
+  var mutation = goog.dom.createDom('mutation');
+  mutation.setAttribute('name',name);
+
+  var count = 0;
+  for(var i = 0; i < sum.products.length; i++) {
+    var product = sum.products[i];
+
+    var prodDom = goog.dom.createDom('product');
+    prodDom.setAttribute('constructor', product.name);
+
+    // Get product types
+    var typeCount = 0;
+    for(var j = 0; j < product.types.length; j++)
+    {
+      var type = product.types[j];
+      var typeDom = type.toDom();
+      prodDom.appendChild(typeDom);
+      typeCount++;
+    }
+    prodDom.setAttribute('items',typeCount);
+    mutation.appendChild(prodDom); 
+    count++;
+  }
+  mutation.setAttribute('items',count);
+  var block = goog.dom.createDom('block');
+  block.setAttribute('type','expr_case');
+  block.setAttribute('gap',16);
+  block.appendChild(mutation);
+
+  xmlList.push(block);
 };
 
 
