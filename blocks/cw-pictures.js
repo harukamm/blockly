@@ -29,6 +29,8 @@ Blockly.Blocks['cwCombine'] = {
     this.setMutator(new Blockly.Mutator(['pics_combine_ele']));
     this.setTooltip('Combine multiple pictures');
     this.itemCount_ = 2;
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Picture'));
   },
 
   decompose: function(workspace) {
@@ -78,7 +80,6 @@ Blockly.Blocks['cwCombine'] = {
     return container;
   },
 
-
   domToMutation: function(xmlElement) {
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
 
@@ -89,12 +90,8 @@ Blockly.Blocks['cwCombine'] = {
       if (i > 0) {
         input.appendField(new Blockly.FieldLabel("&","blocklyTextEmph") );
       }
-
     };
   },
-
-
-
 };
 
 Blockly.Blocks['pics_combine_ele'] = {
@@ -115,7 +112,7 @@ Blockly.Blocks['pics_combine_ele'] = {
 
 Blockly.Blocks['pics_combine_container'] = {
   init: function() {
-    this.setColour(Blockly.Blocks.lists.HUE);
+    this.setColour(picsHUE);
     this.appendDummyInput()
         .appendField('Picture inputs');
     this.appendStatementInput('STACK');

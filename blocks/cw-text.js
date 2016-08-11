@@ -20,6 +20,8 @@ goog.provide('Blockly.Blocks.cwText');
 goog.require('Blockly.Blocks');
 
 
+var textHUE = 45;
+
 Blockly.Blocks['text_typed'] = {
   /**
    * Block for text value.
@@ -51,6 +53,108 @@ Blockly.Blocks['text_typed'] = {
       var file = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAQAAAAqJXdxAAAAn0lEQVQI1z3OMa5BURSF4f/cQhAKjUQhuQmFNwGJEUi0RKN5rU7FHKhpjEH3TEMtkdBSCY1EIv8r7nFX9e29V7EBAOvu7RPjwmWGH/VuF8CyN9/OAdvqIXYLvtRaNjx9mMTDyo+NjAN1HNcl9ZQ5oQMM3dgDUqDo1l8DzvwmtZN7mnD+PkmLa+4mhrxVA9fRowBWmVBhFy5gYEjKMfz9AylsaRRgGzvZAAAAAElFTkSuQmCC';
     }
     return new Blockly.FieldImage(file, 12, 12, '"');
+  }
+};
+
+Blockly.Blocks['txtConcat'] = {
+  init: function() {
+    this.appendValueInput('STR1');
+    this.appendValueInput('STR2')
+        .appendField(new Blockly.FieldLabel("<>","blocklyTextEmph") );
+    this.setColour(textHUE);
+    this.setMutator(new Blockly.Mutator(['text_combine_ele']));
+    this.setTooltip('Concatenate multiple text');
+    this.itemCount_ = 2;
+
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Text'));
+  },
+
+  decompose: function(workspace) {
+    var containerBlock =
+        workspace.newBlock('text_combine_container');
+    containerBlock.initSvg();
+    var connection = containerBlock.getInput('STACK').connection;
+
+    for (var x = 0; x < this.itemCount_; x++) {
+      var itemBlock = workspace.newBlock('text_combine_ele');
+      itemBlock.initSvg();
+      connection.connect(itemBlock.previousConnection);
+      connection = itemBlock.nextConnection;
+    }
+
+    return containerBlock;
+  },
+
+  compose: function(containerBlock) {
+    
+    for (var x = this.itemCount_ - 1; x >= 0; x--) {
+      this.removeInput('STR' + x);
+    }
+
+    this.itemCount_ = 0;
+    // Rebuild the block's inputs.
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    while (itemBlock) {
+      var input = this.appendValueInput('STR' + this.itemCount_)
+                      .setTypeExpr(new Blockly.TypeExpr('Text'));
+      if (this.itemCount_ > 0) {
+        input.appendField(new Blockly.FieldLabel("<>","blocklyTextEmph") );
+      }
+      if (itemBlock.valueConnection_) {
+        input.connection.connect(itemBlock.valueConnection_);
+      }
+      this.itemCount_++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+    this.renderMoveConnections_();
+  },
+
+  mutationToDom: function() {
+    var container = document.createElement('mutation');
+    container.setAttribute('items', this.itemCount_);
+    return container;
+  },
+
+  domToMutation: function(xmlElement) {
+    this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+
+    this.inputList = [];
+    for (var i = 0; i < this.itemCount_; i++){
+      var input = this.appendValueInput('STR' + i)
+                      .setTypeExpr(new Blockly.TypeExpr('Text'));
+      if (i > 0) {
+        input.appendField(new Blockly.FieldLabel("<>","blocklyTextEmph") );
+      }
+    };
+  },
+};
+
+Blockly.Blocks['text_combine_ele'] = {
+  /**
+   * Mutator block for procedure argument.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.appendDummyInput()
+        .appendField('text');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setColour(textHUE);
+    this.setTooltip('Adds a text input');
+    this.contextMenu = false;
+  }
+};
+
+Blockly.Blocks['text_combine_container'] = {
+  init: function() {
+    this.setColour(textHUE);
+    this.appendDummyInput()
+        .appendField('Text inputs');
+    this.appendStatementInput('STACK');
+    this.setTooltip('A list of inputs that the combine block should have');
+    this.contextMenu = false;
   }
 };
 
