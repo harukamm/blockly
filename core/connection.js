@@ -699,7 +699,7 @@ Blockly.Connection.prototype.disconnect = function() {
     {
       var defBlock = Blockly.Procedures.getDefinition(childBlock.getProcedureCall(),
           Blockly.getMainWorkspace());
-      defBlock.reset();
+      defBlock.onTypeChange();
     }
     
     Blockly.Connection.reconnectUpward(parentBlock);
