@@ -307,9 +307,6 @@ Blockly.Blocks['lists_comp_guard'] = {
 };
 
 
-
-
-
 Blockly.Blocks['variables_get_lists'] = {
   /**
    * Block for variable getter.
