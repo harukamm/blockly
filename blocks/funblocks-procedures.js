@@ -33,7 +33,7 @@ Blockly.Blocks['procedures_letFunc'] = {
    */
   init: function() {
     var nameField = new Blockly.FieldTextInput(
-        "x",
+        "var",
         Blockly.Procedures.rename);
     nameField.setSpellcheck(false);
     this.appendDummyInput("HEADER")

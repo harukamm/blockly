@@ -29,7 +29,7 @@ Blockly.Blocks['lists_comprehension'] = {
    */
   init: function() {
     this.setColour(listsHUE);
-    this.vars_ = ['x','y','z'];
+    this.vars_ = ['i','j','k'];
     this.varTypes_ = [Blockly.TypeVar.getUnusedTypeVar(),Blockly.TypeVar.getUnusedTypeVar(),Blockly.TypeVar.getUnusedTypeVar()];
     this.appendValueInput("DO")
         .appendField(new Blockly.FieldLabel("List Comprehension","blocklyTextEmph"))
@@ -280,7 +280,7 @@ Blockly.Blocks['lists_comp_var'] = {
    */
   init: function() {
     this.appendDummyInput()
-        .appendField(new Blockly.FieldTextInput('x'), 'NAME')
+        .appendField(new Blockly.FieldTextInput('k'), 'NAME')
         .appendField('\u2190');
     this.setPreviousStatement(true);
     this.setNextStatement(true);
