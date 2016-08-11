@@ -58,8 +58,8 @@ Blockly.Blocks['text_typed'] = {
 
 Blockly.Blocks['txtConcat'] = {
   init: function() {
-    this.appendValueInput('STR1');
-    this.appendValueInput('STR2')
+    this.appendValueInput('STR0');
+    this.appendValueInput('STR1')
         .appendField(new Blockly.FieldLabel("<>","blocklyTextEmph") );
     this.setColour(textHUE);
     this.setMutator(new Blockly.Mutator(['text_combine_ele']));
@@ -88,7 +88,7 @@ Blockly.Blocks['txtConcat'] = {
 
   compose: function(containerBlock) {
     
-    for (var x = this.itemCount_ - 1; x >= 0; x--) {
+    for (var x = 0; x < this.itemCount_; x++) {
       this.removeInput('STR' + x);
     }
 

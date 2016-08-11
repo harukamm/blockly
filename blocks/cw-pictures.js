@@ -22,8 +22,8 @@ goog.require('Blockly.Blocks');
 var picsHUE = 160;
 Blockly.Blocks['cwCombine'] = {
   init: function() {
-    this.appendValueInput('PIC1');
-    this.appendValueInput('PIC2')
+    this.appendValueInput('PIC0');
+    this.appendValueInput('PIC1')
         .appendField(new Blockly.FieldLabel("&","blocklyTextEmph") );
     this.setColour(picsHUE);
     this.setMutator(new Blockly.Mutator(['pics_combine_ele']));
@@ -51,7 +51,7 @@ Blockly.Blocks['cwCombine'] = {
 
   compose: function(containerBlock) {
     
-    for (var x = this.itemCount_ - 1; x >= 0; x--) {
+    for (var x = 0; x < this.itemCount_; x++) {
       this.removeInput('PIC' + x);
     }
 
@@ -67,9 +67,9 @@ Blockly.Blocks['cwCombine'] = {
       if (itemBlock.valueConnection_) {
         input.connection.connect(itemBlock.valueConnection_);
       }
-      this.itemCount_++;
       itemBlock = itemBlock.nextConnection &&
           itemBlock.nextConnection.targetBlock();
+      this.itemCount_++;
     }
     this.renderMoveConnections_();
   },
