@@ -82,6 +82,13 @@ Blockly.Blocks['type_product'] = {
     this.itemCount_ = 2;
     this.allowRename = false;
   },
+
+  fixName: function() {
+    var newName = Blockly.UserTypes.findConstructorName(this.getFieldValue('CONSTRUCTOR'),this);
+    this.getField('CONSTRUCTOR').setValue(newName);
+  },
+  
+
   mutationToDom: function() {
     var container = document.createElement('mutation');
     container.setAttribute('items', this.itemCount_);
@@ -230,9 +237,16 @@ Blockly.Blocks['type_sum'] = {
     this.itemCount_ = 1;
     this.allowRename = false;
   },
+
+  fixName: function() {
+    var newName = Blockly.UserTypes.findTypeName(this.getFieldValue('NAME'),this);
+    this.getField('NAME').setValue(newName);
+  },
+  
   mutationToDom: function() {
     var container = document.createElement('mutation');
     container.setAttribute('items', this.itemCount_);
+    container.setAttribute('name', this.getFieldValue('NAME'));
     return container;
   },
   domToMutation: function(xmlElement) {
@@ -246,6 +260,8 @@ Blockly.Blocks['type_sum'] = {
                       .setAlign(Blockly.ALIGN_RIGHT)
                       .setTypeExpr(new Blockly.TypeExpr('Product'));
     }
+
+  
   },
   decompose: function(workspace) {
     var containerBlock =
