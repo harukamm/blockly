@@ -557,6 +557,7 @@ Blockly.Blocks['pair_first_typed'] = {
         .appendField(new Blockly.FieldLabel("firstOfPair","blocklyTextEmph") );
     this.setOutput(true);
     this.setOutputTypeExpr(A);
+    this.functionName = "firstOfPair";
   }
 };
 
@@ -574,6 +575,7 @@ Blockly.Blocks['pair_second_typed'] = {
         .appendField(new Blockly.FieldLabel("secondOfPair","blocklyTextEmph") );
     this.setOutput(true);
     this.setOutputTypeExpr(B);
+    this.functionName = "secondOfPair";
   }
 };
 
