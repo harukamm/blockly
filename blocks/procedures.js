@@ -710,6 +710,13 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       def && def.select();
     };
     options.push(option);
+  },
+
+  onTypeChange: function(){
+    var workspace = this.workspace;
+    var name = this.getProcedureCall();
+    var def = Blockly.Procedures.getDefinition(name, workspace);
+    def.onTypeChange();
   }
 };
 

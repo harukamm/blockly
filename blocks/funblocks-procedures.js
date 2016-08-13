@@ -243,6 +243,21 @@ Blockly.Blocks['procedures_letFunc'] = {
     {
     }
   },
+  resetCallers: function(){
+    var defBlock = this;
+    var workspace = Blockly.getMainWorkspace();
+    var name = this.getFieldValue('NAME');
+    var callers = Blockly.Procedures.getCallers(name, workspace);
+    var outputType = defBlock.getInput("RETURN").connection.getTypeExpr();
+    callers.forEach(function(caller){
+      caller.setOutputTypeExpr(outputType);
+      for(var k = 0; k < defBlock.argTypes_.length; k++){
+        var tp = defBlock.argTypes_[k];
+        caller.getInput("ARG" + k).setTypeExpr(tp);
+      }
+      caller.render();
+    });
+  },
   onCreate: function(){
     var newName = Blockly.Procedures.findLegalName(this.getFieldValue('NAME'),this);
     this.setFieldValue(newName /**/, 'NAME');
@@ -323,6 +338,7 @@ Blockly.Blocks['procedures_letFunc'] = {
       });
 
       this.updateParams_();
+      this.resetCallers();
       this.render();
   }
 

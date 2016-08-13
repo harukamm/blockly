@@ -324,6 +324,22 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
       }
     }
 
+    if(parentConnection.typeExpr.name == 'Function_' && childBlock.type == 'procedures_callreturn')
+    {
+      // unify children !
+
+      var defBlockMain = Blockly.Procedures.getDefinition(childBlock.getProcedureCall(),
+          Blockly.getMainWorkspace()); 
+
+      var k = 0;
+      for(var k = 0; k < defBlockMain.arguments_.length; k++){
+          defBlockMain.argTypes_[k] = parentConnection.typeExpr.children[k];
+      };
+      defBlockMain.resetCallers();
+      childBlock.render();
+      
+
+    }
 
 
     if(childBlock.onTypeChange)
@@ -692,16 +708,7 @@ Blockly.Connection.prototype.disconnect = function() {
     parentBlock.reconnectInputs(childBlock); // Don't reconnect the child !
     if(parentBlock.onTypeChange)
       parentBlock.onTypeChange();
-
-
-    // Reset children with dependent types - local_vars and calling blocks
-    if(childBlock.type == 'procedures_callreturn')
-    {
-      var defBlock = Blockly.Procedures.getDefinition(childBlock.getProcedureCall(),
-          Blockly.getMainWorkspace());
-      defBlock.onTypeChange();
-    }
-    
+   
     Blockly.Connection.reconnectUpward(parentBlock);
 
     childBlock.render();
