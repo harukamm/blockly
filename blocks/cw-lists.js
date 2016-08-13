@@ -438,7 +438,7 @@ Blockly.Blocks['lists_length'] = {
     this.setColour(210);
     this.appendValueInput('LST')
         .setTypeExpr(new Blockly.TypeExpr('list',[a]))
-        .appendField(new Blockly.FieldLabel("Length","blocklyTextEmph") );
+        .appendField(new Blockly.FieldLabel("length","blocklyTextEmph") );
     this.setOutput(true);
     this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
     this.functionName = "length";
@@ -487,7 +487,7 @@ Blockly.Blocks['lists_create_with_typed'] = {
   init: function() {
     this.setColour(260);
     this.appendValueInput('ADD0')
-        .appendField(new Blockly.FieldLabel("List","blocklyTextEmph"));
+        .appendField(new Blockly.FieldLabel("list","blocklyTextEmph"));
     this.appendValueInput('ADD1');
     this.appendValueInput('ADD2');
     this.setOutput(true);
@@ -580,7 +580,7 @@ Blockly.Blocks['lists_create_with_typed'] = {
       var input = this.appendValueInput('ADD' + this.itemCount_)
                       .setTypeExpr(this.getType());
       if (this.itemCount_ == 0) {
-        input.appendField("List");
+        input.appendField("list");
       }
       // Reconnect any child blocks.
       if (itemBlock.valueConnection_) {
