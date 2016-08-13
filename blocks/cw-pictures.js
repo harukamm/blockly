@@ -121,4 +121,17 @@ Blockly.Blocks['pics_combine_container'] = {
   }
 };
 
+Blockly.Blocks['lists_path'] = {
+  init: function() {
+    this.setColour(160);
+    var pair = new Blockly.TypeExpr('pair', [new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number')]);
+    this.appendValueInput('LST')
+        .setTypeExpr(new Blockly.TypeExpr('list',[pair]))
+        .appendField(new Blockly.FieldLabel("path","blocklyTextEmph") );
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Picture'));
+    this.functionName = "path";
+  }
+};
+
 
