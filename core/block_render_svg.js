@@ -408,7 +408,9 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
     }
 
     //FFC Stefan
-    if(isInline && input.connection && input.connection.typeExpr && input.connection.typeExpr.name == "Function_" && !input.connection.isConnected())
+
+    var isFunc = input.connection && input.connection.typeExpr && input.connection.typeExpr.name == "Function_" && !input.connection.isConnected();
+    if(isInline && isFunc)
     {
       input.renderHeight += Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);
       input.renderHeight += 24;
@@ -734,7 +736,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
                           );
           }
           else{ // TODO, this pushes too long on complex types, such as stacked pairs
-            inlineSteps.push('v', Math.min(row.height,tabHeight,input.renderHeight));
+            inlineSteps.push('v', tabHeight);
           }
           // if(!input.connection.isConnected()) // Experimental
           inlineSteps.push('h', input.renderWidth + 2 -
@@ -752,7 +754,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
           }
 
           // TODO FFC
-          if(isFunc)
+          if(isFunc && !input.connection.isConnected())
           {
             inlineSteps.push('v', 2);
             for(var i = 0; i < input.connection.typeExpr.children.length - 1; i++)
