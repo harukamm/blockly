@@ -543,3 +543,38 @@ Blockly.Blocks['pair_create_typed'] = {
  }
 };
 
+Blockly.Blocks['pair_first_typed'] = {
+  /**
+   * Block for ternary operator.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(210);
+    var A = Blockly.TypeVar.getUnusedTypeVar();
+    var B = Blockly.TypeVar.getUnusedTypeVar();
+    this.appendValueInput('PAIR')
+        .setTypeExpr(new Blockly.TypeExpr ("pair", [A, B]))
+        .appendField(new Blockly.FieldLabel("firstOfPair","blocklyTextEmph") );
+    this.setOutput(true);
+    this.setOutputTypeExpr(A);
+  }
+};
+
+Blockly.Blocks['pair_second_typed'] = {
+  /**
+   * Block for ternary operator.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setColour(210);
+    var A = Blockly.TypeVar.getUnusedTypeVar();
+    var B = Blockly.TypeVar.getUnusedTypeVar();
+    this.appendValueInput('PAIR')
+        .setTypeExpr(new Blockly.TypeExpr ("pair", [A, B]))
+        .appendField(new Blockly.FieldLabel("secondOfPair","blocklyTextEmph") );
+    this.setOutput(true);
+    this.setOutputTypeExpr(B);
+  }
+};
+
+
