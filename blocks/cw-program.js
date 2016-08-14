@@ -29,7 +29,7 @@ Blockly.Blocks['cwSimulationOf'] = {
     this.setColour(0);
     this.setOutput(false);
     this.appendDummyInput()
-        .appendField(new Blockly.FieldLabel('Simulation Of', 'blocklyTextEmph'));
+        .appendField(new Blockly.FieldLabel('simulationOf', 'blocklyTextEmph'));
     
     var world = Blockly.TypeVar.getUnusedTypeVar();
     var number = new Blockly.TypeExpr('Number');
@@ -58,7 +58,7 @@ Blockly.Blocks['cwInteractionOf'] = {
     this.setColour(0);
     this.setOutput(false);
     this.appendDummyInput()
-        .appendField(new Blockly.FieldLabel('Interaction Of', 'blocklyTextEmph'));
+        .appendField(new Blockly.FieldLabel('interactionOf', 'blocklyTextEmph'));
     
     var world = Blockly.TypeVar.getUnusedTypeVar();
     var number = new Blockly.TypeExpr('Number');
@@ -96,7 +96,7 @@ Blockly.Blocks['cwAnimationOf'] = {
     this.setOutput(false);
 
     this.appendDummyInput()
-        .appendField(new Blockly.FieldLabel('Animation Of', 'blocklyTextEmph'));
+        .appendField(new Blockly.FieldLabel('animationOf', 'blocklyTextEmph'));
     this.appendValueInput('FUNC')
         .setTypeExpr(new Blockly.TypeExpr('Function_', 
               [new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Picture') ]  ));
