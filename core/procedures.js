@@ -355,3 +355,26 @@ Blockly.Procedures.getVarsInScope = function(connection){
   }
   return vars;
 }
+
+
+/**
+ * List all available variables in the current scope
+ */
+Blockly.Procedures.getUnusedVar = function(connection,exclude){
+  var vars = Blockly.Procedures.getVarsInScope(connection);
+  exclude.forEach(function(e){
+    vars.push(e);
+  });
+ 
+  var j = 0;
+  for(var j = 0; j < 26; j++){
+    var chr = String.fromCharCode(97 + j);
+    if (vars.indexOf(chr) < 0)
+      return chr;
+  }
+  return ("var" + Math.floor((Math.random() * 100) + 1));
+}
+
+
+
+

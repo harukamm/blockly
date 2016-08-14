@@ -512,6 +512,24 @@ Blockly.Blocks['expr_case'] = {
       itemBlock = itemBlock.nextConnection &&
           itemBlock.nextConnection.targetBlock();
     }
+  },
+
+  onchange: function(changeEv){
+
+    for (var i = 0; i < this.itemCount_; i++) {
+      var inp = this.getInput('CS' + i);
+
+      var exc = [];
+      for(var j = 1; j < inp.fieldRow.length; j++){
+        if(inp.fieldRow[j].getValue() == '' || inp.fieldRow[j].getValue() == ' ') 
+           continue; // Skip spaces
+
+        var name = inp.fieldRow[j].getValue();
+        var varname = Blockly.Procedures.getUnusedVar(this.outputConnection, exc); 
+        exc.push(varname); // Can't use again
+        inp.fieldRow[j].setValue(varname);
+      }
+    }
   }
 };
 
