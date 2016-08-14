@@ -426,11 +426,21 @@ Blockly.Blocks['procedures_mutatorarg_auto'] = {
   },
 
   validator_: function(name) {
+    var exc = [];
+    var blocks = Blockly.getMainWorkspace().getTopBlocks();
+    blocks.forEach(function(b){
+      if(b.type='procedures_letFunc')
+        exc.push(b.getFieldValue('NAME'));
+    });
+
     name = name.replace(/[\s\xa0]+/g, ' ').replace(/^ | $/g, '');
     name = name.replace(' ','');
     name = name.charAt(0).toLowerCase() + name.slice(1); // Make first letter uppercase
     if(/[^a-z_]/.test( name[0] ) )
       name = 'x1';
+
+    if(exc.indexOf(name) >= 0)
+      return null;
 
     return name || null;
   }
