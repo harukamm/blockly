@@ -366,7 +366,6 @@ Blockly.Procedures.getUnusedVar = function(connection,exclude){
     vars.push(e);
   });
  
-  var j = 0;
   for(var j = 0; j < 26; j++){
     var chr = String.fromCharCode(97 + j);
     if (vars.indexOf(chr) < 0)

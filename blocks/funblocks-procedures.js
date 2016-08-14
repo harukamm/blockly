@@ -40,7 +40,7 @@ Blockly.Blocks['procedures_letFunc'] = {
         .appendField("")
         .appendField(nameField, 'NAME');
     this.appendValueInput('RETURN');
-    this.setMutator(new Blockly.Mutator(['procedures_mutatorarg']));
+    this.setMutator(new Blockly.Mutator(['procedures_mutatorarg_auto']));
     this.setColour(Blockly.Blocks.procedures.HUE);
     this.setTooltip(Blockly.Msg.PROCEDURES_DEFRETURN_TOOLTIP);
     this.arguments_ = [];
@@ -127,7 +127,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     // Parameter list.
     var connection = containerBlock.getInput('STACK').connection;
     for (var i = 0; i < this.arguments_.length; i++) {
-      var paramBlock = workspace.newBlock('procedures_mutatorarg');
+      var paramBlock = workspace.newBlock('procedures_mutatorarg_auto');
       paramBlock.initSvg();
       paramBlock.setFieldValue(this.arguments_[i], 'NAME');
       // Store the old location.
@@ -357,8 +357,85 @@ Blockly.Blocks['procedures_mutatorcontainer_nostatements'] = {
     this.setColour(Blockly.Blocks.procedures.HUE);
     this.setTooltip(Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP);
     this.contextMenu = false;
+  },
+
+  getUnusedVar : function(){
+    var connection = this.getInput('STACK').connection;
+    var vars = [];
+
+    var paramBlock = this.getInputTargetBlock('STACK');
+    while (paramBlock) {
+      vars.push(paramBlock.getFieldValue('NAME'));
+      paramBlock = paramBlock.nextConnection &&
+          paramBlock.nextConnection.targetBlock();
+    }
+
+    var k = 0;
+    while(k<26){
+      var j = ((k++) + 23) % 26;
+
+      var chr = String.fromCharCode(97 + j);
+      if (vars.indexOf(chr) < 0)
+        return chr;
+    }
+ 
   }
 };
+
+
+
+Blockly.Blocks['procedures_mutatorarg_auto'] = {
+
+  init: function() {
+
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.PROCEDURES_MUTATORARG_TITLE)
+        .appendField(new Blockly.FieldTextInput('x', this.validator_), 'NAME');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setColour(Blockly.Blocks.procedures.HUE);
+    this.setTooltip(Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP);
+    this.contextMenu = false;
+  
+  },
+
+  onchange : function(evChange){
+
+    if(evChange.type == Blockly.Events.CREATE){
+      if(this.isInFlyout)
+        return;
+      if(evChange.blockId != this.id)
+        return;
+
+      var workspace = this.workspace;
+      var blocks = workspace.getAllBlocks();
+      var stack;
+      for(var i =0; i < blocks.length; i++){
+        if(blocks[i].type == 'procedures_mutatorcontainer_nostatements'){
+          stack = blocks[i];
+          break;
+        }
+      }
+      var varName = 'x';
+      if(stack)
+        varName = stack.getUnusedVar();
+
+      this.setFieldValue(varName, 'NAME');
+    }
+
+  },
+
+  validator_: function(name) {
+    name = name.replace(/[\s\xa0]+/g, ' ').replace(/^ | $/g, '');
+    name = name.replace(' ','');
+    name = name.charAt(0).toLowerCase() + name.slice(1); // Make first letter uppercase
+    if(/[^a-z_]/.test( name[0] ) )
+      name = 'x1';
+
+    return name || null;
+  }
+};
+
 
 Blockly.Blocks['procedures_getVar'] = {
   init: function() {
