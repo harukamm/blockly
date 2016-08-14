@@ -35,7 +35,7 @@ Blockly.Blocks['text_typed'] = {
         .appendField(new Blockly.FieldTextInput(''), 'TEXT')
         .appendField(this.newQuote_(false));
     this.setOutput(true);
-    this.setOutputTypeExpr(new Blockly.TypeExpr('text'));
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Text'));
     this.setTooltip("Gives the given text");
     this.functionName = "";
   },
