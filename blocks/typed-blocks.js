@@ -407,7 +407,7 @@ Blockly.Blocks['drawingOfTest'] = {
   init: function() {
     this.setColour(160);
     this.appendDummyInput()
-        .appendField(new Blockly.FieldImage('cafe-18.svg',15,15))
+        .appendField(new Blockly.FieldClass('mdi mdi-bell'))
         .appendField('Drawing Of');
     this.appendValueInput('PIC');
     this.arrows = [ new Blockly.TypeExpr('Picture',[])];

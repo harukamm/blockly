@@ -951,7 +951,8 @@ Blockly.Flyout.prototype.placeNewBlock_ = function(originBlock) {
  * @private
  */
 
-Blockly.Flyout.programBlockList = ["cwAnimationOf", "cwDrawingOf", "cwSimulationOf", "cwInteractionOf"];
+Blockly.Flyout.programBlockList = ["cwAnimationOf", "cwDrawingOf", "cwSimulationOf","cwInteractionOf" ];
+
 Blockly.Flyout.prototype.filterForCapacity_ = function() {
   var remainingCapacity = this.targetWorkspace_.remainingCapacity();
   var blocks = this.workspace_.getTopBlocks(false);
