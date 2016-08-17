@@ -447,3 +447,64 @@ Blockly.UserTypes.generateCase_ = function(sum,xmlList){
 };
 
 
+
+Blockly.UserTypes.mutateCallers = function(defBlock) {
+  var oldRecordUndo = Blockly.Events.recordUndo;
+  var name = defBlock.getFieldValue('NAME');
+  var xmlElement = defBlock.mutationToDom(true);
+  var constructors = Blockly.Procedures.getConstructors(name, defBlock.workspace);
+  var cases = Blockly.Procedures.getConstructors(name, defBlock.workspace);
+  var callers = constructors.concat(cases);
+
+  for (var i = 0, caller; caller = callers[i]; i++) {
+    var oldMutationDom = caller.mutationToDom();
+    var oldMutation = oldMutationDom && Blockly.Xml.domToText(oldMutationDom);
+    caller.domToMutation(xmlElement);
+    var newMutationDom = caller.mutationToDom();
+    var newMutation = newMutationDom && Blockly.Xml.domToText(newMutationDom);
+    if (oldMutation != newMutation) {
+
+      Blockly.Events.recordUndo = false;
+      Blockly.Events.fire(new Blockly.Events.Change(
+          caller, 'mutation', null, oldMutation, newMutation));
+      Blockly.Events.recordUndo = oldRecordUndo;
+    }
+  }
+};
+
+
+Blockly.UserTypes.getConstructors = function(name, workspace) {
+  var callers = [];
+  var blocks = workspace.getTopBlocks();
+
+  for (var i = 0; i < blocks.length; i++) {
+    if (blocks[i].getUserType) {
+      var procName = blocks[i].getUserType();
+
+      if (procName && procName == name && blocks[i].type == 'expr_constructor') {
+        callers.push(blocks[i]);
+      }
+    }
+  }
+  return callers;
+};
+
+Blockly.UserTypes.getCases = function(name, workspace) {
+  var callers = [];
+  var blocks = workspace.getTopBlocks();
+
+  for (var i = 0; i < blocks.length; i++) {
+    if (blocks[i].getUserType) {
+      var procName = blocks[i].getUserType();
+
+      if (procName && procName == name && blocks[i].type == 'expr_case') {
+        callers.push(blocks[i]);
+      }
+    }
+  }
+  return callers;
+};
+
+
+
+
