@@ -407,6 +407,9 @@ Blockly.Blocks['procedures_mutatorarg_auto'] = {
         return;
       if(evChange.blockId != this.id)
         return;
+      // If we aren't dragging a newly created block exit
+      if(Blockly.selected != this) return;
+      if(Blockly.dragMode_==Blockly.DRAG_NONE) return;
 
       var workspace = this.workspace;
       var blocks = workspace.getAllBlocks();
