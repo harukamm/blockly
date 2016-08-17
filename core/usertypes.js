@@ -111,6 +111,50 @@ Blockly.UserTypes.addUserTypes = function(xmlList){
   });
 };
 
+
+// block is a sum block !
+Blockly.UserTypes.generateCase = function(block){
+  var name = block.getFieldValue('NAME');
+  var mutation = goog.dom.createDom('mutation');
+  mutation.setAttribute('name',block.getFieldValue('NAME'));
+  var count = 0;
+  for(var i = 0; i < block.itemCount_; i++) {
+    var product = block.getInputTargetBlock('PROD' + i);
+    if(!product) continue; // Maybe error here 
+    var prodDom = goog.dom.createDom('product');
+    prodDom.setAttribute('constructor', product.getFieldValue('CONSTRUCTOR'));
+
+    // Get product types
+    var typeCount = 0;
+    for(var j = 0; j < product.itemCount_; j++)
+    {
+      var typeBlock = product.getInputTargetBlock('TP' + j);
+      if(!typeBlock)
+        continue;
+      var typeDom;
+      if(typeBlock.getType){
+        typeDom = typeBlock.getType().toDom();
+      } else {
+        typeDom= goog.dom.createDom('type');
+        var typeName = typeBlock.getFieldValue('NAME');
+        typeDom.setAttribute('name',typeName);
+      }
+      prodDom.appendChild(typeDom);
+      typeCount++;
+    }
+    prodDom.setAttribute('items',typeCount);
+    mutation.appendChild(prodDom); 
+    count++;
+  }
+  mutation.setAttribute('items',count);
+  var block = goog.dom.createDom('block');
+  block.setAttribute('type','expr_case');
+  block.setAttribute('gap',16);
+  block.appendChild(mutation);
+
+  return block;
+};
+
 /**
  * Adds the a case block for each user defined type to the toolbox 
  * @param {!Object} xmlList List of current blocks
@@ -120,48 +164,55 @@ Blockly.UserTypes.generateCases = function(xmlList){
   blocks.forEach(function(block){
     if (block.type == 'type_sum')
     {
-      var name = block.getFieldValue('NAME');
-      var mutation = goog.dom.createDom('mutation');
-      mutation.setAttribute('name',block.getFieldValue('NAME'));
-      var count = 0;
-      for(var i = 0; i < block.itemCount_; i++) {
-        var product = block.getInputTargetBlock('PROD' + i);
-        if(!product) continue; // Maybe error here 
-        var prodDom = goog.dom.createDom('product');
-        prodDom.setAttribute('constructor', product.getFieldValue('CONSTRUCTOR'));
-
-        // Get product types
-        var typeCount = 0;
-        for(var j = 0; j < product.itemCount_; j++)
-        {
-          var typeBlock = product.getInputTargetBlock('TP' + j);
-          if(!typeBlock)
-            continue;
-          var typeDom;
-          if(typeBlock.getType){
-            typeDom = typeBlock.getType().toDom();
-          } else {
-            typeDom= goog.dom.createDom('type');
-            var typeName = typeBlock.getFieldValue('NAME');
-            typeDom.setAttribute('name',typeName);
-          }
-          prodDom.appendChild(typeDom);
-          typeCount++;
-        }
-        prodDom.setAttribute('items',typeCount);
-        mutation.appendChild(prodDom); 
-        count++;
-      }
-      mutation.setAttribute('items',count);
-      var block = goog.dom.createDom('block');
-      block.setAttribute('type','expr_case');
-      block.setAttribute('gap',16);
-      block.appendChild(mutation);
-
-      xmlList.push(block);
+      var blockDom = Blockly.UserTypes.generateCase(block); 
+      xmlList.push(blockDom);
     }
   });
 };
+
+
+
+Blockly.UserTypes.generateConstructor = function(block){
+  if(block.outputConnection.isConnected())
+  {
+    var parentBlock = block.outputConnection.targetBlock();
+    var userTypeName = parentBlock.getFieldValue('NAME');
+
+    var name = block.getFieldValue('CONSTRUCTOR');
+    var types = [];
+    
+    for(var i =0; i < block.itemCount_; i++){
+      var typeBlock = block.getInputTargetBlock('TP' + i);
+      if(!typeBlock) continue;
+      types.push(typeBlock);
+    }
+
+    // Create dom
+    var block = goog.dom.createDom('block');
+    block.setAttribute('type', 'expr_constructor');
+    block.setAttribute('items', 10);
+    block.setAttribute('gap', 16);
+    var mutation = goog.dom.createDom('mutation');
+    mutation.setAttribute('items',types.length);
+    mutation.setAttribute('name',name );
+    mutation.setAttribute('output',userTypeName);
+    types.forEach(function(typeBlock){
+      var typeDom;
+      if(typeBlock.getType){
+        typeDom = typeBlock.getType().toDom();
+      } else {
+        typeDom= goog.dom.createDom('type');
+        typeDom.setAttribute(typeBlock.getAttribute('NAME'));
+      }
+      mutation.appendChild(typeDom);
+    });
+    block.appendChild(mutation);
+    return block;
+  }
+  return null;
+};
+
+
 
 /**
  * Adds a constructor block for each user defined product type to the toolbox 
@@ -172,42 +223,9 @@ Blockly.UserTypes.generateConstructors = function(xmlList){
   blocks.forEach(function(block){
     if(block.type == 'type_product')
     {
-      if(block.outputConnection.isConnected())
-      {
-        var parentBlock = block.outputConnection.targetBlock();
-        var userTypeName = parentBlock.getFieldValue('NAME');
-
-        var name = block.getFieldValue('CONSTRUCTOR');
-        var types = [];
-        
-        for(var i =0; i < block.itemCount_; i++){
-          var typeBlock = block.getInputTargetBlock('TP' + i);
-          if(!typeBlock) continue;
-          types.push(typeBlock);
-        }
-
-        // Create dom
-        var block = goog.dom.createDom('block');
-        block.setAttribute('type', 'expr_constructor');
-        block.setAttribute('items', 10);
-        block.setAttribute('gap', 16);
-        var mutation = goog.dom.createDom('mutation');
-        mutation.setAttribute('items',types.length);
-        mutation.setAttribute('name',name );
-        mutation.setAttribute('output',userTypeName);
-        types.forEach(function(typeBlock){
-          var typeDom;
-          if(typeBlock.getType){
-            typeDom = typeBlock.getType().toDom();
-          } else {
-            typeDom= goog.dom.createDom('type');
-            typeDom.setAttribute(typeBlock.getAttribute('NAME'));
-          }
-          mutation.appendChild(typeDom);
-        });
-        block.appendChild(mutation);
-        xmlList.push(block);
-      }
+      var blockDom = Blockly.UserTypes.generateConstructor(block);
+      if(blockDom)
+        xmlList.push(blockDom);
     }
   });
 };
