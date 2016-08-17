@@ -452,9 +452,7 @@ Blockly.UserTypes.mutateCallers = function(defBlock) {
   var oldRecordUndo = Blockly.Events.recordUndo;
   var name = defBlock.getFieldValue('NAME');
   var xmlElement = defBlock.mutationToDom(true);
-  var constructors = Blockly.Procedures.getConstructors(name, defBlock.workspace);
-  var cases = Blockly.Procedures.getConstructors(name, defBlock.workspace);
-  var callers = constructors.concat(cases);
+  var callers = Blockly.UserTypes.getCallers(name, defBlock.workspace);
 
   for (var i = 0, caller; caller = callers[i]; i++) {
     var oldMutationDom = caller.mutationToDom();
@@ -473,7 +471,7 @@ Blockly.UserTypes.mutateCallers = function(defBlock) {
 };
 
 
-Blockly.UserTypes.getConstructors = function(name, workspace) {
+Blockly.UserTypes.getCallers = function(name, workspace) {
   var callers = [];
   var blocks = workspace.getTopBlocks();
 
@@ -481,30 +479,11 @@ Blockly.UserTypes.getConstructors = function(name, workspace) {
     if (blocks[i].getUserType) {
       var procName = blocks[i].getUserType();
 
-      if (procName && procName == name && blocks[i].type == 'expr_constructor') {
+      if (procName && procName == name) {
         callers.push(blocks[i]);
       }
     }
   }
   return callers;
 };
-
-Blockly.UserTypes.getCases = function(name, workspace) {
-  var callers = [];
-  var blocks = workspace.getTopBlocks();
-
-  for (var i = 0; i < blocks.length; i++) {
-    if (blocks[i].getUserType) {
-      var procName = blocks[i].getUserType();
-
-      if (procName && procName == name && blocks[i].type == 'expr_case') {
-        callers.push(blocks[i]);
-      }
-    }
-  }
-  return callers;
-};
-
-
-
 
