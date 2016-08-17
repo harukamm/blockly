@@ -274,25 +274,26 @@ Blockly.Blocks['procedures_letFunc'] = {
       this.reconnectInputs();
       var workspace = Blockly.getMainWorkspace();
       var name = this.getFieldValue("NAME");
-      var callers = Blockly.Procedures.getCallers(name, workspace);
-      var tp = this.getInput("RETURN").connection.getTypeExpr();
-      var isMono = true;
-      for(var k = 0; k < callers.length; k++){// First pass, if a child is connected, reinvoke the connection to set the types properly
-        var block = callers[k];
-        if(block.outputConnection.isConnected()){
-          var conn = block.outputConnection.targetConnection;
-          block.outputConnection.connect__(conn); // Recon
-          isMono = false;
-          break;
-        }
-      }
-      if(isMono){ // Then we need to make all callers polymorphic
-        for(var k = 0; k < callers.length; k++){
-          var block = callers[k];
-          block.setOutputTypeExpr(tp);
-          block.render();
-        }
-      }
+      // var callers = Blockly.Procedures.getCallers(name, workspace);
+      // var tp = this.getInput("RETURN").connection.getTypeExpr();
+      // var isMono = true;
+      // for(var k = 0; k < callers.length; k++){// First pass, if a child is connected, reinvoke the connection to set the types properly
+      //   var block = callers[k];
+      //   if(block.outputConnection.isConnected()){
+      //     var conn = block.outputConnection.targetConnection;
+      //     block.outputConnection.connect__(conn); // Recon
+      //     isMono = false;
+      //     break;
+      //   }
+      // }
+      // if(isMono){ // Then we need to make all callers polymorphic
+      //   for(var k = 0; k < callers.length; k++){
+      //     var block = callers[k];
+      //     block.setOutputTypeExpr(tp);
+      //     block.render();
+      //   }
+      // }
+
 
       // Update local_vars
       var thisBlock = this;
