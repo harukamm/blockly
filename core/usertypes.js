@@ -433,7 +433,6 @@ Blockly.UserTypes.generateConstructors_ = function(sum, xmlList){
 Blockly.UserTypes.generateCase_ = function(sum,xmlList){
   var name = sum.name;
   var mutation = goog.dom.createDom('mutation');
-  mutation.setAttribute('name',name);
 
   var count = 0;
   for(var i = 0; i < sum.products.length; i++) {
@@ -455,6 +454,7 @@ Blockly.UserTypes.generateCase_ = function(sum,xmlList){
     mutation.appendChild(prodDom); 
     count++;
   }
+  mutation.setAttribute('name',name);
   mutation.setAttribute('items',count);
   var block = goog.dom.createDom('block');
   block.setAttribute('type','expr_case');
@@ -466,28 +466,49 @@ Blockly.UserTypes.generateCase_ = function(sum,xmlList){
 
 
 
-Blockly.UserTypes.mutateCallers = function(defBlock) {
+Blockly.UserTypes.mutateCases = function(defBlock) {
   var oldRecordUndo = Blockly.Events.recordUndo;
   var name = defBlock.getFieldValue('NAME');
   var xmlElement = defBlock.mutationToDom(true);
-  var callers = Blockly.UserTypes.getCallers(name, defBlock.workspace);
+  var callers = Blockly.UserTypes.getCases(name,defBlock.workspace);
+
+  var newMutationDom = Blockly.UserTypes.generateCase(defBlock).children[0];
+  var newMutation = newMutationDom && Blockly.Xml.domToText(newMutationDom);
 
   for (var i = 0, caller; caller = callers[i]; i++) {
     var oldMutationDom = caller.mutationToDom();
     var oldMutation = oldMutationDom && Blockly.Xml.domToText(oldMutationDom);
-    caller.domToMutation(xmlElement);
-    var newMutationDom = caller.mutationToDom();
-    var newMutation = newMutationDom && Blockly.Xml.domToText(newMutationDom);
+    
     if (oldMutation != newMutation) {
 
       Blockly.Events.recordUndo = false;
-      Blockly.Events.fire(new Blockly.Events.Change(
-          caller, 'mutation', null, oldMutation, newMutation));
+     
+      caller.domToMutation(newMutationDom);
+
       Blockly.Events.recordUndo = oldRecordUndo;
     }
   }
 };
 
+Blockly.UserTypes.getConstructors = function(name, workspace){
+  var blocks = [];
+  var blocks_ = Blockly.UserTypes.getCallers(name, workspaces);
+  blocks_.forEach(function(block){
+    if(block.type == 'expr_constructor')
+      blocks.push(block);
+  });
+  return blocks;
+};
+
+Blockly.UserTypes.getCases = function(name, workspace){
+  var blocks = [];
+  var blocks_ = Blockly.UserTypes.getCallers(name, workspace);
+  blocks_.forEach(function(block){
+    if(block.type == 'expr_case')
+      blocks.push(block);
+  });
+  return blocks;
+};
 
 Blockly.UserTypes.getCallers = function(name, workspace) {
   var callers = [];

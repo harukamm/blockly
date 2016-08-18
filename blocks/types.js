@@ -301,6 +301,7 @@ Blockly.Blocks['type_sum'] = {
           itemBlock.nextConnection.targetBlock();
     }
     this.renderMoveConnections_();
+    Blockly.UserTypes.mutateCases(this);
   },
   saveConnections: function(containerBlock) {
     var itemBlock = containerBlock.getInputTargetBlock('STACK');
@@ -456,8 +457,8 @@ Blockly.Blocks['expr_case'] = {
 
   mutationToDom: function() {
     var container = document.createElement('mutation');
-    container.setAttribute('items', this.itemCount_);
     container.setAttribute('name', this.getFieldValue('NAME'));
+    container.setAttribute('items', this.itemCount_);
 
     for (var i = 0; i < this.itemCount_; i++) {
 
@@ -473,15 +474,14 @@ Blockly.Blocks['expr_case'] = {
         var typeDom = tp.toDom();
         prodDom.appendChild(typeDom);
       }
-      prodDom.setAttribute('items',its); 
       prodDom.setAttribute('constructor',constructorName); 
+      prodDom.setAttribute('items',its); 
       container.appendChild(prodDom);
     }
     return container;
   },
 
   domToMutation: function(xmlElement) {
-
     for (var x = 0; x < this.itemCount_; x++) {
       this.removeInput('CS' + x);
     }
