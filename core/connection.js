@@ -296,6 +296,7 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
           block.varTypes_[f] = block.varTypes_[f].apply(unifyResult);
         }
       }
+
       if (block.argTypes_) {
         for (var f in block.argTypes_) {
           block.argTypes_[f] = block.argTypes_[f].apply(unifyResult);
@@ -359,6 +360,7 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
     // }
     Blockly.TypeVar.triggerGarbageCollection();
   }
+  Blockly.Connection.resetCallersUpward(parentBlock);
 
 
 
@@ -772,6 +774,24 @@ Blockly.Connection.typeChangeUpward = function(block){
 
   Blockly.Connection.typeChangeUpward(block.outputConnection.targetBlock());
 };
+
+Blockly.Connection.resetCallersUpward = function(block){
+  if(!block)
+    return; 
+
+  if(block.resetCallers)
+    block.resetCallers();
+
+  if(!block.outputConnection)
+    return; // We are done
+  if(!block.outputConnection.isConnected())
+    return;
+
+  Blockly.Connection.resetCallersUpward(block.outputConnection.targetBlock());
+};
+
+
+
 
 
 

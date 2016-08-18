@@ -90,6 +90,30 @@ Blockly.TypeExpr.prototype.apply = function(subst) {
     this.children.map(function (x) { return x.apply(subst); }));
 }
 
+
+Blockly.TypeExpr.IsNamePolymorphic = function(name){
+  if (name.length < 3 && name == name.toUpperCase()) // TODO, only check for A,B,...,AB,AC...
+    return true;
+  if(name.startsWith("_POLY_"))
+    return true;
+  return false;
+}
+
+// Clone by value 
+Blockly.TypeExpr.prototype.copy = function(){
+  var name = this.name.slice(0);
+  var newTyp = new Blockly.TypeExpr(name);
+  if (Blockly.TypeExpr.IsNamePolymorphic(name)){
+    newTyp = Blockly.TypeVar.getUnusedTypeVar();
+    newTyp.children = [];
+  }
+
+  this.children.forEach(function(child){
+    newTyp.children.push(child.copy());
+  });
+  return newTyp;
+}
+
 // Copy values over, so that the reference is unchange
 Blockly.TypeExpr.prototype.copyOver = function(otherTp){
   otherTp.name = this.name;

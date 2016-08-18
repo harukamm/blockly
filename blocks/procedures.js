@@ -527,7 +527,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
     {
       if (defBlockMain.type == "procedures_letFunc")
       {
-        var tp = defBlockMain.getInput("RETURN").connection.getTypeExpr();
+        var tp = defBlockMain.getInput("RETURN").connection.getTypeExpr().copy();
         this.setOutputTypeExpr(tp);
         this.setColourByType(tp);
         if(this.outputConnection.typeExpr)
@@ -643,7 +643,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
     // set input types correctly
     for(var i = 0; i < this.arguments_.length; i++)
     {
-      this.getInput('ARG' + i).setTypeExpr(defBlockMain.argTypes_[i]);
+      this.getInput('ARG' + i).setTypeExpr(defBlockMain.argTypes_[i].copy());
     }
   },
   /**
@@ -713,10 +713,16 @@ Blockly.Blocks['procedures_callnoreturn'] = {
   },
 
   onTypeChange: function(){
+    console.log('on type change');
     var workspace = this.workspace;
     var name = this.getProcedureCall();
     var def = Blockly.Procedures.getDefinition(name, workspace);
-    def.onTypeChange();
+    for(var i = 0; i < this.arguments_.length; i++){
+      var arg = this.arguments_[i];
+      var ind = def.arguments_.indexOf(arg);
+      var argType = def.argTypes_[ind];
+      this.getInput('ARG' + i).connection.setTypeExpr(argType);
+    }
   }
 };
 

@@ -248,11 +248,11 @@ Blockly.Blocks['procedures_letFunc'] = {
     var workspace = Blockly.getMainWorkspace();
     var name = this.getFieldValue('NAME');
     var callers = Blockly.Procedures.getCallers(name, workspace);
-    var outputType = defBlock.getInput("RETURN").connection.getTypeExpr();
+    var outputType = defBlock.getInput("RETURN").connection.typeExpr;
     callers.forEach(function(caller){
       caller.setOutputTypeExpr(outputType);
       for(var k = 0; k < defBlock.argTypes_.length; k++){
-        var tp = defBlock.argTypes_[k];
+        var tp = defBlock.argTypes_[k].copy();
         caller.getInput("ARG" + k).setTypeExpr(tp);
       }
       caller.render();
@@ -274,7 +274,8 @@ Blockly.Blocks['procedures_letFunc'] = {
       this.reconnectInputs();
       var workspace = Blockly.getMainWorkspace();
       var name = this.getFieldValue("NAME");
-      // var callers = Blockly.Procedures.getCallers(name, workspace);
+      var callers = Blockly.Procedures.getCallers(name, workspace);
+
       // var tp = this.getInput("RETURN").connection.getTypeExpr();
       // var isMono = true;
       // for(var k = 0; k < callers.length; k++){// First pass, if a child is connected, reinvoke the connection to set the types properly
@@ -298,43 +299,43 @@ Blockly.Blocks['procedures_letFunc'] = {
       // Update local_vars
       var thisBlock = this;
       this.arguments_.forEach(function(varName){
-        var callers = [];  // That correspond to the current variable. TODO make more effective !!
-        Blockly.getMainWorkspace().getAllBlocks().forEach(function(block){
-          if(block.type == "vars_local"){
-            var owner = block.parentBlock__;
-            if(owner == thisBlock && block.getFieldValue("NAME") == varName){
-              callers.push(block);
-            }
+      var callers = [];  // That correspond to the current variable. TODO make more effective !!
+      Blockly.getMainWorkspace().getAllBlocks().forEach(function(block){
+        if(block.type == "vars_local"){
+          var owner = block.parentBlock__;
+          if(owner == thisBlock && block.getFieldValue("NAME") == varName){
+            callers.push(block);
           }
-        });
+        }
+      });
 
 
-        var isMono = true;
-        for(var k = 0; k < callers.length; k++){// First pass, if a child is connected, reinvoke the connection to set the types properly
+      var isMono = true;
+      for(var k = 0; k < callers.length; k++){// First pass, if a child is connected, reinvoke the connection to set the types properly
+        var block = callers[k];
+        if(block.outputConnection.isConnected()){
+          var conn = block.outputConnection.targetConnection;
+          try{block.outputConnection.connect__(conn);}catch(e){} // Recon
+          isMono = false;
+          break;
+        }
+      }
+      if(isMono){ // Then we need to make all callers polymorphic
+        var tp = Blockly.TypeVar.getUnusedTypeVar();
+        for(var k = 0; k < callers.length; k++){
           var block = callers[k];
-          if(block.outputConnection.isConnected()){
-            var conn = block.outputConnection.targetConnection;
-            try{block.outputConnection.connect__(conn);}catch(e){} // Recon
-            isMono = false;
-            break;
-          }
+          block.setOutputTypeExpr(tp);
+          block.render();
         }
-        if(isMono){ // Then we need to make all callers polymorphic
-          var tp = Blockly.TypeVar.getUnusedTypeVar();
-          for(var k = 0; k < callers.length; k++){
-            var block = callers[k];
-            block.setOutputTypeExpr(tp);
-            block.render();
-          }
-        }
+      }
 
-        // Type unification works well on blocks, so we just copy the type over
-        // now
-        if(callers[0]){
-          var tp = callers[0].outputConnection.typeExpr;
-          var ind = thisBlock.arguments_.indexOf(varName);
-          thisBlock.argTypes_[ind] = tp;
-        }
+      // Type unification works well on blocks, so we just copy the type over
+      // now
+      if(callers[0]){
+        var tp = callers[0].outputConnection.typeExpr;
+        var ind = thisBlock.arguments_.indexOf(varName);
+        thisBlock.argTypes_[ind] = tp;
+      }
 
       });
 
