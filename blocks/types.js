@@ -489,14 +489,17 @@ Blockly.Blocks['expr_case'] = {
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
     var name = xmlElement.getAttribute('name');
     this.setFieldValue(name, 'NAME');
+    this.arrows = [];
     this.getInput('INPUT').setTypeExpr(new Blockly.TypeExpr(name));
-
+    this.arrows.push(new Blockly.TypeExpr(name));
     for (var i = 0, productNode; productNode = xmlElement.childNodes[i]; i++) {
       if (productNode.nodeName.toLowerCase() == 'product') {
         var constructorName = productNode.getAttribute('constructor');
 
         var input = this.appendValueInput('CS' + i)
             .setTypeExpr(this.a);
+
+        this.arrows.push(new Blockly.TypeExpr('_POLY_A'));
         input.appendField(constructorName);
         
         for(var j = 0, typeNode; typeNode = productNode.childNodes[j]; j++){
@@ -505,8 +508,9 @@ Blockly.Blocks['expr_case'] = {
           input.appendField(' ');
           input.appendField(new Blockly.FieldVarInput(String.fromCharCode(97 + j),tp));
         }
-
       }
+
+      this.arrows.push(new Blockly.TypeExpr('_POLY_A'));
     }
   },
 
