@@ -1036,6 +1036,11 @@ Blockly.BlockSvg.prototype.renderDrawLeft_ = function(steps, highlightSteps) {
 
 /** Define connector shapes for various types
  */
+// Notes
+// These can be drawn in inkscape. Generally up is the reverse of down, and can
+// most can be quickly obtained by starting in the reverse order and multiplying
+// with -1. 
+// Offsets is used for the polymorphic color indicator
 Blockly.BlockSvg.typeVarShapes_ = {
   // jagged
   // int : 
