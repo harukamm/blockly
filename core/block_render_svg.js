@@ -1175,12 +1175,19 @@ Blockly.BlockSvg.typeVarShapes_ = {
   },
 
 
+  // key hole thingy
+  // 'l 0,4.53259 c 0,0 -9.85345,0.78827 -7.19301,5.22232 2.66043,4.43406 5.715,3.15311 5.715,3.15311 l -5.715,7.98129 8.37543,0',
+
+  Custom : {
+    down: 'l 0,4.5 c 0,0 -10,0.8 -7,5 2.5,4.5 6,3 6,3 l -6,8 8.5,0',
+    up: 'l -8.5,0 6,-8 c 0,0 -10,-0.8 -7,-5 2.5,-4.5 6,-3 6,-3 l 0,-4.5 ',
+    height: 20,
+    blockColour: Blockly.BlockSvg.TEXT_COLOUR
+  },
 
   Text : {
-    down: 
-    'v 5 c 0,10 -6,-8 -6,7.5 s 6,-2.5 6,7.5',
-    up: 
-    'c 0,-10 -6,8 -6,-7.5 s 6,2.5 6,-7.5',
+    down: 'l 0,2 -7,0 0,9 5,0 0,9 3,0',
+    up: 'l -3,0 0,-9 -5,0 0,-9 7,0 0,-2',
     height: 20,
     blockColour: Blockly.BlockSvg.TEXT_COLOUR
   },

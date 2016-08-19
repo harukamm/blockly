@@ -406,11 +406,11 @@ Blockly.Blocks['fieldVarInputTest'] = {
 Blockly.Blocks['drawingOfTest'] = {
   init: function() {
     this.setColour(160);
-    this.appendDummyInput()
+    this.appendValueInput()
+        .setTypeExpr(new Blockly.TypeExpr('Custom'))
         .appendField('Drawing Of');
-    this.appendValueInput('PIC');
-    this.arrows = [ new Blockly.TypeExpr('Picture',[])];
-    this.setOutput(false);
+    this.setOutput(true);
+    this.setOutputTypeExpr(new Blockly.TypeExpr('Custom'));
   }
 };
 
