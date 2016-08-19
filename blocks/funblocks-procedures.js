@@ -253,7 +253,9 @@ Blockly.Blocks['procedures_letFunc'] = {
       caller.setOutputTypeExpr(outputType);
       for(var k = 0; k < defBlock.argTypes_.length; k++){
         var tp = defBlock.argTypes_[k].copy();
-        caller.getInput("ARG" + k).setTypeExpr(tp);
+        var inp = caller.getInput("ARG" + k);
+        if (inp)
+          inp.setTypeExpr(tp);
       }
       caller.render();
     });
