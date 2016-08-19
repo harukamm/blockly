@@ -446,8 +446,10 @@ Blockly.Blocks['procedures_mutatorarg_auto'] = {
     if(/[^a-z_]/.test( name[0] ) )
       name = 'x1';
 
+    //if(exc.indexOf(name) >= 0)
+    //  return null; // Returning null breaks the parser
     if(exc.indexOf(name) >= 0)
-      return null;
+      name += "1";
 
     return name || null;
   }
