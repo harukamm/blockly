@@ -175,6 +175,7 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
 // Blockly.TypeVar.getUnusedTypeVar()
 
 Blockly.Block.prototype.initArrows = function(){
+  if(!this.arrows) return;
   if(this.arrows.length == 0)
     return;
 
@@ -193,6 +194,8 @@ Blockly.Block.prototype.initArrows = function(){
     }
 
     // Handle input
+    if(!this.inputList[inp]) // Too far, can't proceed.
+      return;
     while(this.inputList[inp].type != Blockly.INPUT_VALUE){
       inp++; // Skip dummy and statement inputs
       if(inp>=this.inputList.length) {console.log("yelp"); return; }// Something went wrong
