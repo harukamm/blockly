@@ -331,14 +331,14 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
 
       var defBlockMain = Blockly.Procedures.getDefinition(childBlock.getProcedureCall(),
           Blockly.getMainWorkspace()); 
-
-      var k = 0;
-      for(var k = 0; k < defBlockMain.arguments_.length; k++){
-          defBlockMain.argTypes_[k] = parentConnection.typeExpr.children[k];
-      };
-      defBlockMain.resetCallers();
-      childBlock.render();
-      
+      if(defBlockMain){
+        var k = 0;
+        for(var k = 0; k < defBlockMain.arguments_.length; k++){
+            defBlockMain.argTypes_[k] = parentConnection.typeExpr.children[k];
+        };
+        defBlockMain.resetCallers();
+        childBlock.render();
+      }
 
     }
 
