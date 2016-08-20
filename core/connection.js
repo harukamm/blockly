@@ -719,7 +719,8 @@ Blockly.Connection.prototype.disconnect = function() {
 
   // increase coupling :/
   // need to disconnect local_vars that are contained, but have no path.
-  Blockly.Connection.disconnectVarsDown(childBlock);  
+  // Temporarily disable
+  // Blockly.Connection.disconnectVarsDown(childBlock);  
 
   Blockly.Events.enable();
   // Blocks have already been re-rendered in copyConnectionTypes_. Just need to update disabled status.
