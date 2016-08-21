@@ -22,92 +22,50 @@ goog.require('Blockly.Blocks');
 
 // For tests /////////////////////////////////////
 
-Blockly.Blocks['take_func_test'] = {
+
+Blockly.Blocks['test_logic_ternary'] = {
   /**
-   * Block for comparison operator.
+   * Block for ternary operator.
    * @this Blockly.Block
    */
   init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_TERNARY_HELPURL);
     this.setColour(210);
-    this.setOutput(true, 'Boolean');
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Picture'));
-
-    var A = Blockly.TypeVar.getUnusedTypeVar();
-    this.appendValueInput('A')
-        .setTypeExpr(new Blockly.TypeExpr('Function_', 
-              [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Bool') ]  ));
-    this.appendValueInput('B')
-        .setTypeExpr(new Blockly.TypeExpr('Number'))
+    this.appendValueInput('IF')
+        .appendField('if');
+    this.appendValueInput('THEN');
+    this.appendValueInput('ELSE');
     this.setInputsInline(true);
-    // Assign 'this' to a variable for use in the tooltip closure below.
+    this.setOutput(true);
+    this.functionName = 'if';
+    this.arrows = Type.fromList(["Number","_POLY_A","_POLY_A","_POLY_A"]);
   }
 };
 
-Blockly.Blocks['func_test'] = {
+Blockly.Blocks['test_number'] = {
   /**
-   * Block for comparison operator.
+   * Block for ternary operator.
    * @this Blockly.Block
    */
   init: function() {
     this.setColour(210);
-    this.setOutput(true);
-    // this.setOutputTypeExpr(new Blockly.TypeExpr('Function_', 
-    //          [new Blockly.TypeExpr('Number'),new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Number'), new Blockly.TypeExpr('Bool') ]  ));
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Bool'));
-
     this.appendDummyInput()
-        .appendField('Niemand');
-    this.appendValueInput('A')
-        .setTypeExpr(new Blockly.TypeExpr('Number'));
-    this.appendValueInput('B')
-        .setTypeExpr(new Blockly.TypeExpr('Number'))
-    this.appendValueInput('A')
-        .setTypeExpr(new Blockly.TypeExpr('Number'));
-
-  }
-};
-
-Blockly.Blocks['fieldVarInputTest'] = {
-  init: function() {
-    this.setColour(160);
-    this.appendValueInput('NUM')
-        .setTypeExpr(new Blockly.TypeExpr('Number'))
-        .appendField(new Blockly.FieldVarInput('Regal', null, new Blockly.TypeExpr('Picture')));
-    this.setOutput(true);
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Picture'));
-    this.functionName = "circle";
-  }
-};
-
-
-Blockly.Blocks['drawingOfTest'] = {
-  init: function() {
-    this.setColour(160);
-    this.appendValueInput()
-        .setTypeExpr(new Blockly.TypeExpr('Custom'))
-        .appendField('Drawing Of');
-    this.setOutput(true);
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Custom'));
-  }
-};
-
-Blockly.Blocks['math_test'] = {
-  /**
-   * Block for basic arithmetic operator.
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.setColour(230);
-    this.setOutput(true);
-    // Sorin
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
-    this.appendValueInput('A');
-    this.appendValueInput('B')
-        .appendField('YEAH');
+        .appendField('5', 'NAME');
     this.setInputsInline(true);
-    this.arrows = [new Blockly.TypeExpr('_POLY_A'), new Blockly.TypeExpr('Number'),
-                   new Blockly.TypeExpr('Number')];
+    this.setOutput(true);
+    this.functionName = 'Literal';
+    this.arrows = Type.fromList(["Number"]);
   }
 };
 
-
+Blockly.Blocks['test_true'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField('True','NAME');
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.functionName = 'Literal';
+    this.arrows = Type.fromList(["Bool"]);
+  }
+};

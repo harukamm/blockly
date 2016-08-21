@@ -726,7 +726,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
                            input.renderWidth);
           // Stefan
           // Sorin
-          var isFunc = input.connection.typeExpr.children.length > 0 && input.connection.typeExpr.name == "Function_" && !input.connection.isConnected();
+          var isFunc = false;// input.connection.typeExpr.children.length > 0 && input.connection.typeExpr.name == "Function_" && !input.connection.isConnected();
           inlineSteps.push(Blockly.BlockSvg.getDownPath(input.connection));
           var tabHeight = Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);
           
@@ -1294,20 +1294,20 @@ Blockly.BlockSvg.typeVarHighlights = function(typeExpr) {
 
 Blockly.BlockSvg.typeVarHighlights_ = function(typeExpr, y, typeVarHighlights) {
   if (typeExpr) {
-    var name = typeExpr.name
+    var name = typeExpr.name;
     if (typeExpr.isTypeVar()) {
       typeVarHighlights.push({
         color: Blockly.TypeVar.getTypeVarColor(name), 
         path: "m 0," + y + " " + Blockly.BlockSvg.typeVarShapes_["typeVar"]["highlight"]
       });
-    } else if (typeExpr.children.length != 0) {
+    } /*else if (typeExpr.children.length != 0) {
       var offsetsY = Blockly.BlockSvg.getShapeForType(name).offsetsY(typeExpr);
       for (var i = 0; i < typeExpr.children.length; i++) {
         Blockly.BlockSvg.typeVarHighlights_(typeExpr.children[i], 
                                             y + offsetsY[i],
                                             typeVarHighlights);
       }
-    }
+    }*/
   }
 }
 
@@ -1316,7 +1316,7 @@ Blockly.BlockSvg.getTypeName = function(typeExpr) {
     if (typeExpr.isTypeVar()) {
       return "typeVar";
     } else {
-      return typeExpr.name;
+      return typeExpr.getLiteral();
     }
   } else {
     return "original";

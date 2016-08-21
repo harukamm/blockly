@@ -262,14 +262,17 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
       parentConnection.typeExpr = oldTp;
     }
     else{
-      unifyResult = parentConnection.typeExpr.unify(childConnection.typeExpr);
+      unifyResult = Type.mgu(parentConnection.typeExpr, childConnection.typeExpr);
       if (unifyResult === false) {
         throw 'Attempt to connect incompatible types. 34';
       }
     }
 
     var workspace = parentConnection.getSourceBlock().workspace;
-    var blocks = workspace.getAllBlocks();
+
+    var blocks = Blockly.Block.getBlocksDown(parentBlock);
+    blocks.push(parentBlock);
+
     if (workspace.flyout_) {
       blocks = blocks.concat(workspace.flyout_.workspace_.getAllBlocks());
     }
@@ -279,42 +282,12 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
       var connections = block.getConnections_(true);
       for (var j = 0; j < connections.length; j++) {
         if (connections[j].typeExpr) {
-          connections[j].typeExpr = connections[j].typeExpr.apply(unifyResult);
+          connections[j].typeExpr = Type.apply(unifyResult, connections[j].typeExpr);
         }
       }
 
-      // process block type params if any
-      if (block.typeParams) {
-        for (var f in block.typeParams) {
-          block.typeParams[f] = block.typeParams[f].apply(unifyResult);
-        }
-      }
-      // Stefan
-      // Also var types
-      if (block.varTypes_) {
-        for (var f in block.varTypes_) {
-          block.varTypes_[f] = block.varTypes_[f].apply(unifyResult);
-        }
-      }
+      
 
-      if (block.argTypes_) {
-        for (var f in block.argTypes_) {
-          block.argTypes_[f] = block.argTypes_[f].apply(unifyResult);
-        }
-      }
-
-      // Also do FieldVarInputs
-      for(var k = 0; k < block.inputList.length; k++)
-      {
-        var inp = block.inputList[k];
-        for (var l = 0; l < inp.fieldRow.length; l++)
-        {
-          var f = inp.fieldRow[l];
-          if(f instanceof Blockly.FieldVarInput){
-            f.render_();
-          }
-        }
-      }
 
       if( block.outputConnection && block.outputConnection.typeExpr ) {
         /* Update colour of blocks in case their output type has changed */
@@ -325,40 +298,11 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
       }
     }
 
-    if(parentConnection.typeExpr.name == 'Function_' && childBlock.type == 'procedures_callreturn')
-    {
-      // unify children !
-
-      var defBlockMain = Blockly.Procedures.getDefinition(childBlock.getProcedureCall(),
-          Blockly.getMainWorkspace()); 
-      if(defBlockMain){
-        var k = 0;
-        for(var k = 0; k < defBlockMain.arguments_.length; k++){
-            defBlockMain.argTypes_[k] = parentConnection.typeExpr.children[k];
-        };
-        defBlockMain.resetCallers();
-        childBlock.render();
-      }
-
-    }
 
 
     if(childBlock.onTypeChange)
       childBlock.onTypeChange();
 
-    // var typeVarBlock;
-    // if (this.typeExpr.isTypeVar()) {
-    //   typeVarBlock = this.sourceBlock_
-    // } else {
-    //   typeVarBlock = otherConnection.sourceBlock_
-    // }
-    // var connections = typeVarBlock.getConnections_(true)
-    // for (var x = 0; x < connections.length; x++) {
-    //   if (connections[x].typeExpr) {
-    //     connections[x].typeExpr = connections[x].typeExpr.apply(unifyResult);
-    //   }
-    // }
-    Blockly.TypeVar.triggerGarbageCollection();
   }
   Blockly.Connection.resetCallersUpward(parentBlock);
 
@@ -394,7 +338,8 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
     }
   }
 
-
+  // Infer type
+  Blockly.Block.inferType(parentBlock);
 
 };
 
@@ -933,7 +878,7 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   }
   var unifyResult = true;
   if (this.typeExpr && otherConnection.typeExpr) {
-    unifyResult = this.typeExpr.unify(otherConnection.typeExpr);
+    unifyResult = Type.mgu(this.typeExpr, otherConnection.typeExpr);
     return unifyResult;
   }
   // STEFAN, TODO CHANGE IF TYPES DONT MATCH ANYMORE
@@ -970,7 +915,7 @@ Blockly.Connection.prototype.setCheck = function(check) {
     // Ensure that check is in an array.
     if (!goog.isArray(check)) {
       /* Passed a single type. Set TypeExpr to specific type. */
-      this.setTypeExpr( new Blockly.TypeExpr( check ) );
+      //this.setTypeExpr( new Blockly.TypeExpr( check ) );
       check = [check];
     } else {
       /* Passed an array. Set TypeExpr to a type variable. */
@@ -988,7 +933,7 @@ Blockly.Connection.prototype.setCheck = function(check) {
     }
   } else {
     this.check_ = null;
-    this.setTypeExpr( Blockly.TypeVar.getUnusedTypeVar() );
+    //this.setTypeExpr( Blockly.TypeVar.getUnusedTypeVar() );
   }
   return this;
 };

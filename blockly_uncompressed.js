@@ -65,7 +65,7 @@ goog.addDependency("../../../" + dir + "/core/field_colour.js", ['Blockly.FieldC
 goog.addDependency("../../../" + dir + "/core/xml.js", ['Blockly.Xml'], ['goog.asserts', 'goog.dom']);
 goog.addDependency("../../../" + dir + "/core/field_image.js", ['Blockly.FieldImage'], ['Blockly.Field', 'goog.dom', 'goog.math.Size', 'goog.userAgent']);
 goog.addDependency("../../../" + dir + "/core/field_dropdown.js", ['Blockly.FieldDropdown'], ['Blockly.Field', 'goog.dom', 'goog.events', 'goog.style', 'goog.ui.Menu', 'goog.ui.MenuItem', 'goog.userAgent']);
-goog.addDependency("../../../" + dir + "/core/type_expr.js", ['Blockly.TypeExpr', 'Blockly.TypeVar'], []);
+goog.addDependency("../../../" + dir + "/core/type_expr.js", ['Blockly.TypeExpr', 'Blockly.TypeVar'], ['Type']);
 goog.addDependency("../../../" + dir + "/core/blocks.js", ['Blockly.Blocks'], []);
 goog.addDependency("../../../" + dir + "/core/block_svg.js", ['Blockly.BlockSvg'], ['Blockly.Block', 'Blockly.ContextMenu', 'Blockly.RenderedConnection', 'goog.Timer', 'goog.asserts', 'goog.dom', 'goog.math.Coordinate', 'goog.userAgent']);
 goog.addDependency("../../../" + dir + "/core/field.js", ['Blockly.Field'], ['goog.asserts', 'goog.dom', 'goog.math.Size', 'goog.style', 'goog.userAgent']);
@@ -89,6 +89,7 @@ goog.addDependency("../../../" + dir + "/core/field_lexical_variable.js", [], []
 goog.addDependency("../../../" + dir + "/core/names.js", ['Blockly.Names'], []);
 goog.addDependency("../../../" + dir + "/core/input.js", ['Blockly.Input'], ['Blockly.Connection', 'Blockly.FieldLabel', 'goog.asserts']);
 goog.addDependency("../../../" + dir + "/core/bubble.js", ['Blockly.Bubble'], ['Blockly.Workspace', 'goog.dom', 'goog.math', 'goog.math.Coordinate', 'goog.userAgent']);
+goog.addDependency("../../../" + dir + "/core/Type.js", ['Type', 'Scheme', 'TypeEnv', 'Exp', 'EVar', 'ELit', 'EAbs', 'EApp', 'ELet'], []);
 goog.addDependency("../../../" + dir + "/core/zoom_controls.js", ['Blockly.ZoomControls'], ['goog.dom']);
 goog.addDependency("../../../" + dir + "/core/trashcan.js", ['Blockly.Trashcan'], ['goog.Timer', 'goog.dom', 'goog.math', 'goog.math.Rect']);
 goog.addDependency("../../../" + dir + "/core/connection_db.js", ['Blockly.ConnectionDB'], ['Blockly.Connection']);
@@ -1664,6 +1665,15 @@ goog.require('Blockly.ZoomControls');
 goog.require('Blockly.constants');
 goog.require('Blockly.inject');
 goog.require('Blockly.utils');
+goog.require('EAbs');
+goog.require('EApp');
+goog.require('ELet');
+goog.require('ELit');
+goog.require('EVar');
+goog.require('Exp');
+goog.require('Scheme');
+goog.require('Type');
+goog.require('TypeEnv');
 
 delete this.BLOCKLY_DIR;
 delete this.BLOCKLY_BOOT;

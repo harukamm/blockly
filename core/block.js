@@ -175,89 +175,32 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
 // Blockly.TypeVar.getUnusedTypeVar()
 
 Blockly.Block.prototype.initArrows = function(){
-  if(!this.arrows) return;
-  if(this.arrows.length == 0)
-    return;
+  Blockly.Block.updateConnectionTypes(this, this.arrows);
+};
 
-  var dic = [];
-  this.arrows.forEach(function(arrow){
-    Blockly.Block.getTypeDic(arrow,dic);
-  });
-
+Blockly.Block.updateConnectionTypes = function(block, type){
+  var flattened = Type.flatten(type);
   var inp = 0;
-  for(var i = 0; i < this.arrows.length; i++){
-
+  for(var i = 0; i < flattened.length; i++){
     // Handle output
-    if(i == this.arrows.length - 1 && this.outputConnection){ // We are at the output
-      this.setOutputTypeExpr( Blockly.Block.Clean(this.arrows[i],dic));
+    if(i == flattened.length - 1 && block.outputConnection){ // We are at the output
+      block.setOutputTypeExpr(flattened[i]);
       return;
     }
 
     // Handle input
-    if(!this.inputList[inp]) // Too far, can't proceed.
+    if(!block.inputList[inp]) // Too far, can't proceed.
       return;
-    while(this.inputList[inp].type != Blockly.INPUT_VALUE){
+    while(block.inputList[inp].type != Blockly.INPUT_VALUE){
       inp++; // Skip dummy and statement inputs
-      if(inp>=this.inputList.length) {console.log("yelp"); return; }// Something went wrong
+      if(inp>=block.inputList.length) {console.log("yelp"); return; }// Something went wrong
     }
 
-    this.inputList[inp].setTypeExpr(Blockly.Block.Clean(this.arrows[i],dic));
+    block.inputList[inp].setTypeExpr(flattened[i]);
 
     inp++;
   }
 };
-
-
-Blockly.Block.getTypeDic = function(t,dic){
-  var name = t.name;
-  var children = t.children;
-
-  if(name.startsWith('_POLY_')){
-    if(!dic[name])
-      dic[name] = Blockly.TypeVar.getUnusedTypeVar();
-  }
-  
-  children.forEach(function(child){
-    Blockly.Block.getTypeDic(child,dic);
-  });
-};
-
-Blockly.Block.Clean = function(t,dic){
-  var name = t.name;
-  var children = t.children;
-
-  var tp;
-  if(dic[name])
-    tp = dic[name];
-  else
-    tp = new Blockly.TypeExpr(name);
-  tp.children = [];
-  
-  children.forEach(function(child){
-    tp.children.push(Blockly.Block.Clean(child,dic));
-  });
-  return tp;  
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * Obtain a newly created block.
@@ -338,7 +281,6 @@ Blockly.Block.prototype.dispose = function(healStack) {
   }
   Blockly.Events.enable();
 
-  Blockly.TypeVar.triggerGarbageCollection();
 };
 
 /** Stefan
@@ -1567,8 +1509,27 @@ Blockly.Block.prototype.allInputsConnected = function(){
     }
   }
   return true;
-
 };
+
+
+Blockly.Block.getBlocksDown = function(block){
+
+  var bs = [];
+  block.inputList.forEach(function(inp){
+    if(inp.connection && inp.connection.targetBlock())
+      bs.push(inp.connection.targetBlock());
+  });
+
+  var cs = [];
+  bs.forEach(function(b){
+    cs = cs.concat( Blockly.Block.getBlocksDown(b));
+  });
+
+  return bs.concat(cs);
+
+}
+
+
 
 Blockly.Block.prototype.reconnectInputs = function(exceptBlock){
   for (var i = 0, input; input = this.inputList[i]; i++) {
@@ -1594,3 +1555,47 @@ Blockly.Block.prototype.getValueInputNames = function(){
   });
   return names;
 };
+
+
+Blockly.Block.inferType = function(block){
+  block.getExpr();
+}
+
+Blockly.Block.prototype.getExpr = function(){
+  if(this.functionName == "Literal")
+    return Exp.Lit(this.arrows.getLiteral());
+  else{ // Assume for now its a function
+    var i = 0;
+    var prefix = 'hk'; // Should be unique
+    var exps = [];
+    var vars = [];
+    this.inputList.forEach(function(input){
+    if(input.type == Blockly.INPUT_VALUE)
+      if(input.connection && input.connection.targetBlock())
+        exps.push(input.connection.targetBlock().getExpr());
+      else{
+        vars.push(prefix + i);
+        exps.push(Exp.Var(prefix + i++));
+      }
+    });
+
+    
+
+    var functionName = 'if';
+    var arrows = this.arrows; //Type.fromList(["Number","_POLY_A","_POLY_A","_POLY_A"]);
+    //var arrows = Type.fromList(['Integer','_POLY_A','_POLY_A','_POLY_A']);
+    
+//    var exps = [Exp.Lit('1'), Exp.Lit('2')];
+
+    var e5 = Exp.AppFunc(exps, Exp.Var(functionName))
+    var e6 = Exp.Func(vars, e5);
+
+    console.log(e6.toString());
+    var s = new Scheme([functionName], arrows);
+    var env = {}; env[functionName] = s;
+    var t6 = Exp.typeInference(env, e6);
+    console.log(t6.toString());
+
+  }
+
+}
