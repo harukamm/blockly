@@ -27,22 +27,28 @@ goog.require('Blockly.Field');
 goog.require('Blockly.Names');
 goog.require('Blockly.Workspace');
 
+// Generate blocks with these names
+Blockly.UserTypes.builtinsStatic = [];
+//Generate blocks with these types
+Blockly.UserTypes.builtinsDynamic = [];
 
 /**
  * Returns an xml list of blocks for the types flyout.
  * @param {!Blockly.Workspace} workspace The workspace, it gets ignored though
  */
-Blockly.UserTypes.builtins = ["Bool", "Number", "Color", "Picture", "Text"];
 
 Blockly.UserTypes.dataFlyoutCategory = function(workspace){
 
   var xmlList = [];
-  var staticBlocks = ["type_sum", "type_product", "type_list"];
+  var staticBlocks = ["type_sum", "type_product"];
   staticBlocks.forEach(function(blockName){
     Blockly.UserTypes.addBlockToXML(blockName, xmlList);
   });
+  Blockly.UserTypes.builtinsDynamic.forEach(function(blockName){
+    Blockly.UserTypes.addBlockToXML(blockName, xmlList);
+  });
 
-  var userBlocks = Blockly.UserTypes.builtins;
+  var userBlocks = Blockly.UserTypes.builtinsStatic;
   userBlocks.forEach(function(name){
     Blockly.UserTypes.addUserType(name, xmlList);
   });
@@ -58,16 +64,6 @@ Blockly.UserTypes.dataFlyoutCategory = function(workspace){
 
   return xmlList;
 };
-
-Blockly.UserTypes.eventFlyoutCategory = function(workspace){
-
-  var xmlList = [];
-
-  Blockly.UserTypes.generateEventBuiltins(xmlList);
-
-  return xmlList;
-};
-
 
 /**
  * Adds the specified block name to the xmlList.
@@ -376,34 +372,6 @@ Blockly.UserTypes.Sum.prototype.getType = function(){
 }
 
 // Events
-
-Blockly.UserTypes.generateEventBuiltins = function(xmlList){
-
-  var LeftButton = new Blockly.UserTypes.Product("LeftButton",[]);
-  var RightButton = new Blockly.UserTypes.Product("RightButton",[]);
-  var MiddleButton = new Blockly.UserTypes.Product("MiddleButton",[]);
-  var MouseButton = new Blockly.UserTypes.Sum("MouseButton", [LeftButton,RightButton,MiddleButton]);
-
-
-  var point = new Blockly.TypeExpr("pair",[new Blockly.TypeExpr("Number"), new Blockly.TypeExpr("Number")]);
-  var KeyPress = new Blockly.UserTypes.Product("KeyPress", [new Blockly.TypeExpr("Text") ]);
-  var KeyRelease = new Blockly.UserTypes.Product("KeyRelease", [new Blockly.TypeExpr("Text") ]);
-  var MousePress = new Blockly.UserTypes.Product("MousePress", [new Blockly.TypeExpr("MouseButton") ]);
-  var MouseRelease = new Blockly.UserTypes.Product("MouseRelease", [ new Blockly.TypeExpr("MouseButton")]);
-  var MouseMovement = new Blockly.UserTypes.Product("MouseMovement", [point]);
-  var Event = new Blockly.UserTypes.Sum("Event",[KeyPress, KeyRelease, MousePress, MouseRelease, MouseMovement]);
-
-
-  var bs = [MouseButton, Event];
-
-
-  bs.forEach(function(sum){
-    Blockly.UserTypes.generateConstructors_(sum, xmlList);
-    Blockly.UserTypes.generateCase_(sum, xmlList);
-  });
-
-};
-
 
 Blockly.UserTypes.generateConstructors_ = function(sum, xmlList){
   var userTypeName = sum.name;
