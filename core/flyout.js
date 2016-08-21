@@ -528,6 +528,12 @@ Blockly.Flyout.prototype.hide = function() {
   // https://neil.fraser.name/news/2014/08/09/
 };
 
+
+/**
+ * @type {Object<string, function(Blockly.Workspace) : Array>}
+ */
+Blockly.Flyout.customDrawers = {};
+
 /**
  * Show and populate the flyout.
  * @param {!Array|string} xmlList List of blocks to show.
@@ -549,8 +555,8 @@ Blockly.Flyout.prototype.show = function(xmlList) {
   else if(xmlList == "DATATYPE"){
     xmlList = Blockly.UserTypes.dataFlyoutCategory(this.workspace_.targetWorkspace);
   }
-  else if(xmlList == "EVENT"){
-    xmlList = Blockly.UserTypes.eventFlyoutCategory(this.workspace_.targetWorkspace);
+  else if(Blockly.Flyout.customDrawers[xmlList]){
+    xmlList = Blockly.Flyout.customDrawers[xmlList](this.workspace_.targetWorkspace);
   }
 
   this.svgGroup_.style.display = 'block';
@@ -951,7 +957,10 @@ Blockly.Flyout.prototype.placeNewBlock_ = function(originBlock) {
  * @private
  */
 
-Blockly.Flyout.programBlockList = ["cwAnimationOf", "cwDrawingOf", "cwSimulationOf","cwInteractionOf" ];
+/*
+ * Blocks of which only one may be placed on the workspace
+ */
+Blockly.Flyout.programBlockList = [];
 
 Blockly.Flyout.prototype.filterForCapacity_ = function() {
   var remainingCapacity = this.targetWorkspace_.remainingCapacity();
