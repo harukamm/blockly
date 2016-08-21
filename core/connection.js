@@ -702,16 +702,16 @@ Blockly.Connection.prototype.disconnect = function() {
 
     // The child affects the parent more
     childBlock.initArrows();
-    childBlock.reconnectInputs();
+    //childBlock.reconnectInputs();
     if(childBlock.onTypeChange)
       childBlock.onTypeChange();
 
     parentBlock.initArrows();
-    parentBlock.reconnectInputs(childBlock); // Don't reconnect the child !
+    //parentBlock.reconnectInputs(childBlock); // Don't reconnect the child !
     if(parentBlock.onTypeChange)
       parentBlock.onTypeChange();
    
-    Blockly.Connection.reconnectUpward(parentBlock);
+    //Blockly.Connection.reconnectUpward(parentBlock);
 
     childBlock.render();
     parentBlock.render();
