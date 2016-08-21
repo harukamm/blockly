@@ -245,8 +245,7 @@ Blockly.UserTypes.isLegalConstructorName = function(name, workspace, opt_exclude
 
 Blockly.UserTypes.isLegalTypeName = function(name, workspace, opt_exclude) {
 
-  
-  if(Blockly.UserTypes.builtins.indexOf(name) >= 0)
+  if(Blockly.UserTypes.builtinsStatic.indexOf(name) >= 0)
     return false;
 
   var blocks = workspace.getAllBlocks();
