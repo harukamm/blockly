@@ -144,9 +144,9 @@
   }*/
   Type.flatten = function(tp){
     var tps = [];
-    if(!tp.next)
+    if(!tp.isFunction())
       return [tp];
-    return Type.flatten(tp.base).concat(Type.flatten(tp.next));
+    return Type.flatten(tp.getFirst()).concat(Type.flatten(tp.getSecond()));
   }
   
   Type.getOutput = function(tp){

@@ -1313,12 +1313,15 @@ Blockly.BlockSvg.typeVarHighlights_ = function(typeExpr, y, typeVarHighlights) {
 
 Blockly.BlockSvg.getTypeName = function(typeExpr) {
   if (typeExpr) {
-    if (typeExpr.isTypeVar()) {
+    var tp = Type.getOutput(typeExpr);
+    if (tp.isTypeVar()) {
       return "typeVar";
-    } else {
-      return typeExpr.getLiteral();
+    } 
+    else if (tp.isLiteral()) {
+      return typeExpr.getLiteralName();
     }
-  } else {
+  } 
+  else {
     return "original";
   }
 }

@@ -199,6 +199,7 @@ Blockly.Block.prototype.initArrows = function(){
 
 Blockly.Block.updateConnectionTypes = function(block, type){
   var flattened = Type.flatten(type);
+  console.log(flattened);
   var inp = 0;
   for(var i = 0; i < flattened.length; i++){
     // Handle output
