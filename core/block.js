@@ -179,6 +179,7 @@ Blockly.Block.prototype.setAsFunction = function(name){
 }
 
 Blockly.Block.prototype.setAsLiteral = function(name){
+  this.setOutput(true);
   this.functionName = 'Literal';
   this.arrows = Type.Lit(name);
 }
@@ -1707,7 +1708,7 @@ Blockly.Block.unificationTest = function(workspace){
 
 Blockly.Block.prototype.getExpr = function(){
   if(this.functionName == "Literal"){
-    return Exp.Lit(this.arrows.getLiteral());
+    return Exp.Lit(this.arrows.getLiteralName());
   }
   else{ // Assume for now its a function
     var i = 0;
