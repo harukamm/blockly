@@ -217,6 +217,33 @@ Blockly.Block.updateConnectionTypes = function(block, type){
   }
 };
 
+Blockly.Block.updateOpenTypes = function(block, type){
+  var flattened = Type.flatten(type);
+  
+  if(flattened.length > block.getValueInputNames().length + 1){
+    console.log("Type is too long, weird stuff is happening");
+    return;
+  }
+
+  var j = 0;
+  for(var i = 0; i < block.inputList.length; i++){
+    var inp = block.inputList[i];
+    if(!inp.connection.isConnected()){
+      inp.setTypeExpr(flattened[j]);
+      j++;
+    }
+    else{
+      Blockly.Connection.Unify(inp.connection, inp.connection.targetConnection);
+    }
+  }
+  if(i == block.inputList.length){ // Output
+      block.setOutputTypeExpr(flattened[j]);
+  } 
+
+};
+
+
+
 /**
  * Obtain a newly created block.
  * @param {!Blockly.Workspace} workspace The block's workspace.
@@ -1573,6 +1600,7 @@ Blockly.Block.prototype.getValueInputNames = function(){
 
 Blockly.Block.builtinTypes = {};
 Blockly.Block.builtinTypes['if'] = Type.fromList(["Number","_POLY_A","_POLY_A","_POLY_A"]);
+Blockly.Block.builtinTypes['undef'] = Type.fromList(["_POLY_A"]);
 
 
 Blockly.Block.inferType = function(block){
@@ -1594,11 +1622,12 @@ Blockly.Block.inferType = function(block){
     var type = Exp.typeInference(env, exp);
     console.log(type.toString());
     block.setWarningText(null);
+    return type;
   }
   catch(e){
     block.setWarningText("Types do not match");
+    return null;
   }
-
 }
 
 Blockly.Block.prototype.getExpr = function(){
@@ -1612,8 +1641,13 @@ Blockly.Block.prototype.getExpr = function(){
     var vars = [];
     this.inputList.forEach(function(input){
     if(input.type == Blockly.INPUT_VALUE)
-      if(input.connection && input.connection.targetBlock())
-        exps.push(input.connection.targetBlock().getExpr());
+      if(input.connection && input.connection.targetBlock()){
+        var targExp = input.connection.targetBlock().getExpr();
+        exps.push(targExp);
+      }
+      //else if (outputOnly){
+      //  exps.push(Exp.Abs('x',Exp.Var('x')));
+      //}
       else{
         var varName = prefix  + "_" + i;
         vars.push(varName);
