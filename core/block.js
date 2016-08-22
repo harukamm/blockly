@@ -169,13 +169,28 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   }
 };
 
+Blockly.Block.prototype.setAsFunction = function(name){
+  this.arrows = null;
+  this.functionName = name;
+}
 
+Blockly.Block.prototype.setAsLiteral = function(name){
+  this.functionName = 'Literal';
+  this.arrows = Type.fromList([name]);
+}
 
 // Uses same typeExpr, though _POLY_ get turned into a
 // Blockly.TypeVar.getUnusedTypeVar()
 
 Blockly.Block.prototype.initArrows = function(){
-  Blockly.Block.updateConnectionTypes(this, this.arrows);
+  if( !this.arrows && this.functionName.length > 0){
+    var type = Blockly.Block.builtinTypes[this.functionName];
+    if(!type)
+      throw "Builtin type for '" + this.functionName + "' was not found";
+    Blockly.Block.updateConnectionTypes(this, type);
+  }
+  else
+    Blockly.Block.updateConnectionTypes(this, this.arrows);
 };
 
 Blockly.Block.updateConnectionTypes = function(block, type){
@@ -1556,17 +1571,37 @@ Blockly.Block.prototype.getValueInputNames = function(){
   return names;
 };
 
+Blockly.Block.builtinTypes = {};
+Blockly.Block.builtinTypes['if'] = Type.fromList(["Number","_POLY_A","_POLY_A","_POLY_A"]);
+
 
 Blockly.Block.inferType = function(block){
-  block.getExpr();
+  var exp = block.getExpr();
+  
+
+  // Get the environment
+  var dic = Blockly.Block.builtinTypes;
+  var env = {};
+  for (var functionName in dic) {
+    if (dic.hasOwnProperty(functionName)) {
+      var s = new Scheme([functionName], dic[functionName] );
+      env[functionName] = s;
+    }
+  }
+
+  console.log(exp.toString());
+  var type = Exp.typeInference(env, exp);
+  console.log(type.toString());
+
 }
 
 Blockly.Block.prototype.getExpr = function(){
-  if(this.functionName == "Literal")
+  if(this.functionName == "Literal"){
     return Exp.Lit(this.arrows.getLiteral());
+  }
   else{ // Assume for now its a function
     var i = 0;
-    var prefix = 'hk'; // Should be unique
+    var prefix = 'tp_' ;//+ this.id.substring(0,4);
     var exps = [];
     var vars = [];
     this.inputList.forEach(function(input){
@@ -1574,27 +1609,30 @@ Blockly.Block.prototype.getExpr = function(){
       if(input.connection && input.connection.targetBlock())
         exps.push(input.connection.targetBlock().getExpr());
       else{
-        vars.push(prefix + i);
-        exps.push(Exp.Var(prefix + i++));
+        var varName = prefix  + "_" + i;
+        vars.push(varName);
+        exps.push(Exp.Var(varName));
+        i++;
       }
     });
 
+
+    var arrows = Blockly.Block.builtinTypes[this.functionName]; 
+    var functionName = this.functionName;
+
+    var e5 = Exp.AppFunc(exps, Exp.Var(this.functionName))
+    if(vars.length == 0){
+      return e5
+    }
+    else{
+      var e6 = Exp.AbsFunc(vars, e5);
+      return e6;
+    }
     
-
-    var functionName = 'if';
-    var arrows = this.arrows; //Type.fromList(["Number","_POLY_A","_POLY_A","_POLY_A"]);
-    //var arrows = Type.fromList(['Integer','_POLY_A','_POLY_A','_POLY_A']);
     
-//    var exps = [Exp.Lit('1'), Exp.Lit('2')];
+    return e6;
 
-    var e5 = Exp.AppFunc(exps, Exp.Var(functionName))
-    var e6 = Exp.Func(vars, e5);
-
-    console.log(e6.toString());
-    var s = new Scheme([functionName], arrows);
-    var env = {}; env[functionName] = s;
-    var t6 = Exp.typeInference(env, e6);
-    console.log(t6.toString());
+    
 
   }
 

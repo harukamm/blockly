@@ -37,8 +37,7 @@ Blockly.Blocks['test_logic_ternary'] = {
     this.appendValueInput('ELSE');
     this.setInputsInline(true);
     this.setOutput(true);
-    this.functionName = 'if';
-    this.arrows = Type.fromList(["Number","_POLY_A","_POLY_A","_POLY_A"]);
+    this.setAsFunction('if'); 
   }
 };
 
@@ -53,8 +52,7 @@ Blockly.Blocks['test_number'] = {
         .appendField('5', 'NAME');
     this.setInputsInline(true);
     this.setOutput(true);
-    this.functionName = 'Literal';
-    this.arrows = Type.fromList(["Number"]);
+    this.setAsLiteral('Number'); 
   }
 };
 
@@ -65,7 +63,6 @@ Blockly.Blocks['test_true'] = {
         .appendField('True','NAME');
     this.setInputsInline(true);
     this.setOutput(true);
-    this.functionName = 'Literal';
-    this.arrows = Type.fromList(["Bool"]);
+    this.setAsLiteral('Bool'); 
   }
 };
