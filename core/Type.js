@@ -563,8 +563,6 @@
       //console.log(t1);
       //console.log(new Type(Type.apply(s1,tv), t1) );
       var res = new Type(Type.apply(s1,tv), t1);
-      if( ! (res instanceof Type))
-        throw "Must be type damnit";
       return {sub : s1, tp : res};
     }
     else if(exp.isApp()){
