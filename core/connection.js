@@ -259,13 +259,42 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
 
   //Blockly.Connection.Unify(parentConnection, childConnection);
   // Infer type
-  
-  var type = Blockly.Block.inferType(parentBlock);
-  console.log(type);
-  Blockly.Block.updateOpenTypes(parentBlock, type); 
-  parentBlock.render();
-
+  Blockly.Connection.doUnification(parentBlock); 
 };
+
+Blockly.Connection.doUnification = function(block){
+  var type = Blockly.Block.inferType(block);
+  //Blockly.Block.updateTypes(block);
+  Blockly.Block.updateOpenTypes(block);
+  block.render();
+
+
+}
+
+Blockly.Connection.UnifyT = function(block, type1, type2){
+
+  var unifyResult;
+
+  unifyResult = Type.mgu(type1, type2);
+  if (unifyResult === false) {
+    throw 'Attempt to connect incompatible types. 34';
+  }
+
+  var blocks = Blockly.Block.getBlocksDown(block);
+  blocks.push(block);
+
+  for (var i = 0; i < blocks.length; i++) {
+    var block = blocks[i];
+    // process connections
+    var connections = block.getConnections_(true);
+    for (var j = 0; j < connections.length; j++) {
+      if (connections[j].typeExpr) {
+        connections[j].typeExpr = Type.apply(unifyResult, connections[j].typeExpr);
+      }
+    }
+  }
+  
+}
 
 Blockly.Connection.Unify = function(parentConnection, childConnection){
 
@@ -643,13 +672,10 @@ Blockly.Connection.prototype.disconnect = function() {
   if (childBlock.rendered) {
     childBlock.updateDisabled();
   }
-  
-  var type = Blockly.Block.inferType(parentBlock);
-  Blockly.Block.updateOpenTypes(parentBlock, type); 
-  parentBlock.render();
+ 
 
-
-  
+  Blockly.Connection.doUnification(parentBlock); 
+  Blockly.Connection.doUnification(childBlock); 
 };
 
 // TODO Maybe move refactor into vars_local function?

@@ -169,6 +169,10 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   }
 };
 
+Blockly.Block.defineFunction = function(functionName, type){
+  Blockly.Block.builtinTypes[functionName] = type;
+}
+
 Blockly.Block.prototype.setAsFunction = function(name){
   this.arrows = null;
   this.functionName = name;
@@ -176,7 +180,7 @@ Blockly.Block.prototype.setAsFunction = function(name){
 
 Blockly.Block.prototype.setAsLiteral = function(name){
   this.functionName = 'Literal';
-  this.arrows = Type.fromList([name]);
+  this.arrows = Type.Lit(name);
 }
 
 // Uses same typeExpr, though _POLY_ get turned into a
@@ -217,30 +221,82 @@ Blockly.Block.updateConnectionTypes = function(block, type){
   }
 };
 
-Blockly.Block.updateOpenTypes = function(block, type){
-  var flattened = Type.flatten(type);
-  
-  if(flattened.length > block.getValueInputNames().length + 1){
-    console.log("Type is too long, weird stuff is happening");
-    return;
-  }
 
+Blockly.Block.updateTypes = function(block){
+
+  block.initArrows();
   var j = 0;
   for(var i = 0; i < block.inputList.length; i++){
     var inp = block.inputList[i];
-    if(!inp.connection.isConnected()){
-      inp.setTypeExpr(flattened[j]);
+    if(inp.connection && !inp.connection.isConnected()){
+//      inp.setTypeExpr(flattened[j]);
       j++;
     }
-    else{
-      Blockly.Connection.Unify(inp.connection, inp.connection.targetConnection);
+    else if (inp.connection){
+      var targBlock = inp.connection.targetBlock();
+      var type = Blockly.Block.inferType(targBlock);
+      var outType = Type.getOutput(type);
+      var curType = inp.connection.typeExpr;
+      Blockly.Connection.UnifyT(block, curType, outType);
     }
   }
-  if(i == block.inputList.length){ // Output
-      block.setOutputTypeExpr(flattened[j]);
+  if(i == block.inputList.length){ 
+    var exp = block.getExpr();
+    if(block.outputConnection.isConnected()){
+      var outType = block.outputConnection.targetConnection.typeExpr;
+      var curType = block.outputConnection.typeExpr;
+      Blockly.Connection.UnifyT(block, outType, curType);
+      Blockly.Block.updateTypes(block.outputConnection.targetBlock());
+    }
+   
   } 
 
 };
+
+Blockly.Block.updateOpenTypes = function(block){
+  var type = Blockly.Block.inferType(block);  
+  if(!type){
+    console.log("No type, can't continue here");
+    return;
+  }
+  if(type) console.log(type.toString());
+  var i = 0;
+  while(type.isFunction()){
+    console.log(type.getFirst().toString());
+
+    while(block.inputList[i] && block.inputList[i].type != Blockly.INPUT_VALUE){
+      console.log("Skipping to next input, this one is a dummy");
+      i++;
+    }
+    if(!block.inputList[i]){
+      console.log("No input list! arg");
+      return;
+    }
+    if(block.inputList[i].connection && block.inputList[i].connection.isConnected()){
+      i++;
+      continue;
+    }
+    var inp = block.inputList[i];     
+
+    var tp = Type.getOutput(type.getFirst());
+    console.log('Setting ' + inp.name + ' to ' + tp.toString());
+    inp.connection.setTypeExpr(tp);
+
+
+    type = type.getSecond();
+    i++;
+  }
+  block.inputList.forEach(function(inp){
+    if(inp.connection && inp.connection.isConnected()){
+      console.log('Unifying on ' + inp.name);
+      var targTp = Blockly.Block.inferTypeMono(inp.connection.targetBlock());
+      var localTp = inp.connection.typeExpr;
+      Blockly.Connection.UnifyT(block, targTp, localTp);
+    }
+  });
+  block.setOutputTypeExpr(type);
+  // Output type here
+}
 
 
 
@@ -1599,14 +1655,24 @@ Blockly.Block.prototype.getValueInputNames = function(){
 };
 
 Blockly.Block.builtinTypes = {};
-Blockly.Block.builtinTypes['if'] = Type.fromList(["Number","_POLY_A","_POLY_A","_POLY_A"]);
-Blockly.Block.builtinTypes['undef'] = Type.fromList(["_POLY_A"]);
+// ensure globals have different types otherwise the environment gets confused
+Blockly.Block.builtinTypes['undef'] = Type.fromList([Type.Var("z")]);
+
+
+Blockly.Block.inferTypeMono = function(block){
+  var tp = Blockly.Block.inferType(block);
+  if(!tp)
+    return Type.getOutput(Blockly.Block.builtinTypes[block.functionName]);
+  else
+    return Type.getOutput(tp);
+}
+
+
 
 
 Blockly.Block.inferType = function(block){
   var exp = block.getExpr();
   
-
   // Get the environment
   var dic = Blockly.Block.builtinTypes;
   var env = {};
@@ -1617,10 +1683,8 @@ Blockly.Block.inferType = function(block){
     }
   }
 
-  console.log(exp.toString());
   try{
     var type = Exp.typeInference(env, exp);
-    console.log(type.toString());
     block.setWarningText(null);
     return type;
   }
@@ -1629,6 +1693,16 @@ Blockly.Block.inferType = function(block){
     return null;
   }
 }
+
+
+Blockly.Block.unificationTest = function(workspace){
+  var blocks = workspace.getTopBlocks();
+  blocks.forEach(function(block){
+    var type = Blockly.Block.inferType(block);
+    console.log(type.toString());
+  });
+}
+
 
 Blockly.Block.prototype.getExpr = function(){
   if(this.functionName == "Literal"){
@@ -1642,12 +1716,9 @@ Blockly.Block.prototype.getExpr = function(){
     this.inputList.forEach(function(input){
     if(input.type == Blockly.INPUT_VALUE)
       if(input.connection && input.connection.targetBlock()){
-        var targExp = input.connection.targetBlock().getExpr();
+        var targExp = input.connection.targetBlock().getExpr(true);
         exps.push(targExp);
       }
-      //else if (outputOnly){
-      //  exps.push(Exp.Abs('x',Exp.Var('x')));
-      //}
       else{
         var varName = prefix  + "_" + i;
         vars.push(varName);

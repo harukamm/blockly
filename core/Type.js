@@ -10,73 +10,122 @@
   goog.provide('EAbs');
   goog.provide('EApp');
   goog.provide('ELet');
-  // All js boys
+  goog.provide('TLit');
+  goog.provide('TVar');
+  goog.provide('TFunction');
 
-  // Type = TypeVar
-  //      | Literal
-  //      | Function this next
+  /**
+   * @constructor
+   */
+  TLit = function(name, children){
+    this.name = name;
+    if(children)
+      this.children = children;
+    else
+      this.children = [];
+  };
+  /**
+   * @constructor
+   */
+  TVar = function(name){
+    this.name = name;
+  };
+  /**
+   * @constructor
+   */
+  TFunction = function(fst, snd){
+    this.first = fst;
+    this.second = snd;
+  };
 
-  // if next then name is type and next is a type
   /**
    * @constructor
    * @param {(Type|string|null)} base
    * @param {Type=} next
    */
-  Type = function(base, next){
-    if(!next && !(typeof base == 'string'))
-      throw "Cannot construct type like this: ";
-    this.base = base;
-    this.next = next;
-  }
+  Type = function(v){
+    if(!(v instanceof TLit || v instanceof TVar || v instanceof TFunction))
+      throw "Use proper constructors to create Type";
+    this.v = v;
+  };
+  
+  Type.Lit = function(name, children){
+    return new Type(new TLit(name, children));
+  };
+  
+  Type.Var = function(name){
+    return new Type(new TVar(name));
+  };
+
+  Type.Func = function(fst, snd){
+    return new Type(new TFunction(fst, snd));
+  };
+
 
   Type.prototype.isTypeVar = function(){
-    return !this.isFunction() && this.base.startsWith("_POLY_");
+    return this.v instanceof TVar;
   }
 
   Type.prototype.isLiteral = function(){
-    return !this.isTypeVar() && !this.isFunction();
+    return this.v instanceof TLit;
   }
 
-  Type.prototype.getLiteral = function(){
+  Type.prototype.isFunction = function(){
+    return this.v instanceof TFunction;
+  }
+
+  Type.prototype.getLiteralName = function(){
     if(!this.isLiteral()) 
       // We error in order to avoid mistakingly using
       // incorrect function
       throw "This is not a literal type !";
-    return this.base;
+    return this.v.name;
+  }
+
+  Type.prototype.getLiteralChildren = function(){
+    if(!this.isLiteral()) 
+      // We error in order to avoid mistakingly using
+      // incorrect function
+      throw "This is not a literal type !";
+    return this.v.children;
   }
 
   Type.prototype.getTypeVar = function(){
     if(!this.isTypeVar())
       throw "This is not a type variable !";
-    return this.base.substring(6);
+    return this.v.name;
   }
   
-  // Is arrow type a -> b ?
-  Type.prototype.isFunction = function(){
-    return this.next != null;
-  }
   // If function, get the first part a -> b 
   Type.prototype.getFirst = function(){
     if(!this.isFunction())
       throw "This is not a function !";
-    return this.base;
+    return this.v.first;
   }
 
   // If function, get the second part a -> b
   Type.prototype.getSecond = function(){
     if(!this.isFunction())
       throw "This is not a function !";
-    return this.next;
+    return this.v.second;
   }
 
   Type.prototype.toString = function(){
     var str = "";
     if(this.isTypeVar())
       str = this.getTypeVar();
-    else if (this.isLiteral())
-      str = this.getLiteral();
-    else
+    else if (this.isLiteral()){
+      str = this.getLiteralName();
+      if(this.getLiteralChildren().length > 0){
+        str =" [" + str + " : ";
+        this.getLiteralChildren().forEach(function(c){
+          str += ", " + c.toString();
+        });
+      }
+    }
+    else{
       str = this.getFirst().toString() + " -> " + this.getSecond().toString();
+    }
     return str;
   }
 
@@ -111,12 +160,12 @@
    * @return {Type}
    */
   Type.fromList = function(ls){
-    if(! (typeof ls[0] == 'string' ))
-      throw 'Can only use fromList on strings';
+    if(! (ls[0] instanceof Type ))
+      throw 'Can only use fromList on Types';
     if(ls.length == 1)
-      return new Type(ls[0]);
+      return ls[0];
 
-    return new Type(new Type(ls[0]), Type.fromList(ls.splice(1)));
+    return Type.Func(ls[0], Type.fromList(ls.splice(1)));
   }
 
   // Get free type variables
@@ -156,7 +205,7 @@
         return t;
     }
     else if (t.isFunction()){
-      return new Type(Type.apply(s,t.getFirst()), Type.apply(s, t.getSecond()));
+      return Type.Func(Type.apply(s,t.getFirst()), Type.apply(s, t.getSecond()));
     }
     else
       return t;
@@ -198,8 +247,9 @@
       var u = t2.getTypeVar();
       return Type.varBind(u,t1);
     }
-    else if(t1.isLiteral() && t2.isLiteral() && t1.getLiteral() ===
-        t2.getLiteral()){
+    // TODO check children
+    else if(t1.isLiteral() && t2.isLiteral() && t1.getLiteralName() ===
+        t2.getLiteralName()){
       return nullSubst;
     }
     else{
@@ -231,7 +281,7 @@
    * @return {Type}
    */
   Type.generateTypeVar = function(prefix){
-    var tv = new Type("_POLY_" + prefix + tiSupply);
+    var tv = Type.Var(prefix + tiSupply);
     tiSupply++;
     return tv;
   }
@@ -580,7 +630,7 @@
       }
     }
     else if(exp.isLiteral()){
-      return {sub: nullSubst , tp : new Type(exp.getLiteral())}; // Expand here
+      return {sub: nullSubst , tp : Type.Lit(exp.getLiteral())}; // Expand here
     }
     else if(exp.isAbs()){
       var n = exp.getAbsVarName();
@@ -593,7 +643,7 @@
       //console.log(Type.apply(s1,tv));
       //console.log(t1);
       //console.log(new Type(Type.apply(s1,tv), t1) );
-      var res = new Type(Type.apply(s1,tv), t1);
+      var res = Type.Func(Type.apply(s1,tv), t1);
       return {sub : s1, tp : res};
     }
     else if(exp.isApp()){
@@ -603,7 +653,7 @@
 
       var k1 = Exp.ti(te, e1); var s1 = k1['sub']; var t1= k1['tp'];
       var k2 = Exp.ti(TypeEnv.apply(s1,te), e2); var s2 = k2['sub']; var t2 = k2['tp'];
-      var s3 = Type.mgu(Type.apply(s2,t1), new Type(t2,tv));
+      var s3 = Type.mgu(Type.apply(s2,t1), Type.Func(t2,tv));
 
       return {sub : Type.composeSubst(s3,Type.composeSubst(s2,s1)), tp : Type.apply(s3,tv)};
     }
@@ -637,9 +687,9 @@
 
 
 
-  var t = new Type("Int");
-  var u = new Type("_POLY_A");
-  var i = new Type("Int");
+  var t = Type.Lit("Int");
+  var u = Type.Var("a");
+  var i = Type.Lit("Int");
   // var f = Type.flatten(r);
 
   // test mgu
@@ -647,17 +697,16 @@
   var ll =Type.mgu(t,u);
   //console.log(Array.from(ll.keys()) );
 
-  var r = Type.fromList(["Int","Float","_POLY_A"]);
-  var y = Type.fromList(["_POLY_A","_POLY_B","_POLY_A"]);
+  var r = Type.fromList([Type.Lit("Int"),Type.Lit("Float"),Type.Var("a")]);
+  var y = Type.fromList([Type.Var("a"),Type.Var("b"),Type.Var("a")]);
   var z = Type.mgu(r,y);
-  var o = Type.fromList(["Int","_POLY_A","_POLY_A"]);
-  var p = Type.fromList(["_POLY_B","_POLY_A","_POLY_A"]);
+  var o = Type.fromList([Type.Lit("Int"),Type.Var("a"),Type.Var("a")]);
+  var p = Type.fromList([Type.Var("b"), Type.Var("a"), Type.Var("a")]);
   var x = Type.mgu(o,p);
   //console.log(z.toObject() );
   //console.log(x.toObject());
   //console.log('end test mgu');
 
-  // test ti
 
 
   var e0 = Exp.Abs('x', Exp.Var('x'));
@@ -689,32 +738,33 @@
 
   // FIX ERROR HERE !
   var e4 = Exp.App( Exp.Var('+'), Exp.Lit('Integer'));
-  var pt = Type.fromList(["Integer","Integer","Integer"]);
+  var pt = Type.fromList([Type.Lit("Integer"),Type.Lit("Integer"),Type.Lit("Integer") ]);
   var s = new Scheme(['+'],pt) 
   var t4 = Exp.typeInference({'+' :s },e4);
   //console.log(s);
   console.log(e4.toString());
   console.log(t4.toString());
 
-//  var e5 = Exp.App(e4, Exp.Lit('20'));
-//  var t5 = Exp.typeInference({'+':s},e5);
-//  console.log(e5.toString());
-//  console.log(t5.toString());
+  var e5 = Exp.App(e4, Exp.Lit('Integer'));
+  var t5 = Exp.typeInference({'+':s},e5);
+  console.log(e5.toString());
+  console.log(t5.toString());
 
-//  var e6 = Exp.AppFunc([Exp.Lit('1'),Exp.Lit('2')], Exp.Var('tri'))
-//  console.log(e6.toString());
-//  var s = new Scheme(['tri'], Type.fromList(['Integer','Integer','Integer','Integer']));
-//  var t6 = Exp.typeInference({'tri' : s}, e6);
-//  console.log(t6.toString());
+  var e6 = Exp.AppFunc([Exp.Lit('Integer'),Exp.Lit('Integer')], Exp.Var('tri'))
+  console.log(e6.toString());
+  var s = new Scheme(['tri'], Type.fromList([Type.Lit('Integer'),Type.Lit('Integer'),Type.Lit('Integer'),Type.Lit('Integer') ]));
+  var t6 = Exp.typeInference({'tri' : s}, e6);
+  console.log(t6.toString());
 
-//   var functionName = 'if';
-//   var arrows = Type.fromList(['Integer','_POLY_A','_POLY_A','_POLY_A']);
-//   var exps = [Exp.Lit('1'), Exp.Lit('2')];
-//   var e6 = Exp.AppFunc(exps, Exp.Var(functionName))
-//   var s = new Scheme([functionName], arrows);
-//   var env = {}; env[functionName] = s;
-//   var t6 = Exp.typeInference(env, e6);
-//   console.log(e6.toString());
-//   console.log(t6.toString());
+  var functionName = 'if';
+  var arrows = Type.fromList([Type.Lit("Integer"),Type.Var("a"),Type.Var("a"),Type.Var("a")]);
+  var exps = [Exp.Var('undef'), Exp.Var('undef')];
+  var e6 = Exp.AppFunc(exps, Exp.Var(functionName))
+  var env = {}; 
+  env[functionName] = new Scheme([functionName], arrows);
+  env['undef'] = new Scheme(['undef'], Type.Var("z"));
+  var t6 = Exp.typeInference(env, e6);
+  console.log(e6.toString());
+  console.log(t6.toString());
 
 

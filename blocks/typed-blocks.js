@@ -169,13 +169,12 @@ Blockly.Blocks['pair_first_typed'] = {
    */
   init: function() {
     this.setColour(210);
-    var A = Blockly.TypeVar.getUnusedTypeVar();
-    var B = Blockly.TypeVar.getUnusedTypeVar();
     this.appendValueInput('PAIR')
-        .setTypeExpr(new Blockly.TypeExpr ("pair", [A, B]))
         .appendField(new Blockly.FieldLabel("fst","blocklyTextEmph") );
     this.setOutput(true);
-    this.setOutputTypeExpr(A);
+
+    this.defineFunction('if', Type.fromList(["Number","_POLY_A","_POLY_A","_POLY_A"]));
+    this.setAsFunction('if'); 
   }
 };
 
