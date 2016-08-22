@@ -39,9 +39,6 @@ Blockly.TypeExpr.fromDom = function(element){
   return new Blockly.TypeExpr(name,children);
 }
 
-Blockly.TypeExpr.prototype.isTypeVar = function() {
-  return this.name in Blockly.TypeVar.getTypeVarDB_();
-}
 
 Blockly.TypeVar.getTypeVarColor = function(name) {
   return "Navy";
