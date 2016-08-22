@@ -138,14 +138,15 @@ Blockly.Blocks['math_arithmetic_typed'] = {
     this.setColour(230);
     this.setOutput(true);
     // Sorin
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Number'));
-    this.appendValueInput('A')
-        .setTypeExpr(new Blockly.TypeExpr('Number'));
+    this.appendValueInput('A');
     this.appendValueInput('B')
-        .setTypeExpr(new Blockly.TypeExpr('Number'))
         .appendField(new Blockly.FieldDropdown(OPERATORS), 'OP');
     this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
+    
+    Blockly.Block.defineFunction("binMath",Type.fromList([Type.Lit("Number"), Type.Lit("Number"), Type.Lit("Number")]));
+    this.setAsFunction("binMath");
+
     var thisBlock = this;
     this.setTooltip(function() {
       var mode = thisBlock.getFieldValue('OP');
