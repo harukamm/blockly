@@ -23,6 +23,8 @@
    * @param {Type=} next
    */
   Type = function(base, next){
+    if(!next && !(typeof base == 'string'))
+      throw "Cannot construct type like this: ";
     this.base = base;
     this.next = next;
   }
@@ -82,7 +84,7 @@
    * @param {Type} tp
    * @return {Array<Type>}
    */
-  Type.flatten = function(tp){
+  /*Type.flatten = function(tp){
     var tps = [];
     while(tp.next){
       tps.push(new Type(tp.base.base));
@@ -90,6 +92,18 @@
     }
     tps.push(new Type(tp.base));
     return tps;
+  }*/
+  Type.flatten = function(tp){
+    var tps = [];
+    if(!tp.next)
+      return [tp];
+    return Type.flatten(tp.base).concat(Type.flatten(tp.next));
+  }
+  
+  Type.getOutput = function(tp){
+    if (tp.next)
+      return Type.getOutput(tp.next);
+    return tp;
   }
   
   /**
@@ -97,6 +111,8 @@
    * @return {Type}
    */
   Type.fromList = function(ls){
+    if(! (typeof ls[0] == 'string' ))
+      throw 'Can only use fromList on strings';
     if(ls.length == 1)
       return new Type(ls[0]);
 
@@ -357,6 +373,8 @@
    * @return {Exp}
    */
   Exp.App = function(exp1, exp2){
+    if(!exp1 || !exp2)
+      throw 'Expressions must be defined';
     return new Exp(new EApp(exp1, exp2));
   }
   
@@ -372,6 +390,8 @@
    * @return {Exp}
    */
   Exp.Abs = function(varName, exp){
+    if(!exp)
+      throw 'Expression must be defined';
     return new Exp(new EAbs(varName, exp));
   }
 
@@ -380,6 +400,8 @@
    * @return {Exp}
    */
   Exp.AbsFunc = function(varNames, exp){
+    if(!exp)
+      throw 'Expression must be defined';
     if(!varNames || varNames.length == 0)
       throw "Cannot create a function with no arguments"
     if(varNames.length == 1)
