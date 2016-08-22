@@ -1590,8 +1590,14 @@ Blockly.Block.inferType = function(block){
   }
 
   console.log(exp.toString());
-  var type = Exp.typeInference(env, exp);
-  console.log(type.toString());
+  try{
+    var type = Exp.typeInference(env, exp);
+    console.log(type.toString());
+    block.setWarningText(null);
+  }
+  catch(e){
+    block.setWarningText("Types do not match");
+  }
 
 }
 
