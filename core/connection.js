@@ -222,91 +222,10 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
   if (Blockly.Events.isEnabled()) {
     event = new Blockly.Events.Move(childBlock);
   }
-  // Stefan  
-  // Sorin
-  /* Unify type expressions */
-  var unifyResult;
-  if (parentConnection.typeExpr && childConnection.typeExpr) {
-    // Stefan
-    if(parentConnection.typeExpr.name == 'Function_')
-    {
-      // Disconnect any shadow blocks, if it has any
-      for (var i = 0, input; input = childConnection.sourceBlock_.inputList[i]; i++) {
-       
-        if(!input.name)
-          continue;
-        if(input.name=='')
-          continue;
-        if(!input.connection)
-          continue;
-        var orphanBlock = input.connection.targetBlock();
-        if(orphanBlock && orphanBlock.isShadow())
-        {
-          // dispose here
-          // OWARI
-          input.connection.shadowDomBackup_ = input.connection.shadowDom_;
-          input.connection.shadowDom_ = null;
-          orphanBlock.dispose();
-          orphanBlock = null;
-        }
-      }
+  //Blockly.Connection.resetCallersUpward(parentBlock);
 
 
-      //  exclude Function_, we already check it in checkType_ properly
-      var oldTp = parentConnection.typeExpr; 
-      parentConnection.typeExpr = parentConnection.typeExpr.children[parentConnection.typeExpr.children.length - 1];
-      unifyResult = parentConnection.typeExpr.unify(childConnection.typeExpr);
-      if (unifyResult === false) {
-        throw 'Attempt to connect incompatible types. 33';
-      }
-      parentConnection.typeExpr = oldTp;
-    }
-    else{
-      unifyResult = Type.mgu(parentConnection.typeExpr, childConnection.typeExpr);
-      if (unifyResult === false) {
-        throw 'Attempt to connect incompatible types. 34';
-      }
-    }
-
-    var workspace = parentConnection.getSourceBlock().workspace;
-
-    var blocks = Blockly.Block.getBlocksDown(parentBlock);
-    blocks.push(parentBlock);
-
-    if (workspace.flyout_) {
-      blocks = blocks.concat(workspace.flyout_.workspace_.getAllBlocks());
-    }
-    for (var i = 0; i < blocks.length; i++) {
-      var block = blocks[i]
-      // process connections
-      var connections = block.getConnections_(true);
-      for (var j = 0; j < connections.length; j++) {
-        if (connections[j].typeExpr) {
-          connections[j].typeExpr = Type.apply(unifyResult, connections[j].typeExpr);
-        }
-      }
-
-      
-
-
-      if( block.outputConnection && block.outputConnection.typeExpr ) {
-        /* Update colour of blocks in case their output type has changed */
-        block.setColourByType( block.outputConnection.typeExpr );
-      }
-      if( block.rendered ) {
-        block.render();
-      }
-    }
-
-
-
-    if(childBlock.onTypeChange)
-      childBlock.onTypeChange();
-
-  }
-  Blockly.Connection.resetCallersUpward(parentBlock);
-
-
+  // Unify things
 
 
   // Establish the connections.
@@ -338,10 +257,61 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
     }
   }
 
+  //Blockly.Connection.Unify(parentConnection, childConnection);
   // Infer type
-  Blockly.Block.inferType(parentBlock);
+  
+  var type = Blockly.Block.inferType(parentBlock);
+  console.log(type);
+  Blockly.Block.updateOpenTypes(parentBlock, type); 
+  parentBlock.render();
 
 };
+
+Blockly.Connection.Unify = function(parentConnection, childConnection){
+
+  var parentBlock = parentConnection.getSourceBlock();
+  var childBlock = childConnection.getSourceBlock();
+
+  var unifyResult;
+  if (parentConnection.typeExpr && childConnection.typeExpr) {
+
+    unifyResult = Type.mgu(parentConnection.typeExpr, childConnection.typeExpr);
+    if (unifyResult === false) {
+      throw 'Attempt to connect incompatible types. 34';
+    }
+
+    var workspace = parentConnection.getSourceBlock().workspace;
+
+    var blocks = Blockly.Block.getBlocksDown(parentBlock);
+    blocks.push(parentBlock);
+
+    for (var i = 0; i < blocks.length; i++) {
+      var block = blocks[i];
+      // process connections
+      var connections = block.getConnections_(true);
+      for (var j = 0; j < connections.length; j++) {
+        if (connections[j].typeExpr) {
+          connections[j].typeExpr = Type.apply(unifyResult, connections[j].typeExpr);
+        }
+      }
+
+      /*if( block.outputConnection && block.outputConnection.typeExpr ) {
+        //Update colour of blocks in case their output type has changed
+        block.setColourByType( block.outputConnection.typeExpr );
+      }
+      if( block.rendered ) {
+        block.render();
+      }*/
+    }
+
+
+
+//    if(childBlock.onTypeChange)
+//      childBlock.onTypeChange();
+
+  }
+  
+}
 
 /**
  * Sever all links to this connection (not including from the source object).
@@ -646,12 +616,13 @@ Blockly.Connection.prototype.disconnect = function() {
     // Reset the affected two blocks
 
     // The child affects the parent more
-    childBlock.initArrows();
+    // childBlock.initArrows();
+    
     //childBlock.reconnectInputs();
     if(childBlock.onTypeChange)
       childBlock.onTypeChange();
 
-    parentBlock.initArrows();
+   // parentBlock.initArrows();
     //parentBlock.reconnectInputs(childBlock); // Don't reconnect the child !
     if(parentBlock.onTypeChange)
       parentBlock.onTypeChange();
@@ -672,6 +643,12 @@ Blockly.Connection.prototype.disconnect = function() {
   if (childBlock.rendered) {
     childBlock.updateDisabled();
   }
+  
+  var type = Blockly.Block.inferType(parentBlock);
+  Blockly.Block.updateOpenTypes(parentBlock, type); 
+  parentBlock.render();
+
+
   
 };
 
