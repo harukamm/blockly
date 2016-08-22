@@ -130,6 +130,8 @@
    * @return {Type}
    */
   Type.apply = function(s, t){
+    if (s==false)
+      throw "Types do not match";
     if (t.isTypeVar()){
       var n = t.getTypeVar();
       if(s.has(n))
@@ -307,7 +309,11 @@
   EApp = function(exp1, exp2){
     this.exp1 = exp1; this.exp2 = exp2
   };
-  EApp.prototype.toString = function(){ return "(" + this.exp1.toString() + ")(" + this.exp2.toString() + ")";};
+  EApp.prototype.toString = function(){ 
+    var left = this.exp1.toString();
+    var right = this.exp2.toString();
+    return "(" + left + ")(" + right + ")";
+  };
   /**
    * @constructor
    */
@@ -370,12 +376,15 @@
   }
 
   /**
+   * Create an anonymous function with the given variables
    * @return {Exp}
    */
-  Exp.Func = function(varNames, exp){
+  Exp.AbsFunc = function(varNames, exp){
+    if(!varNames || varNames.length == 0)
+      throw "Cannot create a function with no arguments"
     if(varNames.length == 1)
       return Exp.Abs(varNames[0],exp);
-    return Exp.Abs(varNames[0], Exp.Func(varNames.splice(1),exp));
+    return Exp.Abs(varNames[0], Exp.AbsFunc(varNames.splice(1),exp));
   }
 
   /**
@@ -658,7 +667,8 @@
   console.log(t3.toString());
 
 
-  var e4 = Exp.App( Exp.Var('+'), Exp.Lit('10'));
+  // FIX ERROR HERE !
+  var e4 = Exp.App( Exp.Var('+'), Exp.Lit('Integer'));
   var pt = Type.fromList(["Integer","Integer","Integer"]);
   var s = new Scheme(['+'],pt) 
   var t4 = Exp.typeInference({'+' :s },e4);
@@ -666,25 +676,25 @@
   console.log(e4.toString());
   console.log(t4.toString());
 
-  var e5 = Exp.App(e4, Exp.Lit('20'));
-  var t5 = Exp.typeInference({'+':s},e5);
-  console.log(e5.toString());
-  console.log(t5.toString());
+//  var e5 = Exp.App(e4, Exp.Lit('20'));
+//  var t5 = Exp.typeInference({'+':s},e5);
+//  console.log(e5.toString());
+//  console.log(t5.toString());
 
-  var e6 = Exp.AppFunc([Exp.Lit('1'),Exp.Lit('2')], Exp.Var('tri'))
-  console.log(e6.toString());
-  var s = new Scheme(['tri'], Type.fromList(['Integer','Integer','Integer','Integer']));
-  var t6 = Exp.typeInference({'tri' : s}, e6);
-  console.log(t6.toString());
+//  var e6 = Exp.AppFunc([Exp.Lit('1'),Exp.Lit('2')], Exp.Var('tri'))
+//  console.log(e6.toString());
+//  var s = new Scheme(['tri'], Type.fromList(['Integer','Integer','Integer','Integer']));
+//  var t6 = Exp.typeInference({'tri' : s}, e6);
+//  console.log(t6.toString());
 
-  var functionName = 'if';
-  var arrows = Type.fromList(['Integer','_POLY_A','_POLY_A','_POLY_A']);
-  var exps = [Exp.Lit('1'), Exp.Lit('2')];
-  var e6 = Exp.AppFunc(exps, Exp.Var(functionName))
-  var s = new Scheme([functionName], arrows);
-  var env = {}; env[functionName] = s;
-  var t6 = Exp.typeInference(env, e6);
-  console.log(e6.toString());
-  console.log(t6.toString());
+//   var functionName = 'if';
+//   var arrows = Type.fromList(['Integer','_POLY_A','_POLY_A','_POLY_A']);
+//   var exps = [Exp.Lit('1'), Exp.Lit('2')];
+//   var e6 = Exp.AppFunc(exps, Exp.Var(functionName))
+//   var s = new Scheme([functionName], arrows);
+//   var env = {}; env[functionName] = s;
+//   var t6 = Exp.typeInference(env, e6);
+//   console.log(e6.toString());
+//   console.log(t6.toString());
 
 
