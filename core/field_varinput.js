@@ -2,8 +2,8 @@
  * @license
  * Visual Blocks Editor
  *
- * Copyright 2012 Google Inc.
- * https://developers.google.com/blockly/
+ * Copyright 2016 Stefan Jacholke.
+ * https://github.com/stefan-j/blockly
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 /**
  * @fileoverview Text input field.
- * @author fraser@google.com (Neil Fraser)
+ * @author stefanjacholke@gmail.com (Stefan Jacholke)
  */
 'use strict';
 
@@ -236,7 +236,7 @@ Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
   var mutation = goog.dom.createDom('mutation');
   if(this.localId) mutation.setAttribute('localId',this.localId);
   mutation.setAttribute('parentId',this.sourceBlock_.id);
-  var typeDom = this.getType().toDom();
+  var typeDom = Blockly.TypeInf.toDom(this.getType());
   mutation.appendChild(typeDom);
   container.appendChild(mutation);
 
