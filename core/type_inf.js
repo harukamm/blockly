@@ -45,12 +45,34 @@ Blockly.TypeInf.getTypeVarColor = function(name) {
   return col;
 };
 
+
+/**
+ * @param {Blockly.Block} block - A block that is part of the component
+ */
+Blockly.TypeInf.UnifyComponent = function(block){
+  var blocks = Blockly.TypeInf.getComponent(block);
+  var subs = blocks.map(b => b.getSubstitutions());
+  var s = subs[0];
+  for(var i = 1; i < subs.length; i++){
+    s = Type.composeSubst(s,subs[i]);
+  }
+
+  blocks.forEach(b => b.applySubst(s));
+  blocks.forEach(b => b.render());
+}
+
+
+Blockly.TypeInf.connectComponent = function(block){
+  Blockly.TypeInf.UnifyComponent(block);
+}
+
 Blockly.TypeInf.disconnectComponent = function(parentBlock, childBlock){
-  console.log('resetting them components');
   Blockly.TypeInf.resetComponent(parentBlock);
   Blockly.TypeInf.resetComponent(childBlock);
   // Now we have two components
   // Unify here !
+  Blockly.TypeInf.UnifyComponent(parentBlock);
+  Blockly.TypeInf.UnifyComponent(childBlock);
 };
 
 Blockly.TypeInf.getComponent = function(block){
@@ -72,7 +94,7 @@ Blockly.TypeInf.getGrandParent = function(block){
   if(!block.outputConnection.isConnected())
     return block;
   else
-    return Block.TypeInf.getGrandParent(block.outputConnection.targetBlock());
+    return Blockly.TypeInf.getGrandParent(block.outputConnection.targetBlock());
 };
 
 Blockly.TypeInf.getBlocksDown = function(block){
@@ -85,7 +107,7 @@ Blockly.TypeInf.getBlocksDown = function(block){
 
   var cs = [];
   bs.forEach(function(b){
-    cs = cs.concat( Blockly.Block.getBlocksDown(b));
+    cs = cs.concat( Blockly.TypeInf.getBlocksDown(b));
   });
 
   return bs.concat(cs);

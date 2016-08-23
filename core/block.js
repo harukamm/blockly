@@ -1726,9 +1726,35 @@ Blockly.Block.prototype.getExpr = function(){
     
     
     return e6;
-
-    
-
   }
-
 }
+
+Blockly.Block.prototype.applySubst = function(subst){
+  this.inputList.forEach(function(inp){
+    if(inp.type == Blockly.INPUT_VALUE){
+      if(inp.connection){
+        var t = Type.apply(subst, inp.connection.typeExpr);
+        inp.connection.typeExpr = t;
+      }
+    }
+  });
+  if(this.outputConnection){
+    var t = Type.apply(subst, this.outputConnection.typeExpr);
+    this.outputConnection.typeExpr = t;
+  }
+};
+
+Blockly.Block.prototype.getSubstitutions = function(){
+  var subst = Immutable.Map({});
+  this.inputList.forEach(function(inp){
+    if(inp.type == Blockly.INPUT_VALUE){
+      if(inp.connection && inp.connection.isConnected()){
+        var local = inp.connection.typeExpr;
+        var targ = inp.connection.targetConnection.typeExpr;
+        var sub = Type.mgu(local,targ);
+        subst = Type.composeSubst(subst,sub);
+      }
+    }
+  });
+  return subst;
+};

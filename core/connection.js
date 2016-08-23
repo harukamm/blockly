@@ -259,7 +259,8 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
 
   //Blockly.Connection.Unify(parentConnection, childConnection);
   // Infer type
-  Blockly.Connection.doUnification(parentBlock); 
+  // Blockly.Connection.doUnification(parentBlock); 
+  Blockly.TypeInf.connectComponent(parentBlock);
 };
 
 Blockly.Connection.doUnification = function(block){
@@ -675,9 +676,6 @@ Blockly.Connection.prototype.disconnect = function() {
     childBlock.updateDisabled();
   }
  
-
-  //Blockly.Connection.doUnification(parentBlock); 
-  //Blockly.Connection.doUnification(childBlock); 
   Blockly.TypeInf.disconnectComponent(parentBlock, childBlock);
 };
 
