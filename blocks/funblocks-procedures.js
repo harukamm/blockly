@@ -528,46 +528,50 @@ Blockly.Blocks['vars_local'] = {
     this.setOutput(true);
     this.parentId = null; // Which block spawned me?
     this.localId = -1; // Which field and so on
-    this.arrows = [new Blockly.TypeExpr('_POLY_A')];
+    this.arrows = Type.Var("a");
     this.dom_ = null;
   },
 
   domToMutation: function(xmlElement) {  // TODO, this needs work, what in the case of a list expr or case block? 
     var name = xmlElement.getAttribute('name');
     this.parentId = xmlElement.getAttribute('parentId'); // Name of parent function
+    console.log(this.parentId);
     this.localId = Number(xmlElement.getAttribute('localId')); // Name of parent function
     this.setFieldValue(name, 'NAME');
 
     var typeDom = xmlElement.childNodes[0];
-    var type = Blockly.TypeExpr.fromDom(typeDom);
+    var type = Blockly.TypeInf.fromDom(typeDom);
     this.dom_ = typeDom;
-    this.setOutputTypeExpr(type);
+    this.arrows = type;
+    this.initArrows();
+  },
 
+  initArrows: function(){
+    this.arrows = this.getType();
+    this.setOutputTypeExpr(Type.getOutput(this.arrows));
+    this.render();
+    console.log(this.arrows.toString());
   },
 
   getType: function(){
     var workspace = Blockly.getMainWorkspace();
     var parentBlock = workspace.getBlockById(this.parentId);
+    var parenttp;
+    if(!parentBlock)
+      return this.arrows;
     if(parentBlock.getArgType){
       var tp = parentBlock.getArgType(this.localId);
       if(tp)
-        return tp;
+        parenttp = tp;
     }
+    if(!parenttp)
+      return this.outputConnection.typeExpr;
+    if(!this.outputConnection.isConnected())
+      return parenttp;
 
-    return this.outputConnection.typeExpr; // Current type
-  },
-
-  // Overide the base method
-  initArrows: function(){
-
-    // this.setOutputTypeExpr(this.getType());
-
-    // if(!this.dom_){
-    //   this.setOutputTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
-    // }
-    // else{
-    //   this.setOutputTypeExpr(Blockly.TypeExpr.fromDom(this.dom_))
-    // }
+    var localtp = this.outputConnection.targetConnection.typeExpr;
+    var s = Type.mgu(localtp, parenttp);
+    return Type.apply(s,localtp);
   },
 
   mutationToDom: function() {
@@ -577,7 +581,8 @@ Blockly.Blocks['vars_local'] = {
     container.setAttribute('parentId', this.parentId);
     container.setAttribute('localId', this.localId);
 
-    var typeDom = this.outputConnection.typeExpr.toDom();
+    var tp = this.getType();
+    var typeDom = Blockly.TypeInf.toDom(tp);
     container.appendChild(typeDom);
 
     return container;
