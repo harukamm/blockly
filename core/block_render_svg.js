@@ -1298,12 +1298,17 @@ Blockly.BlockSvg.typeVarHighlights_ = function(typeExpr, y, typeVarHighlights) {
 
 Blockly.BlockSvg.getTypeName = function(typeExpr) {
   if (typeExpr) {
-    var tp = Type.getOutput(typeExpr);
+    //var tp = Type.getOutput(typeExpr);
+    var tp = typeExpr;
     if (tp.isTypeVar()) {
       return "typeVar";
     } 
     else if (tp.isLiteral()) {
       return typeExpr.getLiteralName();
+    }
+    else if (tp.isFunction()){
+      console.log("function test");
+      return "Function_"; // Hack
     }
   } 
   else {
