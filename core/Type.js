@@ -192,11 +192,21 @@
   Type.ftv = function(tp){
     if (tp.isTypeVar())
       return new Immutable.Set([tp.getTypeVar()]);
-    else if (tp.isLiteral())
-      return new Immutable.Set();
+    else if (tp.isLiteral()){
+      var ch = tp.getLiteralChildren();
+      if(ch.length == 0)
+        return new Immutable.Set();
+      else{ // FTV on the children boys
+        var f = Type.ftv(ch[0]);    
+        for(var i = 1; i < ch.length; i++){
+          f = f.union(Type.ftv(ch[i]));
+        }
+        return f;
+      }
+    }
     else{
       var left = Type.ftv(tp.getFirst());
-      var right = Type.ftv(tp.getFirst());
+      var right = Type.ftv(tp.getSecond());
       return left.union(right);
     }
   }
@@ -730,8 +740,8 @@
   // var ll =Type.mgu(t,u);
   // //console.log(Array.from(ll.keys()) );
 
-  // var r = Type.fromList([Type.Lit("Int"),Type.Lit("Float"),Type.Var("a")]);
-  // var y = Type.fromList([Type.Var("a"),Type.Var("b"),Type.Var("a")]);
+  var r = Type.fromList([Type.Lit("Int"),Type.Lit("Float"),Type.Var("a")]);
+  var y = Type.fromList([Type.Var("a"),Type.Var("b"),Type.Var("a")]);
   // var z = Type.mgu(r,y);
   // var o = Type.fromList([Type.Lit("Int"),Type.Var("a"),Type.Var("a")]);
   // var p = Type.fromList([Type.Var("b"), Type.Var("a"), Type.Var("a")]);
