@@ -27,8 +27,7 @@
 goog.provide('Blockly.RenderedConnection');
 
 goog.require('Blockly.Connection');
-goog.require('Blockly.TypeExpr');
-goog.require('Blockly.TypeVar');
+goog.require('Blockly.TypeInf');
 
 
 /**

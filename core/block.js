@@ -31,8 +31,8 @@ goog.require('Blockly.Comment');
 goog.require('Blockly.Connection');
 goog.require('Blockly.Input');
 goog.require('Blockly.Mutator');
-goog.require('Blockly.TypeExpr');
-goog.require('Blockly.TypeVar');
+goog.require('Blockly.TypeInf');
+goog.require('Type');
 goog.require('Blockly.Warning');
 goog.require('Blockly.Workspace');
 goog.require('Blockly.Xml');
@@ -1658,7 +1658,7 @@ Blockly.Block.prototype.getValueInputNames = function(){
 
 Blockly.Block.builtinTypes = {};
 // ensure globals have different types otherwise the environment gets confused
-Blockly.Block.builtinTypes['undef'] = Type.fromList([Type.Var("z")]);
+Blockly.Block.builtinTypes['undef'] = Type.Var("z");
 
 
 Blockly.Block.inferTypeMono = function(block){

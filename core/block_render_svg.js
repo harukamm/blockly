@@ -28,8 +28,7 @@
 goog.provide('Blockly.BlockSvg.render');
 
 goog.require('Blockly.BlockSvg');
-goog.require('Blockly.TypeExpr');
-goog.require('Blockly.TypeVar');
+goog.require('Blockly.TypeInf');
 
 // UI constants for rendering blocks.
 /**
@@ -1297,7 +1296,7 @@ Blockly.BlockSvg.typeVarHighlights_ = function(typeExpr, y, typeVarHighlights) {
     var name = typeExpr.name;
     if (typeExpr.isTypeVar()) {
       typeVarHighlights.push({
-        color: Blockly.TypeVar.getTypeVarColor(name), 
+        color: Blockly.TypeInf.getTypeVarColor(name), 
         path: "m 0," + y + " " + Blockly.BlockSvg.typeVarShapes_["typeVar"]["highlight"]
       });
     } /*else if (typeExpr.children.length != 0) {
