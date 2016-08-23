@@ -27,17 +27,17 @@ Blockly.Blocks['type_list'] = {
     this.setOutput(true);
     this.appendDummyInput()
         .appendField(new Blockly.FieldLabel('List', 'blocklyTextEmph'), 'NAME');
-    this.appendValueInput('TP')
-        .setTypeExpr(new Blockly.TypeExpr('Type'));
+    this.appendValueInput('TP');
     this.setInputsInline(true);
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Type' ));
     this.setTooltip('A list data type');
+
+    this.arrows = Type.fromList([Type.Lit("Type"), Type.Lit("Type")]);
   },
   getType: function(){
     if(!this.getInput('TP').connection.isConnected())
-      return new Blockly.TypeExpr('list',[new Blockly.TypeVar.getUnusedTypeVar()]);
+      return Type.Lit("list", [Type.Var("a")]);
     var targTp = this.getInput('TP').connection.targetBlock().getType();
-    return new Blockly.TypeExpr('list',[targTp]);
+    return Type.Lit('list',[targTp]);
   }
 };
 
@@ -47,7 +47,7 @@ Blockly.Blocks['type_user'] = {
     this.setOutput(true);
     this.appendDummyInput()
         .appendField(new Blockly.FieldLabel('User', 'blocklyTextEmph'), 'NAME');
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Type'));
+    this.setAsLiteral("Type");
     this.setTooltip('A simple data type');
   },
   domToMutation: function(xmlElement) {
@@ -60,7 +60,7 @@ Blockly.Blocks['type_user'] = {
     return container;
   },
   getType: function(){
-    return new Blockly.TypeExpr(this.getFieldValue('NAME'));
+    return Type.Lit(this.getFieldValue('Name'));
   }
 };
 
@@ -70,14 +70,13 @@ Blockly.Blocks['type_product'] = {
     this.setColour(90);
     this.appendDummyInput()
         .appendField(new Blockly.FieldTextInput('Constructor', Blockly.UserTypes.renameProduct), 'CONSTRUCTOR')
-    this.appendValueInput('TP0')
-        .setTypeExpr(new Blockly.TypeExpr('Type'))
-    this.appendValueInput('TP1')
-        .setTypeExpr(new Blockly.TypeExpr('Type'));
+    this.appendValueInput('TP0');
+    this.appendValueInput('TP1');
     this.setOutput(true);
 
+    this.arrows = Type.fromList([Type.Lit("Type"), Type.Lit("Type"), Type.Lit("Product")]);
+    
     this.setInputsInline(true);
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Product'));
     this.setMutator(new Blockly.Mutator(['tp_create_with_field']));
     this.setTooltip('Add a term to an algabraic data type');
     this.itemCount_ = 2;
@@ -100,10 +99,14 @@ Blockly.Blocks['type_product'] = {
       this.removeInput('TP' + x);
     }
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+    var tps = [];
     for (var x = 0; x < this.itemCount_; x++) {
-      var input = this.appendValueInput('TP' + x)
-                      .setTypeExpr(new Blockly.TypeExpr('Type'));
+      var input = this.appendValueInput('TP' + x);
+      tps.push(Type.Lit("Type"));
     }
+    tps.push(Type.Lit("Product"));
+    this.arrows = Type.fromList(tps);
+    this.initArrows();
   },
   decompose: function(workspace) {
     var containerBlock =
@@ -128,9 +131,10 @@ Blockly.Blocks['type_product'] = {
     this.itemCount_ = 0;
     // Rebuild the block's inputs.
     var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var tps = [];
     while (itemBlock) {
-      var input = this.appendValueInput('TP' + this.itemCount_)
-                      .setTypeExpr(new Blockly.TypeExpr('Type'));
+      var input = this.appendValueInput('TP' + this.itemCount_);
+      tps.push(Type.Lit("Type"));
       // Reconnect any child blocks.
       if (itemBlock.valueConnection_) {
         input.connection.connect(itemBlock.valueConnection_);
@@ -139,6 +143,9 @@ Blockly.Blocks['type_product'] = {
       itemBlock = itemBlock.nextConnection &&
           itemBlock.nextConnection.targetBlock();
     }
+    tps.push(Type.Lit("Product"));
+    this.arrows = Type.fromList(tps);
+    this.initArrows();
     this.renderMoveConnections_();
   },
   saveConnections: function(containerBlock) {
@@ -230,13 +237,14 @@ Blockly.Blocks['type_sum'] = {
         .appendField(new Blockly.FieldTextInput('UserType',Blockly.UserTypes.renameType), 'NAME');
     this.appendValueInput('PROD0')
         .appendField('|')
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .setTypeExpr(new Blockly.TypeExpr('Product'))
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.setOutput(false);
     this.setMutator(new Blockly.Mutator(['tp_create_with_variant']));
     this.setTooltip('Define a specific data type');
     this.itemCount_ = 1;
     this.allowRename = false;
+
+    this.arrows = Type.fromList([Type.Lit("Product"), Type.Lit("Sum")]);
   },
 
   fixName: function() {
@@ -255,13 +263,16 @@ Blockly.Blocks['type_sum'] = {
       this.removeInput('PROD' + x);
     }
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+    var tps = [];
     for (var x = 0; x < this.itemCount_; x++) {
       var input = this.appendValueInput('PROD' + x)
                       .appendField('|')
-                      .setAlign(Blockly.ALIGN_RIGHT)
-                      .setTypeExpr(new Blockly.TypeExpr('Product'));
+                      .setAlign(Blockly.ALIGN_RIGHT);
+      tps.push(Type.Lit("Product"));
     }
-
+    tps.push(Type.Lit("Sum"));
+    this.arrows = Type.fromList(tps);
+    this.initArrows();
   
   },
   decompose: function(workspace) {
@@ -287,11 +298,12 @@ Blockly.Blocks['type_sum'] = {
     this.itemCount_ = 0;
     // Rebuild the block's inputs.
     var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var tps = [];
     while (itemBlock) {
       var input = this.appendValueInput('PROD' + this.itemCount_)
                       .appendField('|')
-                      .setAlign(Blockly.ALIGN_RIGHT)
-                      .setTypeExpr(new Blockly.TypeExpr('Product'));
+                      .setAlign(Blockly.ALIGN_RIGHT);
+      tps.push(Type.Lit("Product"));
       // Reconnect any child blocks.
       if (itemBlock.valueConnection_) {
         input.connection.connect(itemBlock.valueConnection_);
@@ -300,6 +312,9 @@ Blockly.Blocks['type_sum'] = {
       itemBlock = itemBlock.nextConnection &&
           itemBlock.nextConnection.targetBlock();
     }
+    tps.push("Sum");
+    this.arrows = Type.fromList(tps);
+    this.initArrows();
     this.renderMoveConnections_();
     Blockly.UserTypes.mutateCases(this);
   },
@@ -326,15 +341,12 @@ Blockly.Blocks['expr_constructor'] = {
   init: function() {
     this.setColour(90);
     this.appendDummyInput()
-        .appendField(new Blockly.FieldLabel('Case of', 'blocklyTextEmph'),'NAME')
-    this.appendValueInput('TP0')
-        .setTypeExpr(new Blockly.TypeExpr('Number'))
-    this.appendValueInput('TP1')
-        .setTypeExpr(new Blockly.TypeExpr('String'));
+        .appendField(new Blockly.FieldLabel('Case of', 'blocklyTextEmph'),'NAME');
+    this.appendValueInput('TP0');
+    this.appendValueInput('TP1');
     this.setOutput(true);
 
     this.setInputsInline(true);
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Product'));
     this.setTooltip('Construct a specific data type');
     this.itemCount_ = 2;
   },
@@ -361,17 +373,20 @@ Blockly.Blocks['expr_constructor'] = {
 
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
     this.setFieldValue(xmlElement.getAttribute('name'), 'NAME');
-    this.setOutputTypeExpr(new Blockly.TypeExpr( xmlElement.getAttribute('output') ));
 
+    var tps = [];
     for (var i = 0, childNode; childNode = xmlElement.childNodes[i]; i++) {
       if (childNode.nodeName.toLowerCase() == 'type') {
         var typename = childNode.getAttribute('name');
 
-        var typeExpr = Blockly.TypeExpr.fromDom(childNode);
-        var input = this.appendValueInput('TP' + i)
-            .setTypeExpr(typeExpr);
+        var typeExpr = Type.fromDom(childNode);
+        var input = this.appendValueInput('TP' + i);
+        tps.push(typeExpr);
       }
     }
+    tps.push(xmlElement.getAttribute('output'));
+    this.arrows = Type.fromList(tps);
+    this.initArrows();
   },
 
   saveConnections: function(containerBlock) {
@@ -390,26 +405,23 @@ Blockly.Blocks['expr_constructor'] = {
 Blockly.Blocks['expr_case'] = {
   init: function() {
     this.setColour(190);
-    var a = Blockly.TypeVar.getUnusedTypeVar();
-    this.a = a;
+    this.a = Type.Var('a');
     this.appendValueInput('INPUT')
         .appendField(new Blockly.FieldLabel('Case of', 'blocklyTextEmph'))
-        .appendField(new Blockly.FieldLabel('Maybe', 'blocklyTextEmph'), 'NAME')
-        .setTypeExpr(new Blockly.TypeExpr('Maybe'));
+        .appendField(new Blockly.FieldLabel('Maybe', 'blocklyTextEmph'), 'NAME');
     var f = new Blockly.FieldVarInput('a');
     f.type = 'Number';
     this.appendValueInput('CS0')
         .appendField('Just')
         .appendField(' ')
-        .appendField(f)
-        .setTypeExpr(a);
+        .appendField(f);
     this.appendValueInput('CS1')
-        .appendField('Nothing')
-        .setTypeExpr(a);
+        .appendField('Nothing');
     this.setOutput(true);
     this.setTooltip('Decompose a data type piecewise');
-    this.setOutputTypeExpr(a);
     this.itemCount_ = 2;
+
+    this.arrows = Type.fromList([Type.Lit("Maybe"), this.a, this.a, this.a ]);
 
   },
 
@@ -477,28 +489,28 @@ Blockly.Blocks['expr_case'] = {
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
     var name = xmlElement.getAttribute('name');
     this.setFieldValue(name, 'NAME');
-    this.arrows = [];
-    this.getInput('INPUT').setTypeExpr(new Blockly.TypeExpr(name));
-    this.arrows.push(new Blockly.TypeExpr(name));
+    var tps = [];
+    tps.push(Type.Lit(name));
     for (var i = 0, productNode; productNode = xmlElement.childNodes[i]; i++) {
       if (productNode.nodeName.toLowerCase() == 'product') {
         var constructorName = productNode.getAttribute('constructor');
 
-        var input = this.appendValueInput('CS' + i)
-            .setTypeExpr(this.a);
+        var input = this.appendValueInput('CS' + i);
+        tps.push(this.a);
 
-        this.arrows.push(new Blockly.TypeExpr('_POLY_A'));
         input.appendField(constructorName);
         
         for(var j = 0, typeNode; typeNode = productNode.childNodes[j]; j++){
           if(typeNode.nodeName.toLowerCase() != 'type') continue;
-          var tp = Blockly.TypeExpr.fromDom(typeNode);
+          var tp = Type.fromDom(typeNode);
           input.appendField(' ');
           input.appendField(new Blockly.FieldVarInput(String.fromCharCode(97 + j),tp));
         }
       }
-
-      this.arrows.push(new Blockly.TypeExpr('_POLY_A'));
+      
+      tps.push(this.a);
+      this.arrows = Type.fromList(tps);
+      this.initArrows();
     }
   },
 
