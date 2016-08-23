@@ -189,9 +189,7 @@ Blockly.Block.prototype.setAsLiteral = function(name){
 
 Blockly.Block.prototype.initArrows = function(){
   if( !this.arrows && this.functionName.length > 0){
-    console.log('before: ' + Blockly.Block.builtinTypes[this.functionName].toString());
     var type = Type.instantiate(Blockly.Block.builtinTypes[this.functionName]);
-    console.log('after: ' + type.toString());
     if(!type)
       throw "Builtin type for '" + this.functionName + "' was not found";
     Blockly.Block.updateConnectionTypes(this, type);

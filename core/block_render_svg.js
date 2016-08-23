@@ -1293,7 +1293,14 @@ Blockly.BlockSvg.typeVarHighlights = function(typeExpr) {
 
 Blockly.BlockSvg.typeVarHighlights_ = function(typeExpr, y, typeVarHighlights) {
   if (typeExpr) {
-    var name = typeExpr.name;
+    var tp = Type.getOutput(typeExpr);
+    var name = "";
+    if(tp.isLiteral())
+      name = tp.getLiteralName();
+    else if (tp.isTypeVar())
+      name = tp.getTypeVar();
+    else
+      throw "Unknown type";
     if (typeExpr.isTypeVar()) {
       typeVarHighlights.push({
         color: Blockly.TypeInf.getTypeVarColor(name), 
