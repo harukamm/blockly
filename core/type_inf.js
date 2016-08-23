@@ -10,28 +10,55 @@ goog.require('Type');
 
 
 
-/*Blockly.TypeExpr.prototype.toDom = function(){
+Blockly.TypeInf.toDom = function(type){
    var typeDom = goog.dom.createDom('type');
-   typeDom.setAttribute('name', this.name);
+   if(type.isLiteral()){
+     typeDom.setAttribute('type', 'literal');
+     typeDom.setAttribute('name', type.getLiteralName());
 
-   this.children.forEach(function(child){
-      typeDom.appendChild(child.toDom());
-   });
+     type.getLiteralChildren.forEach(function(child){
+       typeDom.appendChild(Blockly.TypeInf.toDom(child));
+     });
+   }
+   else if(type.isFunction()){
+     typeDom.setAttribute('type', 'function');
+     typeDom.appendChild(Blockly.TypeInf.toDom(type.getFirst()));
+     typeDom.appendChild(Blockly.TypeInf.toDom(type.getSecond()));
+   }
+   else if(type.isTypeVar()){
+     typeDom.setAttribute('type', 'var');
+     typeDom.setAttribute('var', type.getTypeVar());
+   }
+   else
+     throw "Unknown type";
 
    return typeDom;
 }
 
-Blockly.TypeExpr.fromDom = function(element){
-  var name = element.getAttribute('name');
-  var childNodes = element.childNodes;
+Blockly.TypeInf.fromDom = function(element){
+  var type = element.getAttribute('type');
+  if(type == 'literal'){
+    var name = element.getAttribute('name');
+    var childNodes = element.childNodes;
+    var children = []
+    childNodes.forEach(function(childNode){
+      children.push(Blockly.TypeInf.fromDom(childNode));
+    });
+    return Type.Lit(name,children);
+  }
+  else if (type == 'function'){
+    var fst = Blockly.TypeInf.fromDom(element.childNodes[0]);
+    var snd = Blockly.TypeInf.fromDom(element.childNodes[1]);
+    return Type.Func(fst, snd);
 
-  var children = []
-  childNodes.forEach(function(childNode){
-    children.push(Blockly.TypeExpr.fromDom(childNode));
-  });
+  }
+  else if (type == 'var'){
+    var name = element.getAttribute('var');
+    return Type.Var(name);
 
-  return new Blockly.TypeExpr(name,children);
-}*/
+  }
+  throw "Unknown type" + type;
+}
 
 
 Blockly.TypeInf.activeVars = {};
@@ -91,6 +118,8 @@ Blockly.TypeInf.resetComponent = function(block){
 };
 
 Blockly.TypeInf.getGrandParent = function(block){
+  if(!block.outputConnection)
+    return block;
   if(!block.outputConnection.isConnected())
     return block;
   else
