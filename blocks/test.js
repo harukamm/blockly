@@ -38,7 +38,7 @@ Blockly.Blocks['test_logic_ternary'] = {
     this.setInputsInline(true);
     this.setOutput(true);
 
-    Blockly.Block.defineFunction('if', Type.fromList([Type.Lit("Number"),Type.Var("a"),Type.Var("a"),Type.Var("a")]));
+    Blockly.Block.defineFunction('if', Type.fromList([Type.Lit("Bool"),Type.Var("a"),Type.Var("a"),Type.Var("a")]));
     this.setAsFunction('if'); 
   }
 };
