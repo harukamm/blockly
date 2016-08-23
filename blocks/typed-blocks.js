@@ -140,7 +140,7 @@ Blockly.Blocks['math_arithmetic_typed'] = {
     this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
     
-    Blockly.Block.defineFunction("binMath",Type.fromList([Type.Lit("Number"), Type.Lit("Number"), Type.Lit("Number")]));
+    Blockly.TypeInf.defineFunction("binMath",Type.fromList([Type.Lit("Number"), Type.Lit("Number"), Type.Lit("Number")]));
     this.setAsFunction("binMath");
 
     var thisBlock = this;

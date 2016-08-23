@@ -553,10 +553,8 @@ Blockly.Blocks['pair_create_typed'] = {
    this.setOutput(true);
    this.setInputsInline(true);
    this.functionName = ",";
-   var a = new Blockly.TypeExpr('_POLY_A');
-   var b = new Blockly.TypeExpr('_POLY_B');
-   var out = new Blockly.TypeExpr('pair', [a,b]);
-   this.arrows = [a,b,out];
+   Blockly.TypeInf.defineFunction(",", Type.fromList([Type.Var("a"), Type.Var("b"), Type.Lit("pair", [Type.Var("a"), Type.Var("b")])]));
+   this.setAsFunction(",");
  }
 };
 
@@ -572,12 +570,9 @@ Blockly.Blocks['pair_first_typed'] = {
     this.appendValueInput('PAIR')
         .appendField(new Blockly.FieldLabel("firstOfPair","blocklyTextEmph") );
     this.setOutput(true);
-    this.setOutputTypeExpr(A);
-    this.functionName = "firstOfPair";
-    var a = new Blockly.TypeExpr('_POLY_A');
-    var b = new Blockly.TypeExpr('_POLY_B');
-    var out = new Blockly.TypeExpr('pair', [a,b]);
 
+    Blockly.TypeInf.defineFunction("fst", Type.fromList([Type.Lit("pair", [Type.Var("a"), Type.Var("b")]), Type.Var("a")]));
+    this.setAsFunction("fst");
   }
 };
 
@@ -593,13 +588,9 @@ Blockly.Blocks['pair_second_typed'] = {
     this.appendValueInput('PAIR')
         .appendField(new Blockly.FieldLabel("secondOfPair","blocklyTextEmph") );
     this.setOutput(true);
-    this.setOutputTypeExpr(B);
-    this.functionName = "secondOfPair";
 
-    var a = new Blockly.TypeExpr('_POLY_A');
-    var b = new Blockly.TypeExpr('_POLY_B');
-    var out = new Blockly.TypeExpr('pair', [a,b]);
-    this.arrows = [out, b];
+    Blockly.TypeInf.defineFunction("fst", Type.fromList([Type.Lit("pair", [Type.Var("a"), Type.Var("b")]), Type.Var("a")]));
+    this.setAsFunction("fst");
   }
 };
 
