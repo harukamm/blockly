@@ -49,14 +49,28 @@
     this.v = v;
   };
   
+  /**
+   * @param {string} name
+   * @param {!Array<Type>} children
+   * @return {Type}
+   */
   Type.Lit = function(name, children){
     return new Type(new TLit(name, children));
   };
-  
+ 
+  /**
+   * @param {string} name
+   * @return {Type}
+   */
   Type.Var = function(name){
     return new Type(new TVar(name));
   };
 
+  /** 
+   * @param {Type} fst
+   * @param {Type} snd
+   * @return {Type}
+   */
   Type.Func = function(fst, snd){
     return new Type(new TFunction(fst, snd));
   };
@@ -733,7 +747,6 @@
   var ln = Type.apply(m,l);
   console.log(kn.toString());
   console.log(ln.toString());
-  throw("End of the line punks");
   //console.log(z.toObject() );
   //console.log(x.toObject());
   //console.log('end test mgu');
