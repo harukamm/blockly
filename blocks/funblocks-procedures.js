@@ -48,7 +48,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     this.setStatements_(false);
     this.statementConnection_ = null;
     this.allowRename = false;
-    this.arrows = [new Blockly.TypeExpr('_POLY_A')];
+    this.arrows = Type.Var("a");
   },
   setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
   validate: Blockly.Blocks['procedures_defnoreturn'].validate,
@@ -146,9 +146,11 @@ Blockly.Blocks['procedures_letFunc'] = {
     this.arguments_ = [];
     this.paramIds_ = [];
     var paramBlock = containerBlock.getInputTargetBlock('STACK');
+    var i = 0;
     while (paramBlock) {
       this.arguments_.push(paramBlock.getFieldValue('NAME'));
-      this.argTypes_.push(Blockly.TypeVar.getUnusedTypeVar());
+      var chr = String.fromCharCode(97 + i++);
+      this.argTypes_.push(Type.Var(chr));
       this.paramIds_.push(paramBlock.id);
       paramBlock = paramBlock.nextConnection &&
           paramBlock.nextConnection.targetBlock();
@@ -195,53 +197,54 @@ Blockly.Blocks['procedures_letFunc'] = {
 
 
   onchange: function(changeEvent) {
-    var name = this.getFieldValue('NAME');
-    var defBlock = this;
-    var workspace = Blockly.getMainWorkspace();
-    var eventBlock = workspace.getBlockById(changeEvent.blockId);
-    if(!eventBlock || eventBlock.blockId != this.blockId)
-      return; // Only care about events on the parent this block
+    // TODO, figure out what to do here
+    // var name = this.getFieldValue('NAME');
+    // var defBlock = this;
+    // var workspace = Blockly.getMainWorkspace();
+    // var eventBlock = workspace.getBlockById(changeEvent.blockId);
+    // if(!eventBlock || eventBlock.blockId != this.blockId)
+    //   return; // Only care about events on the parent this block
 
-    var parentBlock = null;
-    if(changeEvent.oldParentId)
-      parentBlock = workspace.getBlockById(changeEvent.oldParentId);
-    else if(changeEvent.newParentId)
-      parentBlock = workspace.getBlockById(changeEvent.newParentId);
+    // var parentBlock = null;
+    // if(changeEvent.oldParentId)
+    //   parentBlock = workspace.getBlockById(changeEvent.oldParentId);
+    // else if(changeEvent.newParentId)
+    //   parentBlock = workspace.getBlockById(changeEvent.newParentId);
 
-    if(!parentBlock || parentBlock.type != 'procedures_letFunc')
-      return; 
+    // if(!parentBlock || parentBlock.type != 'procedures_letFunc')
+    //   return; 
 
-    if(parentBlock.getFieldValue('NAME') != name)
-      return; // Only event when parentblock is this block
+    // if(parentBlock.getFieldValue('NAME') != name)
+    //   return; // Only event when parentblock is this block
 
-    if(changeEvent.type == Blockly.Events.MOVE && changeEvent.newInputName)
-    {
-      // Plug in new block
-      var callers = Blockly.Procedures.getCallers(name, workspace);
-      var tp = defBlock.getInput("RETURN").connection.getTypeExpr();
-      callers.forEach(function(block)
-          {
-            if(block.getProcedureCall() == name)
-            {
-              if(block.outputConnection.typeExpr.name != tp.name)
-              {
-                // block.outputConnection.bumpAwayFrom_(block.outputConnection.targetConnection);
-                block.unplug();
-                block.moveBy(-20,-20);
+    // if(changeEvent.type == Blockly.Events.MOVE && changeEvent.newInputName)
+    // {
+    //   // Plug in new block
+    //   var callers = Blockly.Procedures.getCallers(name, workspace);
+    //   var tp = defBlock.getInput("RETURN").connection.getTypeExpr();
+    //   callers.forEach(function(block)
+    //       {
+    //         if(block.getProcedureCall() == name)
+    //         {
+    //           if(block.outputConnection.typeExpr.name != tp.name)
+    //           {
+    //             // block.outputConnection.bumpAwayFrom_(block.outputConnection.targetConnection);
+    //             block.unplug();
+    //             block.moveBy(-20,-20);
 
-                block.setOutputTypeExpr(tp);
-                block.setColourByType(tp);
-                if(block.outputConnection.typeExpr)
-                  block.outputConnection.typeExpr.unify(tp);
+    //             block.setOutputTypeExpr(tp);
+    //             block.setColourByType(tp);
+    //             if(block.outputConnection.typeExpr)
+    //               block.outputConnection.typeExpr.unify(tp);
 
-                block.render();
-              }
-            }
-          });
-    }
-    else if(changeEvent.type == Blockly.Events.MOVE && changeEvent.oldInputName)
-    {
-    }
+    //             block.render();
+    //           }
+    //         }
+    //       });
+    // }
+    // else if(changeEvent.type == Blockly.Events.MOVE && changeEvent.oldInputName)
+    // {
+    // }
   },
   resetCallers: function(){
     var defBlock = this;

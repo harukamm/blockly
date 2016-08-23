@@ -200,8 +200,10 @@ Blockly.Block.prototype.initArrows = function(){
     Blockly.Block.updateConnectionTypes(this, type);
   }
   else{
-    if(!this.arrows)
-      throw "Block '" + this.type + "' must have a type !";
+    if(!this.arrows){
+      //throw "Block '" + this.type + "' must have a type !";
+      return; // This is for statement types - We don't worry about them
+    }
     var type = Type.instantiate(this.arrows);
     Blockly.Block.updateConnectionTypes(this, type);
   }
