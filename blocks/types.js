@@ -322,18 +322,6 @@ Blockly.Blocks['type_sum'] = {
   }
 };
 
-Blockly.Blocks['circTest'] = {
-  init: function() {
-    this.setColour(160);
-    this.appendValueInput('NUM')
-        .setTypeExpr(new Blockly.TypeExpr('Number'))
-        .appendField(new Blockly.FieldLabel("Circle","blocklyTextEmph") );
-    this.setOutput(true);
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Picture'));
-    this.functionName = "circle";
-  }
-};
-
 Blockly.Blocks['expr_constructor'] = {
   init: function() {
     this.setColour(90);

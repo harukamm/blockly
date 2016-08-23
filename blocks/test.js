@@ -38,7 +38,7 @@ Blockly.Blocks['test_logic_ternary'] = {
     this.setInputsInline(true);
     this.setOutput(true);
 
-    Blockly.Block.defineFunction('if', Type.fromList([Type.Lit("Bool"),Type.Var("a"),Type.Var("a"),Type.Var("a")]));
+    Blockly.TypeInf.defineFunction('if', Type.fromList([Type.Lit("Bool"),Type.Var("a"),Type.Var("a"),Type.Var("a")]));
     this.setAsFunction('if'); 
   }
 };
@@ -68,3 +68,15 @@ Blockly.Blocks['test_true'] = {
     this.setAsLiteral('Bool'); 
   }
 };
+
+Blockly.Blocks['circTest'] = {
+  init: function() {
+    this.setColour(160);
+    this.appendValueInput('NUM')
+        .appendField(new Blockly.FieldLabel("Circle","blocklyTextEmph") );
+    this.setOutput(true);
+    Blockly.TypeInf.defineFunction("circTest", Type.fromList([Type.Lit("Number"), Type.Lit("Picture")]));
+    this.setAsFunction("circTest");
+  }
+};
+

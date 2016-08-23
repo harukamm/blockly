@@ -2,6 +2,7 @@
 'use strict';
 
   goog.provide('Type');
+  goog.require("Immutable");
   goog.provide('Scheme');
   goog.provide('TypeEnv');
   goog.provide('Exp');

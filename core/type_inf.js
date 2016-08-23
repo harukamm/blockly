@@ -115,6 +115,11 @@ Blockly.TypeInf.getBlocksDown = function(block){
 }
 
 
+Blockly.TypeInf.defineFunction = function(functionName, type){
+  Blockly.Block.builtinTypes[functionName] = type;
+}
+
+
 
 /**
  * @constructor
@@ -164,3 +169,6 @@ RColor.prototype.get = function(hex,saturation,value) {
   else 
     return rgb;
 };
+
+
+

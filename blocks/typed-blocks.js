@@ -37,12 +37,12 @@ Blockly.Blocks['logic_boolean_typed'] = {
          [Blockly.Msg.LOGIC_BOOLEAN_FALSE, 'FALSE']];
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
     this.setColour(210);
-    this.setOutput(true, 'Bool');
+    this.setOutput(true);
     // Sorin
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Bool'));
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(BOOLEANS), 'BOOL');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+    this.setAsLiteral('Bool');
   }
 };
 
@@ -71,13 +71,13 @@ Blockly.Blocks['logic_compare_typed'] = {
     this.setColour(210);
     this.setOutput(true, 'Bool');
     // Sorin
-    this.setOutputTypeExpr(new Blockly.TypeExpr('Bool'));
     this.appendValueInput('A');
     this.appendValueInput('B')
         .appendField(new Blockly.FieldDropdown(OPERATORS), 'OP');
     this.setInputsInline(true);
 
-    this.arrows = [new Blockly.TypeExpr('_POLY_A'), new Blockly.TypeExpr('_POLY_A'), new Blockly.TypeExpr('Bool')];
+    Blockly.TypeInf.defineFunction("==", Type.fromList([Type.Var('a'), Type.Var('a'), Type.Lit('Bool')]));
+    this.setAsFunction("==");
 
     // Assign 'this' to a variable for use in the tooltip closure below.
     var thisBlock = this;
@@ -104,20 +104,16 @@ Blockly.Blocks['logic_ternary_typed'] = {
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_TERNARY_HELPURL);
     this.setColour(210);
-    var A = Blockly.TypeVar.getUnusedTypeVar();
     this.appendValueInput('IF')
-        .setCheck('Bool')
-        .setTypeExpr(new Blockly.TypeExpr('Bool'))
         .appendField(Blockly.Msg.LOGIC_TERNARY_CONDITION);
     this.appendValueInput('THEN')
-        .setTypeExpr(A)
         .appendField(Blockly.Msg.LOGIC_TERNARY_IF_TRUE);
     this.appendValueInput('ELSE')
-        .setTypeExpr(A)
         .appendField(Blockly.Msg.LOGIC_TERNARY_IF_FALSE);
     this.setInputsInline(true);
     this.setOutput(true);
-    this.setOutputTypeExpr(A);
+    Blockly.TypeInf.defineFunction("if", Type.fromList([Type.Lit('Bool'), Type.Var('a'), Type.Var('a'), Type.Var('a')]));
+    this.setAsFunction("if");
     this.setTooltip(Blockly.Msg.LOGIC_TERNARY_TOOLTIP);
   }
 };
@@ -173,9 +169,8 @@ Blockly.Blocks['pair_first_typed'] = {
     this.appendValueInput('PAIR')
         .appendField(new Blockly.FieldLabel("fst","blocklyTextEmph") );
     this.setOutput(true);
-
-    this.defineFunction('if', Type.fromList(["Number","_POLY_A","_POLY_A","_POLY_A"]));
-    this.setAsFunction('if'); 
+    
+    this.arrows = Type.fromList([Type.Lit("pair", [Type.Var("a"), Type.Var("b")]), Type.Var("a")]);
   }
 };
 
@@ -186,153 +181,11 @@ Blockly.Blocks['pair_second_typed'] = {
    */
   init: function() {
     this.setColour(210);
-    var A = Blockly.TypeVar.getUnusedTypeVar();
-    var B = Blockly.TypeVar.getUnusedTypeVar();
     this.appendValueInput('PAIR')
-        .setTypeExpr(new Blockly.TypeExpr ("pair", [A, B]))
         .appendField(new Blockly.FieldLabel("snd","blocklyTextEmph") );
     this.setOutput(true);
-    this.setOutputTypeExpr(B);
+
+    this.arrows = Type.fromList([Type.Lit("pair", [Type.Var("a"), Type.Var("b")]), Type.Var("b")]);
   }
 };
 
-/**
- * First class functions
- */
-
-Blockly.Blocks.lambda_id = 0;
-
-Blockly.Blocks['lambda_typed'] = {
-  /**
-   */
-  init: function() {
-    this.setColour(290);
-    var A = Blockly.TypeVar.getUnusedTypeVar();
-    var B = Blockly.TypeVar.getUnusedTypeVar();
-    this.argName = 'X' + Blockly.Blocks.lambda_id;
-    Blockly.Blocks.lambda_id++;
-    this.appendDummyInput()
-        .appendField('function with arg: ' + this.argName);
-    this.appendValueInput('RETURN')
-        .setTypeExpr(B)
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField(Blockly.Msg.PROCEDURES_DEFRETURN_RETURN);
-    this.setOutput(true);
-    this.setOutputTypeExpr(new Blockly.TypeExpr ("fun", [A, B]));
-  },
-
-  getVars: function () {
-    return [this.argName];
-  },
-
-  getVarsWithTypes: function() {
-    var result = {};
-    result[this.argName] = this.outputConnection.typeExpr.children[0];
-    return result;
-  }
-}
-
-Blockly.Blocks['lambda_app_typed'] = {
-  /**
-   */
-  init: function() {
-    this.setColour(290);
-    var A = Blockly.TypeVar.getUnusedTypeVar();
-    var B = Blockly.TypeVar.getUnusedTypeVar();
-    this.appendValueInput('FUN')
-        .setTypeExpr(new Blockly.TypeExpr ("fun", [A, B]))
-        .appendField('call function');
-    this.appendValueInput('ARG')
-        .setTypeExpr(A)
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField('with arg');
-    this.setOutput(true);
-    this.setOutputTypeExpr(B);
-  },
-
-  getVars: function () {
-    return [this.argName];
-  },
-
-  getVarsWithTypes: function() {
-    var result = {};
-    result[this.argName] = this.outputConnection.typeExpr.children[0];
-    return result;
-  }
-}
-
-/**
- * Typed variables
- */
-
-Blockly.Blocks['variables_get_typed'] = {
-  /**
-   * Block for variable getter.
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.setHelpUrl(Blockly.Msg.VARIABLES_GET_HELPURL);
-    this.setColour(330);
-    this.appendDummyInput()
-        .appendField(Blockly.Msg.VARIABLES_GET_TITLE)
-        .appendField(new Blockly.FieldVariable(
-          Blockly.Msg.VARIABLES_GET_ITEM, this.createDropDownChangeFunction()), 'VAR')
-        .appendField(Blockly.Msg.VARIABLES_GET_TAIL);
-    this.setOutput(true);
-    this.setTooltip(Blockly.Msg.VARIABLES_GET_TOOLTIP);
-    this.contextMenuMsg_ = Blockly.Msg.VARIABLES_GET_CREATE_SET;
-    this.contextMenuType_ = 'variables_set';
-  },
-  /**
-   * Return all variables referenced by this block.
-   * @return {!Array.<string>} List of variable names.
-   * @this Blockly.Block
-   */
-  getVars: function() {
-    return [this.getFieldValue('VAR')];
-  },
-  /**
-   * Notification that a variable is renaming.
-   * If the name matches one of this block's variables, rename it.
-   * @param {string} oldName Previous name of variable.
-   * @param {string} newName Renamed variable.
-   * @this Blockly.Block
-   */
-  renameVar: function(oldName, newName) {
-    if (Blockly.Names.equals(oldName, this.getFieldValue('VAR'))) {
-      this.setFieldValue(newName, 'VAR');
-    }
-  },
-  /**
-   * Add menu option to create getter/setter block for this setter/getter.
-   * @param {!Array} options List of menu options to add to.
-   * @this Blockly.Block
-   */
-  customContextMenu: function(options) {
-    var option = {enabled: true};
-    var name = this.getFieldValue('VAR');
-    option.text = this.contextMenuMsg_.replace('%1', name);
-    var xmlField = goog.dom.createDom('field', null, name);
-    xmlField.setAttribute('name', 'VAR');
-    var xmlBlock = goog.dom.createDom('block', null, xmlField);
-    xmlBlock.setAttribute('type', this.contextMenuType_);
-    option.callback = Blockly.ContextMenu.callbackFactory(this, xmlBlock);
-    options.push(option);
-  },
-
-  createDropDownChangeFunction: function() {
-    var self = this;
-    return function(text) {
-      var blocks = Blockly.mainWorkspace.getAllBlocks();
-      for (var i = 0; i < blocks.length; i++) {
-        if (blocks[i].getVarsWithTypes) {
-          var varsWithTypes = blocks[i].getVarsWithTypes();
-          if (text in varsWithTypes) {
-            self.setOutputTypeExpr(varsWithTypes[text]);
-          }
-        }
-      }
-      return undefined;
-    };
-  }
-};

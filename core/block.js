@@ -124,7 +124,7 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   this.allowRename = true;
 
   // List of typeExpr. The last typeExpr is the output
-  this.arrows = [];
+  this.arrows = null;
 
   /**
    * @type {!goog.math.Coordinate}
@@ -169,10 +169,6 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   }
 };
 
-Blockly.Block.defineFunction = function(functionName, type){
-  Blockly.Block.builtinTypes[functionName] = type;
-}
-
 Blockly.Block.prototype.setAsFunction = function(name){
   this.arrows = null;
   this.functionName = name;
@@ -184,10 +180,19 @@ Blockly.Block.prototype.setAsLiteral = function(name){
   this.arrows = Type.Lit(name);
 }
 
+Blockly.Block.prototype.setAsLiteralT = function(tp){
+  this.setOutput(true);
+  this.functionName = 'Literal';
+  this.arrows = tp;
+}
+
+
+
 // Uses same typeExpr, though _POLY_ get turned into a
 // Blockly.TypeVar.getUnusedTypeVar()
 
 Blockly.Block.prototype.initArrows = function(){
+  console.log(this.type);
   if( !this.arrows && this.functionName.length > 0){
     var type = Type.instantiate(Blockly.Block.builtinTypes[this.functionName]);
     if(!type)
@@ -195,6 +200,8 @@ Blockly.Block.prototype.initArrows = function(){
     Blockly.Block.updateConnectionTypes(this, type);
   }
   else{
+    if(!this.arrows)
+      throw "Block '" + this.type + "' must have a type !";
     var type = Type.instantiate(this.arrows);
     Blockly.Block.updateConnectionTypes(this, type);
   }
