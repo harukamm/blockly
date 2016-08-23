@@ -586,11 +586,9 @@ Blockly.Blocks['pair_first_typed'] = {
     this.setOutput(true);
     this.setOutputTypeExpr(A);
     this.functionName = "firstOfPair";
-    this.arrows
     var a = new Blockly.TypeExpr('_POLY_A');
     var b = new Blockly.TypeExpr('_POLY_B');
     var out = new Blockly.TypeExpr('pair', [a,b]);
-    this.arrows = [out,a];
 
   }
 };
