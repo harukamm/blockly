@@ -189,18 +189,21 @@ Blockly.Block.prototype.setAsLiteral = function(name){
 
 Blockly.Block.prototype.initArrows = function(){
   if( !this.arrows && this.functionName.length > 0){
-    var type = Blockly.Block.builtinTypes[this.functionName];
+    console.log('before: ' + Blockly.Block.builtinTypes[this.functionName].toString());
+    var type = Type.instantiate(Blockly.Block.builtinTypes[this.functionName]);
+    console.log('after: ' + type.toString());
     if(!type)
       throw "Builtin type for '" + this.functionName + "' was not found";
     Blockly.Block.updateConnectionTypes(this, type);
   }
-  else
-    Blockly.Block.updateConnectionTypes(this, this.arrows);
+  else{
+    var type = Type.instantiate(this.arrows);
+    Blockly.Block.updateConnectionTypes(this, type);
+  }
 };
 
 Blockly.Block.updateConnectionTypes = function(block, type){
   var flattened = Type.flatten(type);
-  console.log(flattened);
   var inp = 0;
   for(var i = 0; i < flattened.length; i++){
     // Handle output

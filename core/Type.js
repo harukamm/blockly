@@ -316,6 +316,16 @@
     }
   };
 
+  /**
+   * Generates a type with new type vars
+   * @param {Type} tp
+   * @return {Type}
+   */
+  Type.instantiate = function(tp){
+    var ftv = Type.ftv(tp);
+    return Scheme.instantiate(new Scheme(ftv,tp));
+  }
+
     // Global state
   var tiSupply = 0;
 
