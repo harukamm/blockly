@@ -119,8 +119,9 @@
       if(this.getLiteralChildren().length > 0){
         str =" [" + str + " : ";
         this.getLiteralChildren().forEach(function(c){
-          str += ", " + c.toString();
+          str += c.toString() + ",";
         });
+        str += "]";
       }
     }
     else{
@@ -207,6 +208,9 @@
     else if (t.isFunction()){
       return Type.Func(Type.apply(s,t.getFirst()), Type.apply(s, t.getSecond()));
     }
+    else if(t.isLiteral() && t.getLiteralChildren().length > 0){
+      return Type.Lit(t.getLiteralName(), t.getLiteralChildren().map(v => Type.apply(s,v)));
+    }
     else
       return t;
   }
@@ -250,7 +254,22 @@
     // TODO check children
     else if(t1.isLiteral() && t2.isLiteral() && t1.getLiteralName() ===
         t2.getLiteralName()){
-      return nullSubst;
+      var cs1 = t1.getLiteralChildren();
+      var cs2 = t2.getLiteralChildren();
+      if(cs1.length != cs2.length)
+        throw "types do not unify: children must have the same length";
+      else if (cs1.length == 0 || cs2.length == 0)
+        return nullSubst;
+      var subs = [];
+      for(var i = 0; i < cs1.length; i++){
+        var s = Type.mgu(cs1[i],cs2[i]);
+        subs.push(s);
+      }
+      var sub = subs[0];
+      for (var i = 1; i< subs.length; i++){
+        sub = Type.composeSubst(sub, subs[i]);
+      }
+      return sub;
     }
     else{
       return false;
@@ -687,22 +706,34 @@
 
 
 
-  var t = Type.Lit("Int");
-  var u = Type.Var("a");
-  var i = Type.Lit("Int");
-  // var f = Type.flatten(r);
+  // var t = Type.Lit("Int");
+  // var u = Type.Var("a");
+  // var i = Type.Lit("Int");
+  // // var f = Type.flatten(r);
 
-  // test mgu
-  
-  var ll =Type.mgu(t,u);
-  //console.log(Array.from(ll.keys()) );
+  // // test mgu
+  // 
+  // var ll =Type.mgu(t,u);
+  // //console.log(Array.from(ll.keys()) );
 
-  var r = Type.fromList([Type.Lit("Int"),Type.Lit("Float"),Type.Var("a")]);
-  var y = Type.fromList([Type.Var("a"),Type.Var("b"),Type.Var("a")]);
-  var z = Type.mgu(r,y);
-  var o = Type.fromList([Type.Lit("Int"),Type.Var("a"),Type.Var("a")]);
-  var p = Type.fromList([Type.Var("b"), Type.Var("a"), Type.Var("a")]);
-  var x = Type.mgu(o,p);
+  // var r = Type.fromList([Type.Lit("Int"),Type.Lit("Float"),Type.Var("a")]);
+  // var y = Type.fromList([Type.Var("a"),Type.Var("b"),Type.Var("a")]);
+  // var z = Type.mgu(r,y);
+  // var o = Type.fromList([Type.Lit("Int"),Type.Var("a"),Type.Var("a")]);
+  // var p = Type.fromList([Type.Var("b"), Type.Var("a"), Type.Var("a")]);
+  // var x = Type.mgu(o,p);
+
+  var k = Type.Lit("Pair",[Type.Var("a"), Type.Var("b")]);
+  var l = Type.Lit("Pair",[Type.Lit("Int"), Type.Var("c")]);
+  var m = Type.mgu(k,l);
+  console.log(k.toString());
+  console.log(l.toString());
+  console.log(m.toObject());
+  var kn = Type.apply(m,k);
+  var ln = Type.apply(m,l);
+  console.log(kn.toString());
+  console.log(ln.toString());
+  throw("End of the line punks");
   //console.log(z.toObject() );
   //console.log(x.toObject());
   //console.log('end test mgu');
