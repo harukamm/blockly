@@ -67,12 +67,12 @@ Blockly.TypeInf.connectComponent = function(block){
 }
 
 Blockly.TypeInf.disconnectComponent = function(parentBlock, childBlock){
-  Blockly.TypeInf.resetComponent(parentBlock);
   Blockly.TypeInf.resetComponent(childBlock);
+  Blockly.TypeInf.resetComponent(parentBlock);
   // Now we have two components
   // Unify here !
-  Blockly.TypeInf.UnifyComponent(parentBlock);
   Blockly.TypeInf.UnifyComponent(childBlock);
+  Blockly.TypeInf.UnifyComponent(parentBlock);
 };
 
 Blockly.TypeInf.getComponent = function(block){
