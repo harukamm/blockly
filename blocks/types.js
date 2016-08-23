@@ -359,7 +359,7 @@ Blockly.Blocks['expr_constructor'] = {
 
     for (var i = 0; i < this.itemCount_; i++) {
       var tp = this.getInput("TP" + i).connection.typeExpr; 
-      container.appendChild(tp.toDom());
+      container.appendChild( Blockly.TypeInf.toDom(tp));
     }
     return container;
   },
@@ -379,12 +379,12 @@ Blockly.Blocks['expr_constructor'] = {
       if (childNode.nodeName.toLowerCase() == 'type') {
         var typename = childNode.getAttribute('name');
 
-        var typeExpr = Type.fromDom(childNode);
+        var typeExpr = Blockly.TypeInf.fromDom(childNode);
         var input = this.appendValueInput('TP' + i);
         tps.push(typeExpr);
       }
     }
-    tps.push(xmlElement.getAttribute('output'));
+    tps.push(Type.Lit(xmlElement.getAttribute('output')));
     this.arrows = Type.fromList(tps);
     this.initArrows();
   },
@@ -471,7 +471,7 @@ Blockly.Blocks['expr_case'] = {
         var tp = inp.fieldRow[j].getType();
         its++;
 
-        var typeDom = tp.toDom();
+        var typeDom = Blockly.TypeInf.toDom(tp);
         prodDom.appendChild(typeDom);
       }
       prodDom.setAttribute('constructor',constructorName); 
@@ -502,7 +502,7 @@ Blockly.Blocks['expr_case'] = {
         
         for(var j = 0, typeNode; typeNode = productNode.childNodes[j]; j++){
           if(typeNode.nodeName.toLowerCase() != 'type') continue;
-          var tp = Type.fromDom(typeNode);
+          var tp = Blockly.TypeInf.fromDom(typeNode);
           input.appendField(' ');
           input.appendField(new Blockly.FieldVarInput(String.fromCharCode(97 + j),tp));
         }

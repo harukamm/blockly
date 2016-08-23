@@ -16,7 +16,7 @@ Blockly.TypeInf.toDom = function(type){
      typeDom.setAttribute('type', 'literal');
      typeDom.setAttribute('name', type.getLiteralName());
 
-     type.getLiteralChildren.forEach(function(child){
+     type.getLiteralChildren().forEach(function(child){
        typeDom.appendChild(Blockly.TypeInf.toDom(child));
      });
    }

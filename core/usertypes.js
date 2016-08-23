@@ -129,7 +129,7 @@ Blockly.UserTypes.generateCase = function(block){
         continue;
       var typeDom;
       if(typeBlock.getType){
-        typeDom = typeBlock.getType().toDom();
+        typeDom = Blockly.TypeInf.toDom(typeBlock.getType());
       } else {
         typeDom= goog.dom.createDom('type');
         var typeName = typeBlock.getFieldValue('NAME');
@@ -195,7 +195,7 @@ Blockly.UserTypes.generateConstructor = function(block){
     types.forEach(function(typeBlock){
       var typeDom;
       if(typeBlock.getType){
-        typeDom = typeBlock.getType().toDom();
+        typeDom = Blockly.TypeInf.toDom(typeBlock.getType());
       } else {
         typeDom= goog.dom.createDom('type');
         typeDom.setAttribute(typeBlock.getAttribute('NAME'));
@@ -367,7 +367,7 @@ Blockly.UserTypes.Sum = function(dataTypeName, products){
 };
 
 Blockly.UserTypes.Sum.prototype.getType = function(){
-  return new Blockly.TypeExpr(this.name);
+  return new Type.Lit(this.name);
 }
 
 // Events
@@ -389,7 +389,7 @@ Blockly.UserTypes.generateConstructors_ = function(sum, xmlList){
     mutation.setAttribute('name',name );
     mutation.setAttribute('output',userTypeName);
     types.forEach(function(type){
-      var typeDom = type.toDom();
+      var typeDom = Blockly.TypeInf.toDom(type);
       mutation.appendChild(typeDom);
     });
     block.appendChild(mutation);
@@ -413,7 +413,7 @@ Blockly.UserTypes.generateCase_ = function(sum,xmlList){
     for(var j = 0; j < product.types.length; j++)
     {
       var type = product.types[j];
-      var typeDom = type.toDom();
+      var typeDom = Blockly.TypeInf.toDom(type);
       prodDom.appendChild(typeDom);
       typeCount++;
     }
