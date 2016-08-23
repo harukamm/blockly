@@ -39,7 +39,8 @@ Blockly.TypeInf.getTypeVarColor = function(name) {
   if(Blockly.TypeInf.activeVars[name])
     return Blockly.TypeInf.activeVars[name];
   // Otherwise generate a random color
-  var col = RColor().get(true); 
+  var col_ = new RColor();
+  var col = col_.get(true);
   Blockly.TypeInf.activeVars[name] = col;
   return col;
 }
@@ -53,12 +54,6 @@ RColor = function() {
   this.hexwidth	= 2;
 }; 
 
-Type = function(v){
-    if(!(v instanceof TLit || v instanceof TVar || v instanceof TFunction))
-      throw "Use proper constructors to create Type";
-    this.v = v;
-  };
- 
 
 RColor.prototype.hsvToRgb = function (h,s,v) {
   var	h_i	= Math.floor(h*6),
