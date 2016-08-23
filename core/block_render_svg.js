@@ -1049,15 +1049,15 @@ Blockly.BlockSvg.typeVarShapes_ = {
 
   list : { 
     down: function (self, steps, updown) {
-      Blockly.BlockSvg.renderTypeExpr(self.children[0], steps, updown);
+      Blockly.BlockSvg.renderTypeExpr(self.getLiteralChildren()[0], steps, updown);
       steps.push('l 0,3 -8,0 0,4, 8,0 0,3');
     },
     up: function (self, steps, updown) {
       steps.push('l 0,-3 -8,0 0,-4, 8,0 0,-3');
-      Blockly.BlockSvg.renderTypeExpr(self.children[0], steps, updown);
+      Blockly.BlockSvg.renderTypeExpr(self.getLiteralChildren()[0], steps, updown);
     },
     height: function(self) {
-      return Blockly.BlockSvg.getTypeExprHeight(self.children[0]) + 10;
+      return Blockly.BlockSvg.getTypeExprHeight(self.getLiteralChildren()[0]) + 10;
     },
     offsetsY: function(self) {
       return [0];
