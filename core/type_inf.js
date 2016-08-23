@@ -43,7 +43,56 @@ Blockly.TypeInf.getTypeVarColor = function(name) {
   var col = col_.get(true);
   Blockly.TypeInf.activeVars[name] = col;
   return col;
+};
+
+Blockly.TypeInf.disconnectComponent = function(parentBlock, childBlock){
+  console.log('resetting them components');
+  Blockly.TypeInf.resetComponent(parentBlock);
+  Blockly.TypeInf.resetComponent(childBlock);
+  // Now we have two components
+  // Unify here !
+};
+
+Blockly.TypeInf.getComponent = function(block){
+  var father = Blockly.TypeInf.getGrandParent(block);  
+  var blocks = Blockly.TypeInf.getBlocksDown(father);
+  blocks.push(father);
+  return blocks;
 }
+
+Blockly.TypeInf.resetComponent = function(block){
+  var blocks = Blockly.TypeInf.getComponent(block);
+  blocks.forEach(function(b){
+    b.initArrows();
+    b.render();
+  });
+};
+
+Blockly.TypeInf.getGrandParent = function(block){
+  if(!block.outputConnection.isConnected())
+    return block;
+  else
+    return Block.TypeInf.getGrandParent(block.outputConnection.targetBlock());
+};
+
+Blockly.TypeInf.getBlocksDown = function(block){
+
+  var bs = [];
+  block.inputList.forEach(function(inp){
+    if(inp.connection && inp.connection.targetBlock())
+      bs.push(inp.connection.targetBlock());
+  });
+
+  var cs = [];
+  bs.forEach(function(b){
+    cs = cs.concat( Blockly.Block.getBlocksDown(b));
+  });
+
+  return bs.concat(cs);
+
+}
+
+
 
 /**
  * @constructor

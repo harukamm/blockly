@@ -272,6 +272,8 @@ Blockly.Connection.doUnification = function(block){
 }
 
 Blockly.Connection.UnifyT = function(block, type1, type2){
+  console.log("Re-enable this plox");
+  return;
 
   var unifyResult;
 
@@ -674,8 +676,9 @@ Blockly.Connection.prototype.disconnect = function() {
   }
  
 
-  Blockly.Connection.doUnification(parentBlock); 
-  Blockly.Connection.doUnification(childBlock); 
+  //Blockly.Connection.doUnification(parentBlock); 
+  //Blockly.Connection.doUnification(childBlock); 
+  Blockly.TypeInf.disconnectComponent(parentBlock, childBlock);
 };
 
 // TODO Maybe move refactor into vars_local function?

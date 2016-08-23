@@ -1613,25 +1613,6 @@ Blockly.Block.prototype.allInputsConnected = function(){
 };
 
 
-Blockly.Block.getBlocksDown = function(block){
-
-  var bs = [];
-  block.inputList.forEach(function(inp){
-    if(inp.connection && inp.connection.targetBlock())
-      bs.push(inp.connection.targetBlock());
-  });
-
-  var cs = [];
-  bs.forEach(function(b){
-    cs = cs.concat( Blockly.Block.getBlocksDown(b));
-  });
-
-  return bs.concat(cs);
-
-}
-
-
-
 Blockly.Block.prototype.reconnectInputs = function(exceptBlock){
   for (var i = 0, input; input = this.inputList[i]; i++) {
     if (input.type != Blockly.INPUT_VALUE)
