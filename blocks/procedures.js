@@ -518,23 +518,6 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       this.quarkIds_ = null;
     }
 
-     // StefanJ
-    // Set the type to that of the defining block
-    var defBlockMain = Blockly.Procedures.getDefinition(this.getProcedureCall(),
-          Blockly.getMainWorkspace()); 
-
-    if (defBlockMain)
-    {
-      if (defBlockMain.type == "procedures_letFunc")
-      {
-        var tp = defBlockMain.getInput("RETURN").connection.getTypeExpr().copy();
-        this.setOutputTypeExpr(tp);
-        this.setColourByType(tp);
-        if(this.outputConnection.typeExpr)
-          this.outputConnection.typeExpr.unify(tp);
-        this.render();
-      }
-    }
 
     if (!paramIds) {
       // Reset the quarks (a mutator is about to open).
@@ -606,8 +589,6 @@ Blockly.Blocks['procedures_callnoreturn'] = {
    * @this Blockly.Block
    */
   updateShape_: function() {
-    var defBlockMain = Blockly.Procedures.getDefinition(this.getProcedureCall(),
-          Blockly.getMainWorkspace()); 
 
     for (var i = 0; i < this.arguments_.length; i++) {
       var field = this.getField('ARGNAME' + i);
@@ -623,8 +604,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
         field = new Blockly.FieldLabel(this.arguments_[i]);
         var input = this.appendValueInput('ARG' + i)
             .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField(field, 'ARGNAME' + i)
-            .setTypeExpr(Blockly.TypeVar.getUnusedTypeVar());
+            .appendField(field, 'ARGNAME' + i);
         input.init();
       }
     }
@@ -634,17 +614,26 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       i++;
     }
 
+    var defBlockMain = Blockly.Procedures.getDefinition(this.getProcedureCall(),
+          Blockly.getMainWorkspace()); 
+
     if(!defBlockMain){
-      // This probably occurs when the whole workspace hasn't loaded then, then
-      // we can't find our block :/
       return;
     }
 
-    // set input types correctly
+    var tps = [];
     for(var i = 0; i < this.arguments_.length; i++)
-    {
-      this.getInput('ARG' + i).setTypeExpr(defBlockMain.argTypes_[i].copy());
-    }
+      tps.push(defBlockMain.argTypes_[i]);
+
+    var tp = defBlockMain.getInput("RETURN").connection.typeExpr;
+    tps.push(tp);
+
+    this.arrows = Type.fromList(tps);
+    this.initArrows();
+
+
+    this.render();
+
   },
   /**
    * Create XML to represent the (non-editable) name and arguments.
@@ -741,6 +730,8 @@ Blockly.Blocks['procedures_callreturn'] = {
     this.arguments_ = [];
     this.quarkConnections_ = {};
     this.quarkIds_ = null;
+    this.updateShape_();
+    this.arrows = Type.Var('a');
   },
   getProcedureCall: Blockly.Blocks['procedures_callnoreturn'].getProcedureCall,
   renameProcedure: Blockly.Blocks['procedures_callnoreturn'].renameProcedure,
