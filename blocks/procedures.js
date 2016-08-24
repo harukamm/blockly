@@ -526,7 +526,7 @@ Blockly.Blocks['procedures_callnoreturn'] = {
     if (goog.array.equals(this.arguments_, paramNames)) {
       // No change.
       this.quarkIds_ = paramIds;
-      return;
+      // return;
     }
     if (paramIds.length != paramNames.length) {
       throw 'Error: paramNames and paramIds must be the same length.';
@@ -622,8 +622,8 @@ Blockly.Blocks['procedures_callnoreturn'] = {
     }
 
     var tps = [];
-    for(var i = 0; i < this.arguments_.length; i++)
-      tps.push(defBlockMain.argTypes_[i]);
+    for(var i = 0; i < defBlockMain.argTypes_.length; i++)
+      tps.push(defBlockMain.getArgType(i));
 
     var tp = defBlockMain.getInput("RETURN").connection.typeExpr;
     tps.push(tp);
@@ -702,7 +702,6 @@ Blockly.Blocks['procedures_callnoreturn'] = {
   },
 
   onTypeChange: function(){
-    console.log('on type change');
     var workspace = this.workspace;
     var name = this.getProcedureCall();
     var def = Blockly.Procedures.getDefinition(name, workspace);
@@ -730,8 +729,8 @@ Blockly.Blocks['procedures_callreturn'] = {
     this.arguments_ = [];
     this.quarkConnections_ = {};
     this.quarkIds_ = null;
-    this.updateShape_();
     this.arrows = Type.Var('a');
+    this.updateShape_();
   },
   getProcedureCall: Blockly.Blocks['procedures_callnoreturn'].getProcedureCall,
   renameProcedure: Blockly.Blocks['procedures_callnoreturn'].renameProcedure,

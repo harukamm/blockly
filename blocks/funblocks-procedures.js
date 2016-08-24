@@ -100,7 +100,19 @@ Blockly.Blocks['procedures_letFunc'] = {
     Blockly.Events.enable();
   },
   getArgType: function(localId){
-    return this.argTypes_[localId];
+
+    var thisBlock = this;
+    var inp = this.getInput("HEADER");
+    var tps = [];
+
+    for(var f = 0; f < inp.fieldRow.length; f++){
+      var fieldvar = inp.fieldRow[f];
+      if(fieldvar instanceof Blockly.FieldVarInput){
+        tps.push(fieldvar.type);
+      }
+    }
+
+    return tps[localId];
   },
 
   mutationToDom: Blockly.Blocks['procedures_defnoreturn'].mutationToDom,
@@ -255,7 +267,7 @@ Blockly.Blocks['procedures_letFunc'] = {
       var fieldvar = inp.fieldRow[f];
       if(fieldvar instanceof Blockly.FieldVarInput){
         var tp = thisBlock.argTypes_[i++];
-        console.log('Resetting ' + fieldvar.getValue() + ' to ' + tp.toString());
+        //console.log('Resetting ' + fieldvar.getValue() + ' to ' + tp.toString());
         fieldvar.type = tp;
       }
     }
@@ -491,7 +503,6 @@ Blockly.Blocks['vars_local'] = {
     //this.setOutputTypeExpr(Type.getOutput(this.arrows));
     //this.render();
     //console.log(this.arrows.toString());
-    console.log("Custom initArrows");
     this.outputConnection.typeExpr = this.arrows;
   },
 
