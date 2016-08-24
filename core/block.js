@@ -172,6 +172,7 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
 Blockly.Block.prototype.setAsFunction = function(name){
   if(typeof name != 'string')
     throw new "Incorrect function name given to block " + this.type;
+  console.log("Setting " + this.type + " to function " + name);
   this.arrows = null;
   this.functionName = name;
   
@@ -1799,13 +1800,8 @@ Blockly.Block.prototype.applySubst = function(subst){
   this.inputList.forEach(function(inp){
     if(inp.type == Blockly.INPUT_VALUE){
       if(inp.connection){
-        if(!inp.connection.typeExp){
-          // throw "Wakari no typu"
-        }
-        else{
-          var t = Type.apply(subst, inp.connection.typeExpr);
-          inp.connection.typeExpr = t;
-        }
+        var t = Type.apply(subst, inp.connection.typeExpr);
+        inp.connection.typeExpr = t;
       }
     }
   });
@@ -1817,7 +1813,6 @@ Blockly.Block.prototype.applySubst = function(subst){
 
 Blockly.Block.prototype.getSubstitutions = function(){
   var subst = Immutable.Map({});
-  // MGU for inputs
   this.inputList.forEach(function(inp){
     if(inp.type == Blockly.INPUT_VALUE){
       if(inp.connection && inp.connection.isConnected()){
@@ -1828,12 +1823,5 @@ Blockly.Block.prototype.getSubstitutions = function(){
       }
     }
   });
-  // MGU for output
-  // if(this.outputConnection && this.outputConnection.isConnected()){
-  //   var local = this.outputConnection.typeExpr
-  //   var targ = this.outputConnection.targetConnection.typeExpr
-  //   var sub = Type.mgu(local, targ);
-  //   //subst = Type.composeSubst(subst, sub);
-  // }
   return subst;
 };
