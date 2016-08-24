@@ -78,6 +78,10 @@ Blockly.TypeInf.getTypeVarColor = function(name) {
  */
 Blockly.TypeInf.UnifyComponent = function(block){
   var blocks = Blockly.TypeInf.getComponent(block);
+  // blocks.forEach(function(b){
+  //   console.log(b.type);
+  //   console.log(b.getType().toString());
+  // }); 
   var subs = blocks.map(b => b.getSubstitutions());
   var s = subs[0];
   for(var i = 1; i < subs.length; i++){
@@ -149,6 +153,7 @@ Blockly.TypeInf.builtinTypes = {};
 Blockly.TypeInf.builtinTypes['undef'] = Type.Var("z");
 
 Blockly.TypeInf.defineFunction = function(functionName, type){
+  console.log("defineFunction: " + functionName + " = " + type.toString());
   Blockly.TypeInf.builtinTypes[functionName] = type;
 }
 

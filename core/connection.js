@@ -814,44 +814,47 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   var isStatement = otherConnection.type == Blockly.NEXT_STATEMENT || otherConnection.type == Blockly.PREVIOUS_CONNECTION;
   if(isStatement)
     return true; // Stefan, Temp Fix
-
-  if(otherConnection.typeExpr.name == 'Function_')
+  
+  if(!otherConnection.typeExpr)
+    return true;
+  if(otherConnection.typeExpr.isFunction())
   {
-     var thisTp = otherConnection.typeExpr;
-     var thisArrows = thisTp.children;
-     var otherArrows = [];
+    // TODO, FIX HERE
+    //  var thisTp = otherConnection.typeExpr;
+    //  var thisArrows = thisTp.children;
+    //  var otherArrows = [];
    
-     var conned = 0;
-     var ghosts = 0;
-     var totalCons = 0;
-     for (var i = 0, input; input = this.sourceBlock_.inputList[i]; i++) {
-       if(!input.name)
-         continue;
-       if(input.name=='')
-         continue;
-       if(!input.connection)
-         continue;
-       if(input.connection.isConnected())
-         conned++;
-       if(input.connection.isConnected() && input.connection.targetBlock().isShadow())
-         ghosts++;
-       totalCons++;
-       otherArrows.push(input.connection.typeExpr);
-     }
-     if(ghosts==totalCons || conned == 0){} // ghost connections are allowed, we will remove them later
-     else
-       return false; // We don't want partially applied functions
+    //  var conned = 0;
+    //  var ghosts = 0;
+    //  var totalCons = 0;
+    //  for (var i = 0, input; input = this.sourceBlock_.inputList[i]; i++) {
+    //    if(!input.name)
+    //      continue;
+    //    if(input.name=='')
+    //      continue;
+    //    if(!input.connection)
+    //      continue;
+    //    if(input.connection.isConnected())
+    //      conned++;
+    //    if(input.connection.isConnected() && input.connection.targetBlock().isShadow())
+    //      ghosts++;
+    //    totalCons++;
+    //    otherArrows.push(input.connection.typeExpr);
+    //  }
+    //  if(ghosts==totalCons || conned == 0){} // ghost connections are allowed, we will remove them later
+    //  else
+    //    return false; // We don't want partially applied functions
 
-     otherArrows.push(this.sourceBlock_.outputConnection.typeExpr);
+    //  otherArrows.push(this.sourceBlock_.outputConnection.typeExpr);
 
-     if(thisArrows.length != otherArrows.length)
-       return false;
+    //  if(thisArrows.length != otherArrows.length)
+    //    return false;
 
-     for(var i = 0; i < thisArrows.length; i++){
-        if(!thisArrows[i].unify(otherArrows[i]))
-           return false;
-      }
-     return true;
+    //  for(var i = 0; i < thisArrows.length; i++){
+    //     if(!thisArrows[i].unify(otherArrows[i]))
+    //        return false;
+    //   }
+    //  return true;
   }
 
   var thisPrefix = this.sourceBlock_.type.substring(0,4);

@@ -69,6 +69,15 @@ Blockly.Blocks['test_true'] = {
   }
 };
 
+Blockly.Blocks['test_none'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField('True','NAME');
+    this.setInputsInline(true);
+    this.setOutput(true);
+  }
+};
 Blockly.Blocks['circTest'] = {
   init: function() {
     this.setColour(160);

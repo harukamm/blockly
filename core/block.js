@@ -170,8 +170,10 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
 };
 
 Blockly.Block.prototype.setAsFunction = function(name){
+  console.log("Setting " + this.type + " to function " + name);
   this.arrows = null;
   this.functionName = name;
+  
 }
 
 Blockly.Block.prototype.setAsLiteral = function(name){
@@ -207,6 +209,34 @@ Blockly.Block.prototype.initArrows = function(){
     Blockly.Block.updateConnectionTypes(this, type);
   }
 };
+
+Blockly.Block.prototype.getType = function(){
+  console.log("Getting type for " + this.type + " with functionName: " + this.functionName);
+  console.log("functionName: " + this.functionName);
+  console.log("typeof functionName: " + (typeof this.functionName));
+  console.log("functionName.length: " + (this.functionName.length) );
+  console.log("and it has arrows?: " + (this.arrows != null));
+  console.log("Hence:, " + ((!this.arrows) && (this.functionName.length > 0)));
+  if( !this.arrows && this.functionName.length > 0){
+    console.log("Looking up builtin type: " + this.functionName );
+    var base = Blockly.TypeInf.builtinTypes[this.functionName];
+    console.log("Found type" + base.toString());
+    if(!base)
+      throw "Builtin type for '" + this.functionName + "' was not found";
+
+    var type = Type.instantiate(base);
+    console.log("Instantiating to: " + type.toString());
+    return type;
+  }
+  else{
+    console.log("Getting base type");
+    if(!this.arrows){
+      return null; 
+    }
+    var type = Type.instantiate(this.arrows);
+    return type;
+  }
+}
 
 // Old unused, deprecated
 Blockly.Block.updateConnectionTypes_ = function(block, type){
