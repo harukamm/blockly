@@ -725,6 +725,10 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
                            input.renderWidth);
           // Stefan
           // Sorin
+          if(!input.connection.typeExpr){
+            console.log("What is going on here");
+            console.log(input.sourceBlock_.type);
+          }
           var isFunc = input.connection.typeExpr.isFunction() && !input.connection.isConnected();
           inlineSteps.push(Blockly.BlockSvg.getDownPath(input.connection));
           var tabHeight = Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);

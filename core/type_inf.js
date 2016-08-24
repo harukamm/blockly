@@ -78,10 +78,10 @@ Blockly.TypeInf.getTypeVarColor = function(name) {
  */
 Blockly.TypeInf.UnifyComponent = function(block){
   var blocks = Blockly.TypeInf.getComponent(block);
-  // blocks.forEach(function(b){
-  //   console.log(b.type);
-  //   console.log(b.getType().toString());
-  // }); 
+  blocks.forEach(function(b){
+     console.log(b.type);
+     console.log(b.getType().toString());
+  }); 
   var subs = blocks.map(b => b.getSubstitutions());
   var s = subs[0];
   for(var i = 1; i < subs.length; i++){
