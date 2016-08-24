@@ -89,7 +89,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     if(this.arguments_.length > 0)
       header.appendField(' ');
     for (var i = 0; i < this.arguments_.length; i++) {
-      var field = new Blockly.FieldVarInput(this.arguments_[i],this.getArgType,i);
+      var field = new Blockly.FieldVarInput(this.arguments_[i],this.argTypes_[i]);
       header.appendField(field);
     }
     this.inputList = this.inputList.concat(bodyInput);
@@ -106,10 +106,11 @@ Blockly.Blocks['procedures_letFunc'] = {
   mutationToDom: Blockly.Blocks['procedures_defnoreturn'].mutationToDom,
   domToMutation: function(xmlElement) {
     this.arguments_ = [];
+    this.argTypes_ = [];
     for (var i = 0, childNode; childNode = xmlElement.childNodes[i]; i++) {
       if (childNode.nodeName.toLowerCase() == 'arg') {
         this.arguments_.push(childNode.getAttribute('name'));
-        this.argTypes_.push(Blockly.TypeVar.getUnusedTypeVar());
+        this.argTypes_.push(Type.generateTypeVar('var'));
       }
     }
     this.updateParams_();
@@ -149,8 +150,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     var i = 0;
     while (paramBlock) {
       this.arguments_.push(paramBlock.getFieldValue('NAME'));
-      var chr = String.fromCharCode(97 + i++);
-      this.argTypes_.push(Type.Var(chr));
+      this.argTypes_.push(Type.generateTypeVar('var'));
       this.paramIds_.push(paramBlock.id);
       paramBlock = paramBlock.nextConnection &&
           paramBlock.nextConnection.targetBlock();
@@ -246,6 +246,21 @@ Blockly.Blocks['procedures_letFunc'] = {
     // {
     // }
   },
+  assignVars: function(){
+    var i = 0;
+    var thisBlock = this;
+    var inp = this.getInput("HEADER");
+
+    for(var f = 0; f < inp.fieldRow.length; f++){
+      var fieldvar = inp.fieldRow[f];
+      if(fieldvar instanceof Blockly.FieldVarInput){
+        var tp = thisBlock.argTypes_[i++];
+        console.log('Resetting ' + fieldvar.getValue() + ' to ' + tp.toString());
+        fieldvar.type = tp;
+      }
+    }
+  },
+
   resetCallers: function(){
     var defBlock = this;
     var workspace = Blockly.getMainWorkspace();
@@ -446,71 +461,6 @@ Blockly.Blocks['procedures_mutatorarg_auto'] = {
 };
 
 
-Blockly.Blocks['procedures_getVar'] = {
-  init: function() {
-    this.setHelpUrl(Blockly.Msg.VARIABLES_GET_HELPURL);
-    this.setColour(330);
-    var dropdown = new Blockly.FieldDropdown(this.genMenu, this.createDropdownChangeFunction());
-    dropdown.master = this;
-    this.appendDummyInput()
-        .appendField(dropdown,"VAR");
-    this.setOutput(true);
-    this.setTooltip(Blockly.Msg.VARIABLES_GET_TOOLTIP);
-  },
-
-  customContextMenu: function(options) {
-  },
-
-  createDropdownChangeFunction: function() {
-    var self = this;
-    return function(text) {
-    var par = self.getParent();
-    var varList = [];
-    // get type of most immediate parent declaring the variable
-    while(par)
-    {
-      if(par.type == "procedures_letFunc")
-      {
-        for(var i =0; i < par.arguments_.length; i++)
-        {
-          if(par.arguments_[i] == text)
-          {
-            var tp = par.argTypes_[i];
-            
-            par.argTypes_[i] = self.outputConnection.typeExpr;
-            //self.setOutputTypeExpr(tp);
-            //self.setColourByType(tp);
-          
-
-            return undefined;    
-          }
-        }
-      }
-      par = par.getParent();
-    }
-    return undefined;
-    };
-  },
-
-  genMenu: function() {
-    var def = [["None","None"]];
-
-    if(!this.master)
-      return def; 
-
-    var varList = [];
-    var par = this.master.getParent();
-    var vars = Blockly.Variables.getVariablesUp(par);
-    vars.forEach(function(v){
-      varList.push([v,v]);
-    });
-
-    if(varList.length < 1)
-      return def;
-    return varList;
-  }
-};
-
 Blockly.Blocks['vars_local'] = {
   init: function() {
     this.setColour(150);
@@ -526,7 +476,6 @@ Blockly.Blocks['vars_local'] = {
   domToMutation: function(xmlElement) {  // TODO, this needs work, what in the case of a list expr or case block? 
     var name = xmlElement.getAttribute('name');
     this.parentId = xmlElement.getAttribute('parentId'); // Name of parent function
-    console.log(this.parentId);
     this.localId = Number(xmlElement.getAttribute('localId')); // Name of parent function
     this.setFieldValue(name, 'NAME');
 
@@ -538,10 +487,12 @@ Blockly.Blocks['vars_local'] = {
   },
 
   initArrows: function(){
-    this.arrows = this.getType();
-    this.setOutputTypeExpr(Type.getOutput(this.arrows));
-    this.render();
-    console.log(this.arrows.toString());
+    //this.arrows = this.getType();
+    //this.setOutputTypeExpr(Type.getOutput(this.arrows));
+    //this.render();
+    //console.log(this.arrows.toString());
+    console.log("Custom initArrows");
+    this.outputConnection.typeExpr = this.arrows;
   },
 
   getType: function(){

@@ -43,12 +43,11 @@ goog.require('goog.userAgent');
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldVarInput = function(text,callFunc, localId) {
+Blockly.FieldVarInput = function(text,type) {
   Blockly.FieldVarInput.superClass_.constructor.call(this, text,
       null);
   
-  this.callFunc = callFunc;
-  this.localId = localId;
+  this.type = type;
   this.size_.height += 4;
 };
 goog.inherits(Blockly.FieldVarInput, Blockly.Field);
@@ -61,11 +60,7 @@ Blockly.FieldVarInput.prototype.updateEditable = function() {
 };
 
 Blockly.FieldVarInput.prototype.getType = function(){
-  if(typeof this.callFunc === "function"){
-    return this.callFunc.call(this.sourceBlock_,this.localId);
-  } else {
-    return this.callFunc; // It is a typeExpr here
-  }
+  return this.type; // It is a typeExpr here
 }
 
 Blockly.FieldVarInput.prototype.getPath = function(width)
