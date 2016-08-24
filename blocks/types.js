@@ -577,8 +577,6 @@ Blockly.Blocks['pair_first_typed'] = {
    */
   init: function() {
     this.setColour(210);
-    var A = Blockly.TypeVar.getUnusedTypeVar();
-    var B = Blockly.TypeVar.getUnusedTypeVar();
     this.appendValueInput('PAIR')
         .appendField(new Blockly.FieldLabel("firstOfPair","blocklyTextEmph") );
     this.setOutput(true);
@@ -595,8 +593,6 @@ Blockly.Blocks['pair_second_typed'] = {
    */
   init: function() {
     this.setColour(210);
-    var A = Blockly.TypeVar.getUnusedTypeVar();
-    var B = Blockly.TypeVar.getUnusedTypeVar();
     this.appendValueInput('PAIR')
         .appendField(new Blockly.FieldLabel("secondOfPair","blocklyTextEmph") );
     this.setOutput(true);
