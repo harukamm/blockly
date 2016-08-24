@@ -144,8 +144,12 @@ Blockly.TypeInf.getBlocksDown = function(block){
 }
 
 
+Blockly.TypeInf.builtinTypes = {};
+// ensure globals have different types otherwise the environment gets confused
+Blockly.TypeInf.builtinTypes['undef'] = Type.Var("z");
+
 Blockly.TypeInf.defineFunction = function(functionName, type){
-  Blockly.Block.builtinTypes[functionName] = type;
+  Blockly.TypeInf.builtinTypes[functionName] = type;
 }
 
 

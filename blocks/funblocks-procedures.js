@@ -48,7 +48,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     this.setStatements_(false);
     this.statementConnection_ = null;
     this.allowRename = false;
-    this.arrows = Type.Var("a");
+    this.arrows = Type.Func(Type.Var("a"), Type.Var("func") ); // Top level hack
   },
   setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
   validate: Blockly.Blocks['procedures_defnoreturn'].validate,

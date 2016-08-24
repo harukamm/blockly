@@ -192,9 +192,8 @@ Blockly.Block.prototype.setAsLiteralT = function(tp){
 // Blockly.TypeVar.getUnusedTypeVar()
 
 Blockly.Block.prototype.initArrows = function(){
-  console.log(this.type);
   if( !this.arrows && this.functionName.length > 0){
-    var type = Type.instantiate(Blockly.Block.builtinTypes[this.functionName]);
+    var type = Type.instantiate(Blockly.TypeInf.builtinTypes[this.functionName]);
     if(!type)
       throw "Builtin type for '" + this.functionName + "' was not found";
     Blockly.Block.updateConnectionTypes(this, type);
@@ -209,7 +208,8 @@ Blockly.Block.prototype.initArrows = function(){
   }
 };
 
-Blockly.Block.updateConnectionTypes = function(block, type){
+// Old unused, deprecated
+Blockly.Block.updateConnectionTypes_ = function(block, type){
   var flattened = Type.flatten(type);
   var inp = 0;
   for(var i = 0; i < flattened.length; i++){
@@ -231,6 +231,31 @@ Blockly.Block.updateConnectionTypes = function(block, type){
 
     inp++;
   }
+};
+
+Blockly.Block.updateConnectionTypes = function(block, type){
+  var flattened = Type.flatten(type);
+ 
+  var inp = 0;
+  var it = type;
+  while(it.isFunction()){
+
+    if(!block.inputList[inp]) // Too far, can't proceed.
+      return;
+    while(block.inputList[inp].type != Blockly.INPUT_VALUE){
+      inp++; // Skip dummy and statement inputs
+      if(inp>=block.inputList.length) {console.log("yelp"); return; }// Something went wrong
+    }
+
+    block.inputList[inp].setTypeExpr(it.getFirst());
+
+    it = it.getSecond();
+    inp++;
+  }
+  if(block.outputConnection){ // We are at the output
+    block.setOutputTypeExpr(it);
+  }
+
 };
 
 
@@ -1647,15 +1672,12 @@ Blockly.Block.prototype.getValueInputNames = function(){
   return names;
 };
 
-Blockly.Block.builtinTypes = {};
-// ensure globals have different types otherwise the environment gets confused
-Blockly.Block.builtinTypes['undef'] = Type.Var("z");
 
 
 Blockly.Block.inferTypeMono = function(block){
   var tp = Blockly.Block.inferType(block);
   if(!tp)
-    return Type.getOutput(Blockly.Block.builtinTypes[block.functionName]);
+    return Type.getOutput(Blockly.TypeInf.builtinTypes[block.functionName]);
   else
     return Type.getOutput(tp);
 }
@@ -1667,7 +1689,7 @@ Blockly.Block.inferType = function(block){
   var exp = block.getExpr();
   
   // Get the environment
-  var dic = Blockly.Block.builtinTypes;
+  var dic = Blockly.TypeInf.builtinTypes;
   var env = {};
   for (var functionName in dic) {
     if (dic.hasOwnProperty(functionName)) {
@@ -1721,7 +1743,7 @@ Blockly.Block.prototype.getExpr = function(){
     });
 
 
-    var arrows = Blockly.Block.builtinTypes[this.functionName]; 
+    var arrows = Blockly.TypeInf.TypeInf[this.functionName]; 
     var functionName = this.functionName;
 
     var e5 = Exp.AppFunc(exps, Exp.Var(this.functionName))

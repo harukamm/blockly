@@ -408,7 +408,7 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
 
     //FFC Stefan
 
-    var isFunc = input.connection && input.connection.typeExpr && input.connection.typeExpr.name == "Function_" && !input.connection.isConnected();
+    var isFunc = input.connection && input.connection.typeExpr && input.connection.typeExpr.isFunction() && !input.connection.isConnected();
     if(isInline && isFunc)
     {
       input.renderHeight += Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);
@@ -725,7 +725,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
                            input.renderWidth);
           // Stefan
           // Sorin
-          var isFunc = false;// input.connection.typeExpr.children.length > 0 && input.connection.typeExpr.name == "Function_" && !input.connection.isConnected();
+          var isFunc = input.connection.typeExpr.isFunction() && !input.connection.isConnected();
           inlineSteps.push(Blockly.BlockSvg.getDownPath(input.connection));
           var tabHeight = Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);
           
@@ -756,9 +756,10 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
           if(isFunc && !input.connection.isConnected())
           {
             inlineSteps.push('v', 2);
-            for(var i = 0; i < input.connection.typeExpr.children.length - 1; i++)
+            var children = Type.flatten(input.connection.typeExpr);
+            for(var i = 0; i < children.length - 1; i++)
             {
-              var t = input.connection.typeExpr.children[i];
+              var t = children[i];
 
               Blockly.BlockSvg.renderTypeExpr(t, inlineSteps, 'down');
 
@@ -1066,16 +1067,19 @@ Blockly.BlockSvg.typeVarShapes_ = {
 
   Function_ : {
     down: function (self, steps, updown) {
-      Blockly.BlockSvg.renderTypeExpr(self.children[self.getLiteralChildren().length - 1], steps, updown);
+      var children = Type.flatten(self);
+      Blockly.BlockSvg.renderTypeExpr(children[children.length - 1], steps, updown);
     },
     up: function (self, steps, updown) {
-      Blockly.BlockSvg.renderTypeExpr(self.children[self.getLiteralChildren().length - 1], steps, updown);
+      var children = Type.flatten(self);
+      Blockly.BlockSvg.renderTypeExpr(children[children.length - 1], steps, updown);
     },
     height: function(self) {
       var h = 6;
-      for(var i = 0; i < self.getLiteralChildren().length-1; i++)
+      var children = Type.flatten(self);
+      for(var i = 0; i < children.length-1; i++)
       {
-        var t = self.children[i];
+        var t = children[i];
         var h_ = Blockly.BlockSvg.getTypeExprHeight(t);
         h+=h_;
       }
@@ -1278,8 +1282,12 @@ Blockly.BlockSvg.typeVarHighlights_ = function(typeExpr, y, typeVarHighlights) {
       name = tp.getLiteralName();
     else if (tp.isTypeVar())
       name = tp.getTypeVar();
-    else
-      throw "Unknown type";
+    else if (tp.isFunction()){
+      name = "Function_";
+    }
+    else{
+      throw "Unknown type" + typeExpr.toString();
+    }
     if (typeExpr.isTypeVar()) {
       typeVarHighlights.push({
         color: Blockly.TypeInf.getTypeVarColor(name), 
@@ -1307,7 +1315,6 @@ Blockly.BlockSvg.getTypeName = function(typeExpr) {
       return typeExpr.getLiteralName();
     }
     else if (tp.isFunction()){
-      console.log("function test");
       return "Function_"; // Hack
     }
   } 
