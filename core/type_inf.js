@@ -90,6 +90,7 @@ Blockly.TypeInf.UnifyComponent = function(block){
 
   blocks.forEach(b => b.applySubst(s));
   blocks.forEach(b => b.render());
+  blocks.forEach(b => b.redrawAdditional());
 }
 
 

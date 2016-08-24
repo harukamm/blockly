@@ -214,6 +214,9 @@ Blockly.Block.prototype.initArrows = function(){
     var type = Type.instantiate(this.arrows);
     Blockly.Block.updateConnectionTypes(this, type);
   }
+  if(this.assignVars)
+    this.assignVars(); // A function that assigns varTypes_ to the correct fieldvars
+  
 };
 
 Blockly.Block.prototype.getType = function(){
@@ -1790,11 +1793,53 @@ Blockly.Block.prototype.getExpr = function(){
       var e6 = Exp.AbsFunc(vars, e5);
       return e6;
     }
-    
-    
     return e6;
   }
 }
+
+// For things such as vars_ or args_
+Blockly.Block.prototype.resetAdditional = function(){
+  if(this.varTypes_){
+    for(var i = 0; i < this.varTypes_.length; i++){
+      var c = String.fromCharCode(97 + i);
+      this.varTypes_[i] = Type.Var(c);
+    }
+  }
+
+  if(this.argTypes_){
+    for(var i = 0; i < this.argTypes_.length; i++){
+      var c = String.fromCharCode(97 + i);
+      this.argTypes_[i] = Type.Var(c);
+    }
+  }
+};
+
+// Mostly used to redraw field vars
+Blockly.Block.prototype.redrawAdditional = function(){
+  this.inputList.forEach(function(inp){
+    for (var l = 0; l < inp.fieldRow.length; l++)
+    {
+      var f = inp.fieldRow[l];
+      if(f instanceof Blockly.FieldVarInput){
+        f.render_();
+      }
+    }
+  });
+};
+
+Blockly.Block.prototype.getAllFieldVars = function(){
+  var fieldVars = [];
+  this.inputList.forEach(function(inp){
+    for (var l = 0; l < inp.fieldRow.length; l++)
+    {
+      var f = inp.fieldRow[l];
+      if(f instanceof Blockly.FieldVarInput){
+        fieldVars.push(f);
+      }
+    }
+  });
+  return fieldVars;
+};
 
 Blockly.Block.prototype.applySubst = function(subst){
   this.inputList.forEach(function(inp){
@@ -1809,6 +1854,12 @@ Blockly.Block.prototype.applySubst = function(subst){
     var t = Type.apply(subst, this.outputConnection.typeExpr);
     this.outputConnection.typeExpr = t;
   }
+
+  var fieldVars = this.getAllFieldVars();
+  fieldVars.forEach(function(f){
+    console.log("Assigning " + f.getValue() + " from " + f.type.toString() + " to " + Type.apply(subst, f.type));
+    f.type = Type.apply(subst, f.type);
+  });
 };
 
 Blockly.Block.prototype.getSubstitutions = function(){
