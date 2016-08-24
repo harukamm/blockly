@@ -222,11 +222,6 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
   if (Blockly.Events.isEnabled()) {
     event = new Blockly.Events.Move(childBlock);
   }
-  //Blockly.Connection.resetCallersUpward(parentBlock);
-
-
-  // Unify things
-
 
   // Establish the connections.
   Blockly.Connection.connectReciprocally_(parentConnection, childConnection);
@@ -262,88 +257,6 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
   // Blockly.Connection.doUnification(parentBlock); 
   Blockly.TypeInf.connectComponent(parentBlock);
 };
-
-Blockly.Connection.doUnification = function(block){
-  var type = Blockly.Block.inferType(block);
-  //Blockly.Block.updateTypes(block);
-  Blockly.Block.updateOpenTypes(block);
-  block.render();
-
-
-}
-
-Blockly.Connection.UnifyT = function(block, type1, type2){
-  console.log("Re-enable this plox");
-  return;
-
-  var unifyResult;
-
-  unifyResult = Type.mgu(type1, type2);
-  if (unifyResult === false) {
-    throw 'Attempt to connect incompatible types. 34';
-  }
-
-  var blocks = Blockly.Block.getBlocksDown(block);
-  blocks.push(block);
-
-  for (var i = 0; i < blocks.length; i++) {
-    var block = blocks[i];
-    // process connections
-    var connections = block.getConnections_(true);
-    for (var j = 0; j < connections.length; j++) {
-      if (connections[j].typeExpr) {
-        connections[j].typeExpr = Type.apply(unifyResult, connections[j].typeExpr);
-      }
-    }
-  }
-  
-}
-
-Blockly.Connection.Unify = function(parentConnection, childConnection){
-
-  var parentBlock = parentConnection.getSourceBlock();
-  var childBlock = childConnection.getSourceBlock();
-
-  var unifyResult;
-  if (parentConnection.typeExpr && childConnection.typeExpr) {
-
-    unifyResult = Type.mgu(parentConnection.typeExpr, childConnection.typeExpr);
-    if (unifyResult === false) {
-      throw 'Attempt to connect incompatible types. 34';
-    }
-
-    var workspace = parentConnection.getSourceBlock().workspace;
-
-    var blocks = Blockly.Block.getBlocksDown(parentBlock);
-    blocks.push(parentBlock);
-
-    for (var i = 0; i < blocks.length; i++) {
-      var block = blocks[i];
-      // process connections
-      var connections = block.getConnections_(true);
-      for (var j = 0; j < connections.length; j++) {
-        if (connections[j].typeExpr) {
-          connections[j].typeExpr = Type.apply(unifyResult, connections[j].typeExpr);
-        }
-      }
-
-      /*if( block.outputConnection && block.outputConnection.typeExpr ) {
-        //Update colour of blocks in case their output type has changed
-        block.setColourByType( block.outputConnection.typeExpr );
-      }
-      if( block.rendered ) {
-        block.render();
-      }*/
-    }
-
-
-
-//    if(childBlock.onTypeChange)
-//      childBlock.onTypeChange();
-
-  }
-  
-}
 
 /**
  * Sever all links to this connection (not including from the source object).

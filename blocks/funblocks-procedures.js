@@ -255,10 +255,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     callers.forEach(function(caller){
       caller.setOutputTypeExpr(outputType);
       for(var k = 0; k < defBlock.argTypes_.length; k++){
-        var tp = defBlock.argTypes_[k].copy();
-        var inp = caller.getInput("ARG" + k);
-        if (inp)
-          inp.setTypeExpr(tp);
+          // inp.setTypeExpr(tp);
       }
       caller.render();
     });
@@ -326,21 +323,12 @@ Blockly.Blocks['procedures_letFunc'] = {
         }
       }
       if(isMono){ // Then we need to make all callers polymorphic
-        var tp = Blockly.TypeVar.getUnusedTypeVar();
         for(var k = 0; k < callers.length; k++){
           var block = callers[k];
-          block.setOutputTypeExpr(tp);
           block.render();
         }
       }
 
-      // Type unification works well on blocks, so we just copy the type over
-      // now
-      if(callers[0]){
-        var tp = callers[0].outputConnection.typeExpr;
-        var ind = thisBlock.arguments_.indexOf(varName);
-        thisBlock.argTypes_[ind] = tp;
-      }
 
       });
 
