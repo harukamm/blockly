@@ -91,6 +91,12 @@ Blockly.TypeInf.UnifyComponent = function(block){
   blocks.forEach(b => b.applySubst(s));
   blocks.forEach(b => b.render());
   blocks.forEach(b => b.redrawAdditional());
+  // Debug
+  blocks.forEach(b => {
+    var t = b.getOutputType();
+    if(t)
+      console.log(t.toString());
+  });
 }
 
 

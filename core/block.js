@@ -172,7 +172,7 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
 Blockly.Block.prototype.setAsFunction = function(name){
   if(typeof name != 'string')
     throw new "Incorrect function name given to block " + this.type;
-  console.log("Setting " + this.type + " to function " + name);
+  //console.log("Setting " + this.type + " to function " + name);
   this.arrows = null;
   this.functionName = name;
   
@@ -219,33 +219,12 @@ Blockly.Block.prototype.initArrows = function(){
   
 };
 
-Blockly.Block.prototype.getType = function(){
-  console.log("Getting type for " + this.type + " with functionName: " + this.functionName);
-  console.log("functionName: " + this.functionName);
-  console.log("typeof functionName: " + (typeof this.functionName));
-  console.log("functionName.length: " + (this.functionName.length) );
-  console.log("and it has arrows?: " + (this.arrows != null));
-  console.log("Hence:, " + ((!this.arrows) && (this.functionName.length > 0)));
-  if( !this.arrows && this.functionName.length > 0){
-    console.log("Looking up builtin type: " + this.functionName );
-    var base = Blockly.TypeInf.builtinTypes[this.functionName];
-    console.log("Found type" + base.toString());
-    if(!base)
-      throw "Builtin type for '" + this.functionName + "' was not found";
-
-    var type = Type.instantiate(base);
-    console.log("Instantiating to: " + type.toString());
-    return type;
-  }
-  else{
-    console.log("Getting base type");
-    if(!this.arrows){
-      return null; 
-    }
-    var type = Type.instantiate(this.arrows);
-    return type;
-  }
+Blockly.Block.prototype.getOutputType = function(){
+  if(!this.outputConnection)
+    return null;
+  return this.outputConnection.typeExpr;
 }
+
 
 // Old unused, deprecated
 Blockly.Block.updateConnectionTypes_ = function(block, type){
@@ -1782,7 +1761,7 @@ Blockly.Block.prototype.getExpr = function(){
     });
 
 
-    var arrows = Blockly.TypeInf.TypeInf[this.functionName]; 
+    var arrows = Blockly.TypeInf.builtinTypes[this.functionName]; 
     var functionName = this.functionName;
 
     var e5 = Exp.AppFunc(exps, Exp.Var(this.functionName))
@@ -1857,7 +1836,7 @@ Blockly.Block.prototype.applySubst = function(subst){
 
   var fieldVars = this.getAllFieldVars();
   fieldVars.forEach(function(f){
-    console.log("Assigning " + f.getValue() + " from " + f.type.toString() + " to " + Type.apply(subst, f.type));
+    //console.log("Assigning " + f.getValue() + " from " + f.type.toString() + " to " + Type.apply(subst, f.type));
     f.type = Type.apply(subst, f.type);
   });
 };
