@@ -157,6 +157,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     // Parameter list.
     var oldArgs = this.arguments_;
     this.arguments_ = [];
+    this.argTypes_ = [];
     this.paramIds_ = [];
     var paramBlock = containerBlock.getInputTargetBlock('STACK');
     var i = 0;
