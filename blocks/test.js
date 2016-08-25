@@ -78,6 +78,17 @@ Blockly.Blocks['test_none'] = {
     this.setOutput(true);
   }
 };
+
+Blockly.Blocks['test_mouse'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendValueInput('TEST');
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.arrows = Type.fromList([Type.Lit("MouseButton"), Type.Lit("MouseButton")]);
+  }
+};
+
 Blockly.Blocks['circTest'] = {
   init: function() {
     this.setColour(160);
