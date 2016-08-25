@@ -199,7 +199,7 @@ Blockly.Block.prototype.setAsLiteralT = function(tp){
 // Uses same typeExpr, though _POLY_ get turned into a
 // Blockly.TypeVar.getUnusedTypeVar()
 
-Blockly.Block.prototype.initArrows = function(){
+Blockly.Block.prototype.initArrows = function(instantiate){
   if( !this.arrows && this.functionName.length > 0){
     var type = Type.instantiate(Blockly.TypeInf.builtinTypes[this.functionName]);
     if(!type)
@@ -211,7 +211,11 @@ Blockly.Block.prototype.initArrows = function(){
       //throw "Block '" + this.type + "' must have a type !";
       return; // This is for statement types - We don't worry about them
     }
-    var type = Type.instantiate(this.arrows);
+    var type;
+    if(instantiate)
+      type = Type.instantiate(this.arrows);
+    else
+      type = this.arrows;
     Blockly.Block.updateConnectionTypes(this, type);
   }
   if(this.assignVars)
@@ -1823,7 +1827,7 @@ Blockly.Block.prototype.getAllFieldVars = function(){
 Blockly.Block.prototype.applySubst = function(subst){
   this.inputList.forEach(function(inp){
     if(inp.type == Blockly.INPUT_VALUE){
-      if(inp.connection){
+      if(inp.connection && inp.connection.typeExpr){
         var t = Type.apply(subst, inp.connection.typeExpr);
         inp.connection.typeExpr = t;
       }
@@ -1848,12 +1852,12 @@ Blockly.Block.prototype.getSubstitutions = function(){
       if(inp.connection && inp.connection.isConnected()){
         var local = inp.connection.typeExpr;
         var targ = inp.connection.targetConnection.typeExpr;
-        var sub = Type.mgu(local,targ);
 
-        if(local.isFunction()){
+        if(!local || local.isFunction()){
           // HACK TODO !!
         }
         else{
+          var sub = Type.mgu(local,targ);
           subst = Type.composeSubst(subst,sub);
         }
       }

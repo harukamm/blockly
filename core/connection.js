@@ -255,7 +255,9 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
   //Blockly.Connection.Unify(parentConnection, childConnection);
   // Infer type
   // Blockly.Connection.doUnification(parentBlock); 
-  Blockly.TypeInf.connectComponent(parentBlock);
+  var isStatement = parentConnection.type == Blockly.NEXT_STATEMENT || parentConnection.type == Blockly.PREVIOUS_CONNECTION;
+  if(!isStatement)
+    Blockly.TypeInf.connectComponent(parentBlock);
 };
 
 /**

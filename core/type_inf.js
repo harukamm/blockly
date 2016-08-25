@@ -117,6 +117,7 @@ Blockly.TypeInf.getComponent = function(block){
   var father = Blockly.TypeInf.getGrandParent(block);  
   var blocks = Blockly.TypeInf.getBlocksDown(father);
   blocks.push(father);
+
   return blocks;
 }
 
