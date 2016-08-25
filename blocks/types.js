@@ -503,7 +503,6 @@ Blockly.Blocks['expr_case'] = {
         var constructorName = productNode.getAttribute('constructor');
 
         var input = this.appendValueInput('CS' + i);
-        tps.push(this.a);
 
         input.appendField(constructorName);
         
@@ -514,11 +513,12 @@ Blockly.Blocks['expr_case'] = {
           input.appendField(new Blockly.FieldVarInput(String.fromCharCode(97 + j),tp));
         }
       }
-      
       tps.push(this.a);
-      this.arrows = Type.fromList(tps);
-      this.initArrows();
     }
+
+    tps.push(this.a);
+    this.arrows = Type.fromList(tps);
+    this.initArrows();
   },
 
   saveConnections: function(containerBlock) {
