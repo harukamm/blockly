@@ -1179,8 +1179,8 @@ Blockly.BlockSvg.typeVarShapes_ = {
 
 
   MouseButton : { 
-    down: 'l -5,2 -5,8 10,8',
-    up: 'l -10,-8, 5,-8 5,-2',
+    down: 'l -3,2 -3,8 6,8',
+    up: 'l -6,-8, 3,-8 3,-2',
     height: 18,
     blockColour: Blockly.BlockSvg.NUMBER_COLOUR
   },
