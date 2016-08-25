@@ -828,11 +828,25 @@ Type.testPlay = function(){
   var exps = [Exp.Var('undef'), Exp.Var('undef')];
   var e6 = Exp.AppFunc(exps, Exp.Var(functionName))
   var env = {}; 
-  env[functionName] = new Scheme([functionName], arrows);
-  env['undef'] = new Scheme(['undef'], Type.Var("z"));
+  env[functionName] = new Scheme([], arrows);
+  env['undef'] = new Scheme(['z'], Type.Var("z"));
   var t6 = Exp.typeInference(env, e6);
   console.log(e6.toString());
   console.log(t6.toString());
+
+
+  var callIf = Exp.AppFunc([Exp.Var('x'), Exp.Var('y'), Exp.Var('z')],Exp.Var('if'));
+  var def = Exp.AbsFunc(['x', 'y', 'z'], callIf);
+  var e11 = def;
+
+  var ift = Type.fromList([Type.Lit("Integer"),Type.Var("a"),Type.Var("a"),Type.Var("a")]);
+  env = {};
+  env['if'] = new Scheme([], ift);
+  env['z'] = new Scheme(['z'], Type.Var("z"));
+  var t11 = Exp.typeInference(env, e11);
+  console.log(e11.toString());
+  console.log(t11.toString());
+
 }
 
-//Type.testPlay();
+Type.testPlay();

@@ -859,7 +859,7 @@ Blockly.Connection.prototype.setCheck = function(check) {
       check = [check];
     } else {
       /* Passed an array. Set TypeExpr to a type variable. */
-      this.setTypeExpr( Blockly.TypeVar.getUnusedTypeVar() );
+      this.setTypeExpr( Type.generateTypeVar('a') );
     }
 
 
@@ -873,7 +873,6 @@ Blockly.Connection.prototype.setCheck = function(check) {
     }
   } else {
     this.check_ = null;
-    //this.setTypeExpr( Blockly.TypeVar.getUnusedTypeVar() );
   }
   return this;
 };
