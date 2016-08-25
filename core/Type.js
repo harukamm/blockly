@@ -246,6 +246,8 @@
    * @return {Object<string, Type>}
    */
   Type.composeSubst = function(s1,s2){
+    if(!s1 || !s2)
+      return false;
 
     //var left = s2.map(v => Type.apply(s1,v));
     //var res = left.merge(s1);
