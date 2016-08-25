@@ -92,11 +92,11 @@ Blockly.TypeInf.UnifyComponent = function(block){
   blocks.forEach(b => b.render());
   blocks.forEach(b => b.redrawAdditional());
   // Debug
-  blocks.forEach(b => {
-    var t = b.getOutputType();
-    if(t)
-      console.log(t.toString());
-  });
+  // blocks.forEach(b => {
+  //   var t = b.getOutputType();
+  //   if(t)
+  //     console.log(t.toString());
+  // });
 }
 
 
@@ -215,4 +215,23 @@ RColor.prototype.get = function(hex,saturation,value) {
 };
 
 
+Blockly.TypeInf.testDom = function(){
+  var r = Type.fromList([Type.Lit("Int"),Type.Lit("Float"),Type.Var("a")]);
+  var y = Type.fromList([Type.Var("a"),Type.Var("b"),Type.Var("a")]);
+  // var z = Type.mgu(r,y);
+  var k = Type.Lit("Pair",[Type.Var("a"), Type.Var("b")]);
+  var l = Type.Lit("Pair",[Type.Lit("Int"), Type.Var("c")]);
+  // var m = Type.mgu(k,l);
 
+  var e = l;
+  console.log("original: " + e.toString()); 
+  var t0 = Blockly.TypeInf.toDom(e);
+  console.log('dom: ');
+  console.log(t0);
+  console.log('recovering: ');
+  var t1 = Blockly.TypeInf.fromDom(t0);
+  console.log(t1.toString());
+
+
+
+}

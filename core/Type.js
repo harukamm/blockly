@@ -742,7 +742,7 @@
   }
 
 
-
+Type.testPlay = function(){
   // var t = Type.Lit("Int");
   // var u = Type.Var("a");
   // var i = Type.Lit("Int");
@@ -833,5 +833,6 @@
   var t6 = Exp.typeInference(env, e6);
   console.log(e6.toString());
   console.log(t6.toString());
+}
 
-
+//Type.testPlay();
