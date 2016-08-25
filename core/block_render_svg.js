@@ -1158,6 +1158,7 @@ Blockly.BlockSvg.typeVarShapes_ = {
     height: 20,
     blockColour: Blockly.BlockSvg.NUMBER_COLOUR
   },
+
   NumberSmall : { 
     down: 'l 0,5 a 3,3,0,0,0,0,6 l 0,3',
     up: 'l 0,-3 a 3,3,0,0,1,0,-6 l 0,-5',
@@ -1169,12 +1170,21 @@ Blockly.BlockSvg.typeVarShapes_ = {
   // key hole thingy
   // 'l 0,4.53259 c 0,0 -9.85345,0.78827 -7.19301,5.22232 2.66043,4.43406 5.715,3.15311 5.715,3.15311 l -5.715,7.98129 8.37543,0',
 
-  Custom : {
+  Event : {
     down: 'l 0,4.5 c 0,0 -10,0.8 -7,5 2.5,4.5 6,3 6,3 l -6,8 8.5,0',
     up: 'l -8.5,0 6,-8 c 0,0 -10,-0.8 -7,-5 2.5,-4.5 6,-3 6,-3 l 0,-4.5 ',
     height: 20,
     blockColour: Blockly.BlockSvg.TEXT_COLOUR
   },
+
+
+  MouseButton : { 
+    down: 'l 0,5 a 6,6,0,0,0,0,12 l 0,3',
+    up: 'l 0,-3 a 6,6,0,0,1,0,-12 l 0,-5',
+    height: 20,
+    blockColour: Blockly.BlockSvg.NUMBER_COLOUR
+  },
+
 
   Text : {
     down: 'l 0,2 -7,0 0,9 5,0 0,9 3,0',
