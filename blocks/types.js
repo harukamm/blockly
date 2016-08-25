@@ -355,24 +355,30 @@ Blockly.Blocks['expr_constructor'] = {
     var container = document.createElement('mutation');
     container.setAttribute('items', this.itemCount_);
     container.setAttribute('name', this.getFieldValue('NAME'));
-    container.setAttribute('output', this.outputConnection.typeExpr.name);
+    container.setAttribute('output', this.outputConnection.typeExpr.getLiteralName());
 
     for (var i = 0; i < this.itemCount_; i++) {
       var tp = this.getInput("TP" + i).connection.typeExpr; 
       container.appendChild( Blockly.TypeInf.toDom(tp));
     }
+
+    //console.log('mutationToDom');
+    //console.log(container);
     return container;
   },
   getUserType: function(){
     return this.outputConnection.typeExpr.name;
   },
   domToMutation: function(xmlElement) {
+    //console.log('domToMutation');
+    //console.log(xmlElement);
     for (var x = 0; x < this.itemCount_; x++) {
       this.removeInput('TP' + x);
     }
 
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
-    this.setFieldValue(xmlElement.getAttribute('name'), 'NAME');
+    var name = xmlElement.getAttribute('name');
+    this.setFieldValue(name, 'NAME');
 
     var tps = [];
     for (var i = 0, childNode; childNode = xmlElement.childNodes[i]; i++) {
@@ -386,6 +392,7 @@ Blockly.Blocks['expr_constructor'] = {
     }
     tps.push(Type.Lit(xmlElement.getAttribute('output')));
     this.arrows = Type.fromList(tps);
+    //console.log('instantiating constructor for ' + name + ' to ' + this.arrows.toString()); 
     this.initArrows();
   },
 
