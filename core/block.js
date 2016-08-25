@@ -1849,7 +1849,13 @@ Blockly.Block.prototype.getSubstitutions = function(){
         var local = inp.connection.typeExpr;
         var targ = inp.connection.targetConnection.typeExpr;
         var sub = Type.mgu(local,targ);
-        subst = Type.composeSubst(subst,sub);
+
+        if(local.isFunction()){
+          // HACK TODO !!
+        }
+        else{
+          subst = Type.composeSubst(subst,sub);
+        }
       }
     }
   });
