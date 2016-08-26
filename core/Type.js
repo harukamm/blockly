@@ -93,7 +93,7 @@
     if(!this.isLiteral()) 
       // We error in order to avoid mistakingly using
       // incorrect function
-      throw "This is not a literal type !";
+      throw "This is not a literal type ! " + this.toString();
     return this.v.name;
   }
 
