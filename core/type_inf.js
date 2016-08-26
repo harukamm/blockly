@@ -158,7 +158,6 @@ Blockly.TypeInf.getBlocksDown = function(block){
 
 Blockly.TypeInf.builtinTypes = {};
 // ensure globals have different types otherwise the environment gets confused
-Blockly.TypeInf.builtinTypes['undef'] = Type.Var("z");
 
 Blockly.TypeInf.defineFunction = function(functionName, type){
   Blockly.TypeInf.builtinTypes[functionName] = type;
@@ -257,6 +256,7 @@ Blockly.TypeInf.inferType = function(block){
     if (dic.hasOwnProperty(functionName)) {
       var s = new Scheme(Type.ftv(dic[functionName]), dic[functionName] );
       env[functionName] = s;
+      env['undef'] = new Scheme(['z'],Type.Var('z'));
     }
   }
 
@@ -302,9 +302,7 @@ Blockly.TypeInf.getExpr = function(block){
         exps.push(targExp);
       }
       else{
-        var varName = prefix  + "_" + i;
-        vars.push(varName);
-        exps.push(Exp.Var(varName));
+        exps.push(Exp.Var('undef'));
         i++;
       }
     });
@@ -314,13 +312,7 @@ Blockly.TypeInf.getExpr = function(block){
     var functionName = block.functionName;
 
     var e5 = Exp.AppFunc(exps, Exp.Var(block.functionName))
-    if(vars.length == 0){
-      return e5
-    }
-    else{
-      var e6 = Exp.AbsFunc(vars, e5);
-      return e6;
-    }
-    return e6;
+
+    return e5;
   }
 };
