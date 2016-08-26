@@ -50,6 +50,15 @@ Blockly.Blocks['procedures_letFunc'] = {
     this.allowRename = false;
     this.arrows = Type.Func(Type.Var("a"), Type.Var("func") ); // Top level hack
   },
+
+  getExpr: function(){
+    console.log("custom stub");
+    if(this.getInput("RETURN").connection.isConnected())
+      return this.getInput("RETURN").connection.targetBlock().getExpr();
+    else
+      return Exp.Var("undef");
+  },
+
   setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
   validate: Blockly.Blocks['procedures_defnoreturn'].validate,
   updateParams_: function() {
