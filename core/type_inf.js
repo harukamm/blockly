@@ -78,7 +78,6 @@ Blockly.TypeInf.getTypeVarColor = function(name) {
  * @param {Blockly.Block} block - A block that is part of the component
  */
 Blockly.TypeInf.mguComponent = function(block){
-  console.log('mgu');
   var blocks = Blockly.TypeInf.getComponent(block);
   // blocks.forEach(function(b){
   //    console.log(b.type);
@@ -107,7 +106,7 @@ Blockly.TypeInf.connectComponent = function(block){
 }
 
 
-Blockly.TypeInf.useHindley = true;
+Blockly.TypeInf.useHindley = false;
 Blockly.TypeInf.unifyComponent = function(){return !Blockly.TypeInf.useHindley ? Blockly.TypeInf.mguComponent : Blockly.TypeInf.hmComponent};
 
 Blockly.TypeInf.disconnectComponent = function(parentBlock, childBlock){
@@ -256,11 +255,20 @@ Blockly.TypeInf.hmComponent = function(block){
   Blockly.TypeInf.resetComponent(block);
   var father = Blockly.TypeInf.getGrandParent(block);  
 
-  if(father.nextConnection || father.previousConnection || !father.getExpr) return; //ignore statement blocks
+  if(father.nextConnection || father.previousConnection || 
+      !father.getExpr) return; //ignore statement blocks
+  if(father.type.startsWith("type"))
+    return; // Skip type blocks, they are monomorphic anyway
 
   console.log(father.type);
-  var subs = Blockly.TypeInf.typeInference(father);
+  var subs;
 
+  try{
+    subs = Blockly.TypeInf.typeInference(father);
+  } 
+  catch(e){
+    console.log('Critical error');
+  }
   var blocks = Blockly.TypeInf.getComponent(father);
   blocks.forEach(function(b){
     if(b.newType){
@@ -273,6 +281,9 @@ Blockly.TypeInf.hmComponent = function(block){
     }
   });
 
+  //Manually unify some top level blocks
+  var s = father.getSubstitutions();
+  father.applySubst(s);
 };
 
 Blockly.TypeInf.unificationTest2 = function(){
@@ -369,6 +380,7 @@ Blockly.TypeInf.typeInference = function(block){
   }
 
   env['undef'] = new Scheme(['z'],Type.Var('z'));
+  env['[]'] = new Scheme(['a'],Type.Lit('list',[Type.Var('a')]) );
 
   
   var e = block.getExpr();
