@@ -60,7 +60,7 @@ Blockly.Blocks['type_user'] = {
     return container;
   },
   getType: function(){
-    return Type.Lit(this.getFieldValue('Name'));
+    return Type.Lit(this.getFieldValue('NAME'));
   }
 };
 
@@ -383,7 +383,6 @@ Blockly.Blocks['expr_constructor'] = {
     var tps = [];
     for (var i = 0, childNode; childNode = xmlElement.childNodes[i]; i++) {
       if (childNode.nodeName.toLowerCase() == 'type') {
-        var typename = childNode.getAttribute('name');
 
         var typeExpr = Blockly.TypeInf.fromDom(childNode);
         var input = this.appendValueInput('TP' + i);

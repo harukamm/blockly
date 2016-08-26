@@ -195,7 +195,8 @@ Blockly.UserTypes.generateConstructor = function(block){
     types.forEach(function(typeBlock){
       var typeDom;
       if(typeBlock.getType){
-        typeDom = Blockly.TypeInf.toDom(typeBlock.getType());
+        var tp = Blockly.TypeInf.toDom(typeBlock.getType());
+        typeDom = tp;
       } else {
         typeDom= goog.dom.createDom('type');
         typeDom.setAttribute(typeBlock.getAttribute('NAME'));
