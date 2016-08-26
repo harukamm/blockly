@@ -763,7 +763,8 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
       if (this.RTL) {
         highlightSteps.push('v', row.height - 1);
       }
-    } else if (row.type == Blockly.INPUT_VALUE) {
+    } else if (row.type == Blockly.INPUT_VALUE   ) {
+
       // External input.
       var input = row[0];
       var fieldX = cursorX;
@@ -1061,7 +1062,7 @@ Blockly.BlockSvg.typeVarShapes_ = {
       {
         var t = children[i];
         var h_ = Blockly.BlockSvg.getTypeExprHeight(t);
-        h+=h_+1;
+        h+=h_;
       }
       return h; 
     },

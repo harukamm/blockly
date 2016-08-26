@@ -739,7 +739,6 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   //    var thisTp = this.typeExpr; // The connecting block to be a function
 
   //    console.log(otherTp.toString());
-  //    console.log(this.sourceBlock_);
   //    console.log(thisTp.toString());
   //  
   //    var conned = 0;

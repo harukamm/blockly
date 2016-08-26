@@ -102,6 +102,7 @@ Blockly.TypeInf.mguComponent = function(block){
 
 
 Blockly.TypeInf.connectComponent = function(block){
+  Blockly.TypeInf.getComponent(block).forEach(b => {if(b.preConnect) b.preConnect()} );
   Blockly.TypeInf.unifyComponent()(block);
 }
 

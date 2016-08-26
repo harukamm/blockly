@@ -635,6 +635,8 @@ Blockly.Blocks['procedures_callnoreturn'] = {
     this.render();
 
   },
+
+
   /**
    * Create XML to represent the (non-editable) name and arguments.
    * @return {!Element} XML storage element.
@@ -731,6 +733,7 @@ Blockly.Blocks['procedures_callreturn'] = {
     this.quarkIds_ = null;
     this.arrows = Type.Var('a');
     this.updateShape_();
+    this.setInputsInline(true);
   },
   getProcedureCall: Blockly.Blocks['procedures_callnoreturn'].getProcedureCall,
   renameProcedure: Blockly.Blocks['procedures_callnoreturn'].renameProcedure,
@@ -740,7 +743,43 @@ Blockly.Blocks['procedures_callreturn'] = {
   mutationToDom: Blockly.Blocks['procedures_callnoreturn'].mutationToDom,
   domToMutation: Blockly.Blocks['procedures_callnoreturn'].domToMutation,
   renameVar: Blockly.Blocks['procedures_callnoreturn'].renameVar,
-  customContextMenu: Blockly.Blocks['procedures_callnoreturn'].customContextMenu
+  customContextMenu: Blockly.Blocks['procedures_callnoreturn'].customContextMenu,
+
+  preConnect: function(){
+    console.log('preConnect');
+
+    var anyCon = false;
+    this.inputList.forEach(function(inp){
+      if(inp.type == Blockly.INPUT_VALUE && inp.connection && inp.connection.isConnected()) 
+        anyCon = true;
+    });
+    
+    
+    if(!anyCon){
+      this.outputConnection.typeExpr = this.arrows;
+    }
+    else{
+      this.outputConnection.typeExpr = Type.getOutput(this.arrows);
+    }
+    this.render();
+  },
+
+  initArrows: function(){
+    console.log('initArrows');
+    var anyCon = false;
+    this.inputList.forEach(function(inp){
+      if(inp.type == Blockly.INPUT_VALUE && inp.connection && inp.connection.isConnected()) 
+        anyCon = true;
+    });
+
+    var type;
+    type = Type.instantiate(this.arrows);
+    Blockly.Block.updateConnectionTypes(this, type);
+    if(!anyCon){
+      this.outputConnection.typeExpr = this.arrows;
+    }
+    this.render();
+  },
 };
 
 Blockly.Blocks['procedures_ifreturn'] = {

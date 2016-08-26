@@ -158,6 +158,10 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
     this.init();
     this.initArrows();
   }
+
+  if(this.redrawAdditional)
+    this.redrawAdditional();
+
   // Record initial inline state.
   /** @type {boolean|undefined} */
   this.inputsInlineDefault = this.inputsInline;
@@ -1683,14 +1687,26 @@ Blockly.Block.prototype.applySubst = function(subst){
   this.inputList.forEach(function(inp){
     if(inp.type == Blockly.INPUT_VALUE){
       if(inp.connection && inp.connection.typeExpr){
+        try{
         var t = Type.apply(subst, inp.connection.typeExpr);
         inp.connection.typeExpr = t;
+        }
+        catch(e){ // HACK to accomodate function types
+          console.log(e);
+        }
       }
     }
   });
-  if(this.outputConnection){
-    var t = Type.apply(subst, this.outputConnection.typeExpr);
-    this.outputConnection.typeExpr = t;
+  if(this.outputConnection){ // HACK to accomodate function types
+    try{
+      var t = Type.apply(subst, this.outputConnection.typeExpr);
+      this.outputConnection.typeExpr = t;
+    }
+    catch(e){
+      var a = Type.generateTypeVar('a'); 
+      this.outputConnection.typeExpr = Type.apply(subst,a);
+      console.log(e);
+    }
   }
 
   var fieldVars = this.getAllFieldVars();
