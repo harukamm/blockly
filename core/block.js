@@ -1643,6 +1643,40 @@ Blockly.Block.prototype.getAllFieldVars = function(){
   return fieldVars;
 };
 
+
+Blockly.Block.prototype.getExpr = function(){
+  if(this.functionName == "Literal"){
+    var exp = Exp.Lit(this.arrows.getLiteralName());
+    exp.tag = this;
+    return   exp
+  }
+  else{ // Assume for now its a function
+    var i = 0;
+    var prefix = 'tp_' 
+    var exps = [];
+    var vars = [];
+    this.inputList.forEach(function(input){
+    if(input.type == Blockly.INPUT_VALUE)
+      if(input.connection && input.connection.targetBlock()){
+        var targExp = input.connection.targetBlock().getExpr();
+        exps.push(targExp);
+      }
+      else{
+        exps.push(Exp.Var('undef'));
+        i++;
+      }
+    });
+
+    var arrows = Blockly.TypeInf.builtinTypes[this.functionName]; 
+
+    var e5 = Exp.AppFunc(exps, Exp.Var(this.functionName));
+    e5.tag = this;
+
+    return e5;
+  }
+};
+
+
 Blockly.Block.prototype.applySubst = function(subst){
   this.inputList.forEach(function(inp){
     if(inp.type == Blockly.INPUT_VALUE){

@@ -279,53 +279,6 @@ Blockly.TypeInf.unificationTest2 = function(){
 };
 
 
-Blockly.TypeInf.getExpr = function(block){
-  if(block.functionName == "Literal"){
-    var exp = Exp.Lit(block.arrows.getLiteralName());
-    exp.tag = block;
-    return   exp
-  }
-  else{ // Assume for now its a function
-    var i = 0;
-    var prefix = 'tp_' 
-    var exps = [];
-    var vars = [];
-    block.inputList.forEach(function(input){
-    if(input.type == Blockly.INPUT_VALUE)
-      if(input.connection && input.connection.targetBlock()){
-        var targExp = Blockly.TypeInf.getExpr(input.connection.targetBlock());
-        exps.push(targExp);
-      }
-      else{
-        exps.push(Exp.Var('undef'));
-        i++;
-      }
-    });
-
-
-    var arrows = Blockly.TypeInf.builtinTypes[block.functionName]; 
-    var functionName = block.functionName;
-
-    var e5 = Exp.AppFunc(exps, Exp.Var(block.functionName));
-    e5.tag = block;
-
-    return e5;
-  }
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 Blockly.TypeInf.ti = function(te, exp){
     if(! (te instanceof TypeEnv)){
@@ -347,7 +300,7 @@ Blockly.TypeInf.ti = function(te, exp){
         return {sub: nullSubst , tp:t};
       }
       else{
-        throw "Unbound variable " + n;
+        throw "Unbound variable '" + n + "' in expression: " + exp.toString();
       }
     }
     else if(exp.isLiteral()){
@@ -413,7 +366,7 @@ Blockly.TypeInf.typeInference = function(block){
   env['undef'] = new Scheme(['z'],Type.Var('z'));
 
   
-  var e = Blockly.TypeInf.getExpr(block);
+  var e = block.getExpr();
   var k = Blockly.TypeInf.ti(new TypeEnv(env), e);
 
   var s = k['sub']; var t = k['tp'];
