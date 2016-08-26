@@ -190,7 +190,8 @@ Blockly.Blocks['lists_create_with_container'] = {
     this.appendStatementInput('STACK');
     this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TOOLTIP);
     this.contextMenu = false;
-  }
+  },
+  getExpr: null
 };
 
 Blockly.Blocks['lists_create_with_item'] = {
@@ -206,7 +207,8 @@ Blockly.Blocks['lists_create_with_item'] = {
     this.setNextStatement(true);
     this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_ITEM_TOOLTIP);
     this.contextMenu = false;
-  }
+  },
+  getExpr: null
 };
 
 Blockly.Blocks['lists_repeat'] = {
