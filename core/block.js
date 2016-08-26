@@ -1647,16 +1647,14 @@ Blockly.Block.prototype.getAllFieldVars = function(){
 
 
 Blockly.Block.prototype.getExpr = function(){
-  if(this.functionName == "Literal"){
+  if(this.arrows && this.arrows.isLiteral()){
     var exp = Exp.Lit(this.arrows.getLiteralName());
     exp.tag = this;
     return   exp
   }
-  else{ // Assume for now its a function
+  else if (!this.arrows){ // Assume for now its a function
     var i = 0;
-    var prefix = 'tp_' 
     var exps = [];
-    var vars = [];
     this.inputList.forEach(function(input){
     if(input.type == Blockly.INPUT_VALUE)
       if(input.connection && input.connection.targetBlock()){
@@ -1676,6 +1674,8 @@ Blockly.Block.prototype.getExpr = function(){
 
     return e5;
   }
+  else
+    throw "Please define expression manually for block " + this.type;
 };
 
 
