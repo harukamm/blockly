@@ -166,8 +166,8 @@
   }
   
   Type.getOutput = function(tp){
-    if (tp.next)
-      return Type.getOutput(tp.next);
+    if (tp.isFunction())
+      return Type.getOutput(tp.getSecond());
     return tp;
   }
   
