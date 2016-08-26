@@ -52,9 +52,15 @@ Blockly.Blocks['procedures_letFunc'] = {
   },
 
   getExpr: function(){
-    console.log("custom stub");
-    if(this.getInput("RETURN").connection.isConnected())
-      return this.getInput("RETURN").connection.targetBlock().getExpr();
+    if(this.getInput("RETURN").connection.isConnected()){
+      var exp = this.getInput("RETURN").connection.targetBlock().getExpr();
+      if (this.arguments_.length > 0){
+        exp = Exp.AbsFunc(this.arguments_, this.getInput("RETURN").connection.targetBlock().getExpr());
+        exp.tag = this;
+        return exp;
+      }
+      return exp; 
+    }
     else
       return Exp.Var("undef");
   },
@@ -411,7 +417,8 @@ Blockly.Blocks['procedures_mutatorcontainer_nostatements'] = {
         return chr;
     }
  
-  }
+  },
+  getExpr: null
 };
 
 
@@ -494,6 +501,13 @@ Blockly.Blocks['vars_local'] = {
     this.arrows = Type.Var("a");
     this.dom_ = null;
   },
+
+  getExpr: function(){
+    var exp = Exp.Var(this.getFieldValue('NAME'));
+    exp.tag = this;
+    return exp; 
+  },
+
 
   domToMutation: function(xmlElement) {  // TODO, this needs work, what in the case of a list expr or case block? 
     var name = xmlElement.getAttribute('name');
