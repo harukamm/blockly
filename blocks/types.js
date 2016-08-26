@@ -245,11 +245,33 @@ Blockly.Blocks['type_sum'] = {
     this.allowRename = false;
 
     this.arrows = Type.fromList([Type.Lit("Product"), Type.Lit("Sum")]);
+
   },
 
   fixName: function() {
     var newName = Blockly.UserTypes.findTypeName(this.getFieldValue('NAME'),this);
     this.getField('NAME').setValue(newName);
+  },
+
+  foldr1 : function(fn, xs) {
+    var result = xs[xs.length - 1];
+      for (var i = xs.length - 2; i > -1; i--) {
+        result = fn(xs[i], result);
+      }
+    return result;
+  },
+
+  getExpr: function(){
+    var exps = [];
+    this.inputList.forEach(function(inp){
+      if(inp.connection.isConnected())
+        exps.push(inp.connection.targetBlock().getExpr());
+      else
+        exps.push(Exp.Var('undef'));
+    });
+    var func = (a,b) => Exp.AppFunc([a,b],Exp.Var("|"));
+    var e = this.foldr1(func,exps);
+    return e;
   },
   
   mutationToDom: function() {
