@@ -256,15 +256,20 @@ Blockly.TypeInf.hmComponent = function(block){
   Blockly.TypeInf.resetComponent(block);
   var father = Blockly.TypeInf.getGrandParent(block);  
 
+  if(father.nextConnection || father.previousConnection || !father.getExpr) return; //ignore statement blocks
+
+  console.log(father.type);
   var subs = Blockly.TypeInf.typeInference(father);
 
   var blocks = Blockly.TypeInf.getComponent(father);
   blocks.forEach(function(b){
     if(b.newType){
       var tp = Type.apply(subs,b.newType);
-      var s = Type.mgu(b.outputConnection.typeExpr, tp);
-      b.applySubst(s);
-      b.render();
+      if(b.outputConnection){
+        var s = Type.mgu(b.outputConnection.typeExpr, tp);
+        b.applySubst(s);
+        b.render();
+      }
     }
   });
 
