@@ -260,12 +260,12 @@ Blockly.TypeInf.hmComponent = function(block){
 
   var blocks = Blockly.TypeInf.getComponent(father);
   blocks.forEach(function(b){
-    var tp = Type.apply(subs,b.newType);
-    
-    var s = Type.mgu(b.outputConnection.typeExpr, tp);
-    b.applySubst(s);
-
-    b.render();
+    if(b.newType){
+      var tp = Type.apply(subs,b.newType);
+      var s = Type.mgu(b.outputConnection.typeExpr, tp);
+      b.applySubst(s);
+      b.render();
+    }
   });
 
 };

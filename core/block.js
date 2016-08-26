@@ -112,6 +112,8 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
    */
   this.isShadow_ = false;
 
+  this.newType = null;
+
   /**
    * @type {boolean}
    * @private
