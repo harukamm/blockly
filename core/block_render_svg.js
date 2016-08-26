@@ -1307,14 +1307,16 @@ Blockly.BlockSvg.typeVarHighlights_ = function(typeExpr, y, typeVarHighlights) {
         color: Blockly.TypeInf.getTypeVarColor(name), 
         path: "m 0," + y + " " + Blockly.BlockSvg.typeVarShapes_["typeVar"]["highlight"]
       });
-    } /*else if (typeExpr.children.length != 0) {
+    } 
+    else if (typeExpr.isLiteral() && typeExpr.getLiteralChildren().length != 0) {
+      var ch = typeExpr.getLiteralChildren();
       var offsetsY = Blockly.BlockSvg.getShapeForType(name).offsetsY(typeExpr);
-      for (var i = 0; i < typeExpr.children.length; i++) {
-        Blockly.BlockSvg.typeVarHighlights_(typeExpr.children[i], 
+      for (var i = 0; i < ch.length; i++) {
+        Blockly.BlockSvg.typeVarHighlights_(ch[i], 
                                             y + offsetsY[i],
                                             typeVarHighlights);
       }
-    }*/
+    }
   }
 }
 
