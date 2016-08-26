@@ -819,7 +819,13 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   }
   var unifyResult = true;
   if (this.typeExpr && otherConnection.typeExpr) {
-    unifyResult = Type.mgu(this.typeExpr, otherConnection.typeExpr);
+    try{
+      unifyResult = Type.mgu(this.typeExpr, otherConnection.typeExpr);
+    }
+    catch(e){
+      console.log(e);
+      return false;
+    }
     return unifyResult;
   }
   // STEFAN, TODO CHANGE IF TYPES DONT MATCH ANYMORE
