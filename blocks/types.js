@@ -411,7 +411,7 @@ Blockly.Blocks['expr_constructor'] = {
 Blockly.Blocks['expr_case'] = {
   init: function() {
     this.setColour(190);
-    this.a = Type.Var('a');
+    this.a = Type.generateTypeVar('a');
     this.appendValueInput('INPUT')
         .appendField(new Blockly.FieldLabel('Case of', 'blocklyTextEmph'))
         .appendField(new Blockly.FieldLabel('Maybe', 'blocklyTextEmph'), 'NAME');
