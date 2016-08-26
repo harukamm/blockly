@@ -94,8 +94,6 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
    */
   this.deletable_ = true;
 
-  this.outType = null;
-
   /**
    * @type {boolean}
    * @private
@@ -157,7 +155,6 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   if (goog.isFunction(this.init)) {
     this.init();
     this.initArrows();
-    this.setOutType();
   }
   // Record initial inline state.
   /** @type {boolean|undefined} */
@@ -251,7 +248,7 @@ Blockly.Block.updateConnectionTypes = function(block, type){
     inp++;
   }
   if(block.outputConnection){
-    block.outType = it;
+    block.outputConnection.typeExpr = it;
   }
 
 };
@@ -1646,29 +1643,6 @@ Blockly.Block.prototype.getAllFieldVars = function(){
   return fieldVars;
 };
 
-
-Blockly.Block.prototype.getOutType = function(){
-  var inp = 0;
-  var uncon = [];
-  this.inputList.forEach(function(inp){
-   if( inp.type == Blockly.INPUT_VALUE && inp.connection.typeExpr && !inp.connection.isConnected() )
-     uncon.push(inp.connection.typeExpr);
-  });
-
-  uncon.push(this.outType);
-
-  return Type.fromList(uncon);
-}
-
-
-Blockly.Block.prototype.setOutType = function(){
-
-  if(this.outputConnection){ // We are at the output
-    var t = this.getOutType();
-    this.outputConnection.typeExpr = t;
-  }
-}
-
 Blockly.Block.prototype.applySubst = function(subst){
   this.inputList.forEach(function(inp){
     if(inp.type == Blockly.INPUT_VALUE){
@@ -1678,11 +1652,10 @@ Blockly.Block.prototype.applySubst = function(subst){
       }
     }
   });
-  if(this.outType){
-    var t = Type.apply(subst, this.outType);
-    this.outType = t;
+  if(this.outputConnection){
+    var t = Type.apply(subst, this.outputConnection.typeExpr);
+    this.outputConnection.typeExpr = t;
   }
-  this.setOutType();
 
   var fieldVars = this.getAllFieldVars();
   fieldVars.forEach(function(f){
@@ -1697,10 +1670,7 @@ Blockly.Block.prototype.getSubstitutions = function(){
     if(inp.type == Blockly.INPUT_VALUE){
       if(inp.connection && inp.connection.isConnected()){
         var local = inp.connection.typeExpr;
-        var targ = inp.connection.targetBlock().getOutType();
-        console.log(local);
-        console.log(inp.connection.targetBlock());
-        console.log(targ);
+        var targ = inp.connection.targetConnection.typeExpr;
 
         if(!local){
           // HACK TODO !!
