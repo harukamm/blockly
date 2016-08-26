@@ -119,7 +119,6 @@ Blockly.Blocks['test_func2'] = {
     this.setInputsInline(true);
     this.setOutput(true);
     this.setOutputTypeExpr(Type.fromList([Type.Lit('Number'), Type.Lit('Picture')]));
-    console.log('hehe: ' + this.outputConnection.typeExpr.toString());
   }
 };
 
