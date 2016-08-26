@@ -173,8 +173,9 @@ Blockly.Blocks['pair_first_typed'] = {
     this.appendValueInput('PAIR')
         .appendField(new Blockly.FieldLabel("fst","blocklyTextEmph") );
     this.setOutput(true);
-    
-    this.arrows = Type.fromList([Type.Lit("pair", [Type.Var("a"), Type.Var("b")]), Type.Var("a")]);
+   
+    Blockly.TypeInf.defineFunction('fst', Type.fromList([Type.Lit("pair", [Type.Var("a"), Type.Var("b")]), Type.Var("a")]));
+    this.setAsFunction('fst');
   }
 };
 

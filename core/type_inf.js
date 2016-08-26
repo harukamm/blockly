@@ -74,9 +74,11 @@ Blockly.TypeInf.getTypeVarColor = function(name) {
 
 
 /**
+ * Most general unification
  * @param {Blockly.Block} block - A block that is part of the component
  */
-Blockly.TypeInf.UnifyComponent = function(block){
+Blockly.TypeInf.mguComponent = function(block){
+  console.log('mgu');
   var blocks = Blockly.TypeInf.getComponent(block);
   // blocks.forEach(function(b){
   //    console.log(b.type);
@@ -101,16 +103,20 @@ Blockly.TypeInf.UnifyComponent = function(block){
 
 
 Blockly.TypeInf.connectComponent = function(block){
-  Blockly.TypeInf.UnifyComponent(block);
+  Blockly.TypeInf.unifyComponent()(block);
 }
+
+
+Blockly.TypeInf.useHindley = true;
+Blockly.TypeInf.unifyComponent = function(){return !Blockly.TypeInf.useHindley ? Blockly.TypeInf.mguComponent : Blockly.TypeInf.hmComponent};
 
 Blockly.TypeInf.disconnectComponent = function(parentBlock, childBlock){
   Blockly.TypeInf.resetComponent(childBlock);
   Blockly.TypeInf.resetComponent(parentBlock);
   // Now we have two components
   // Unify here !
-  Blockly.TypeInf.UnifyComponent(childBlock);
-  Blockly.TypeInf.UnifyComponent(parentBlock);
+  Blockly.TypeInf.unifyComponent()(childBlock);
+  Blockly.TypeInf.unifyComponent()(parentBlock);
 };
 
 Blockly.TypeInf.getComponent = function(block){
@@ -239,56 +245,45 @@ Blockly.TypeInf.testDom = function(){
 
 
 
-
-
-
-
 // Test HM
 
-Blockly.TypeInf.inferType = function(block){
-  var exp = Blockly.TypeInf.getExpr(block);
-  console.log(exp.toString());
-  
-  // Get the environment
-  var dic = Blockly.TypeInf.builtinTypes;
-  var env = {};
-  for (var functionName in dic) {
-    if (dic.hasOwnProperty(functionName)) {
-      var s = new Scheme(Type.ftv(dic[functionName]), dic[functionName] );
-      env[functionName] = s;
-      env['undef'] = new Scheme(['z'],Type.Var('z'));
-    }
-  }
+/**
+ * Applies hindley milner inference to the component containing block
+ * Updates connections to match
+ */
+Blockly.TypeInf.hmComponent = function(block){
 
-  try{
-    var type = Exp.typeInference(env, exp);
-    block.setWarningText(null);
-    return type;
-  }
-  catch(e){
-    block.setWarningText("Types do not match");
-    return null;
-  }
-}
+  Blockly.TypeInf.resetComponent(block);
+  var father = Blockly.TypeInf.getGrandParent(block);  
 
+  var subs = Blockly.TypeInf.typeInference(father);
 
-Blockly.TypeInf.unificationTest = function(workspace){
-  var blocks = workspace.getTopBlocks();
-  blocks.forEach(function(block){
-    var type = Blockly.TypeInf.inferType(block);
-    console.log(type.toString());
+  var blocks = Blockly.TypeInf.getComponent(father);
+  blocks.forEach(function(b){
+    var tp = Type.apply(subs,b.newType);
+    
+    var s = Type.mgu(b.outputConnection.typeExpr, tp);
+    b.applySubst(s);
+
+    b.render();
   });
+
 };
 
 Blockly.TypeInf.unificationTest2 = function(){
-  Blockly.TypeInf.unificationTest(Blockly.getMainWorkspace());
+  var blocks = Blockly.getMainWorkspace().getTopBlocks();
+  blocks.forEach(function(block){
+    Blockly.TypeInf.hmComponent(block);
+  });
 
 };
 
 
 Blockly.TypeInf.getExpr = function(block){
   if(block.functionName == "Literal"){
-    return Exp.Lit(block.arrows.getLiteralName());
+    var exp = Exp.Lit(block.arrows.getLiteralName());
+    exp.tag = block;
+    return   exp
   }
   else{ // Assume for now its a function
     var i = 0;
@@ -311,8 +306,119 @@ Blockly.TypeInf.getExpr = function(block){
     var arrows = Blockly.TypeInf.builtinTypes[block.functionName]; 
     var functionName = block.functionName;
 
-    var e5 = Exp.AppFunc(exps, Exp.Var(block.functionName))
+    var e5 = Exp.AppFunc(exps, Exp.Var(block.functionName));
+    e5.tag = block;
 
     return e5;
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Blockly.TypeInf.ti = function(te, exp){
+    if(! (te instanceof TypeEnv)){
+      throw "Must supply a TypeEnv";
+    }
+    var env = te.env;
+
+    if(exp.isVar()){
+      var n = exp.getVarName();
+      if(env.has(n)){
+        /**
+         * @type {Scheme}
+         */
+        var sigma = env.get(n); // sigma : Scheme
+        var t = Scheme.instantiate(sigma);
+        if(exp.tag)
+          exp.tag.newType = t;
+
+        return {sub: nullSubst , tp:t};
+      }
+      else{
+        throw "Unbound variable " + n;
+      }
+    }
+    else if(exp.isLiteral()){
+      if(exp.tag)
+        exp.tag.newType = Type.Lit(exp.getLiteral());
+      return {sub: nullSubst , tp : Type.Lit(exp.getLiteral())}; // Expand here
+    }
+    else if(exp.isAbs()){
+      var n = exp.getAbsVarName();
+      var e = exp.getAbsExp();
+      var tv = Type.generateTypeVar('a');
+      var ten = TypeEnv.remove(te, n);
+      var tenn = TypeEnv.insert(n,new Scheme([],tv),ten);
+      var k = Blockly.TypeInf.ti(tenn,e);
+      var s1 = k['sub']; var t1 = k['tp'];
+      //console.log(Type.apply(s1,tv));
+      //console.log(t1);
+      //console.log(new Type(Type.apply(s1,tv), t1) );
+      var res = Type.Func(Type.apply(s1,tv), t1);
+      return {sub : s1, tp : res};
+    }
+    else if(exp.isApp()){
+      var e1 = exp.getAppExpFirst();
+      var e2 = exp.getAppExpSecond();
+      var tv = Type.generateTypeVar('a');
+
+      var k1 = Blockly.TypeInf.ti(te, e1); var s1 = k1['sub']; var t1= k1['tp'];
+      var k2 = Blockly.TypeInf.ti(TypeEnv.apply(s1,te), e2); var s2 = k2['sub']; var t2 = k2['tp'];
+      var s3 = Type.mgu(Type.apply(s2,t1), Type.Func(t2,tv));
+      if(exp.tag)
+        exp.tag.newType = Type.apply(s3,tv);
+      return {sub : Type.composeSubst(s3,Type.composeSubst(s2,s1)), tp : Type.apply(s3,tv)};
+    }
+    else if (exp.isLet()){
+      var x = exp.getLetVarName();
+      var e1 = exp.getLetExpFirst();
+      var e2 = exp.getLetExpSecond();
+      var k1 = Blockly.TypeInf.ti(te, e1); var s1 = k1['sub']; var t1 = k1['tp'];
+      var ten = TypeEnv.remove(te,x);
+      var tn = TypeEnv.generalize(TypeEnv.apply(s1,ten),t1);
+      var tenn = TypeEnv.insert(x,tn,ten); 
+      var k2 = Blockly.TypeInf.ti(TypeEnv.apply(s1,tenn), e2); var s2 = k2['sub']; var t2 = k2['tp'];
+      return { sub : Type.composeSubst(s1,s2), tp : t2 };
+    }
+    throw "Partial pattern match";
+  }
+
+  /**
+   * @param {Object<string,Scheme>} env
+   * @param {Exp} e
+   */
+Blockly.TypeInf.typeInference = function(block){
+
+  var dic = Blockly.TypeInf.builtinTypes;
+  var env = {};
+  for (var functionName in dic) {
+    if (dic.hasOwnProperty(functionName)) {
+      var s = new Scheme(Type.ftv(dic[functionName]), dic[functionName] );
+      env[functionName] = s;
+    }
+  }
+
+  env['undef'] = new Scheme(['z'],Type.Var('z'));
+
+  
+  var e = Blockly.TypeInf.getExpr(block);
+  var k = Blockly.TypeInf.ti(new TypeEnv(env), e);
+
+  var s = k['sub']; var t = k['tp'];
+
+
+  return s
+}
+
