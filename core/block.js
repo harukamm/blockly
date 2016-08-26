@@ -94,6 +94,8 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
    */
   this.deletable_ = true;
 
+  this.outType = null;
+
   /**
    * @type {boolean}
    * @private
@@ -155,6 +157,7 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   if (goog.isFunction(this.init)) {
     this.init();
     this.initArrows();
+    this.setOutType();
   }
   // Record initial inline state.
   /** @type {boolean|undefined} */
@@ -230,34 +233,7 @@ Blockly.Block.prototype.getOutputType = function(){
 }
 
 
-// Old unused, deprecated
-Blockly.Block.updateConnectionTypes_ = function(block, type){
-  var flattened = Type.flatten(type);
-  var inp = 0;
-  for(var i = 0; i < flattened.length; i++){
-    // Handle output
-    if(i == flattened.length - 1 && block.outputConnection){ // We are at the output
-      block.setOutputTypeExpr(flattened[i]);
-      return;
-    }
-
-    // Handle input
-    if(!block.inputList[inp]) // Too far, can't proceed.
-      return;
-    while(block.inputList[inp].type != Blockly.INPUT_VALUE){
-      inp++; // Skip dummy and statement inputs
-      if(inp>=block.inputList.length) {console.log("yelp"); return; }// Something went wrong
-    }
-
-    block.inputList[inp].setTypeExpr(flattened[i]);
-
-    inp++;
-  }
-};
-
 Blockly.Block.updateConnectionTypes = function(block, type){
-  var flattened = Type.flatten(type);
- 
   var inp = 0;
   var it = type;
   while(it.isFunction()){
@@ -274,89 +250,11 @@ Blockly.Block.updateConnectionTypes = function(block, type){
     it = it.getSecond();
     inp++;
   }
-  if(block.outputConnection){ // We are at the output
-    block.setOutputTypeExpr(it);
+  if(block.outputConnection){
+    block.outType = it;
   }
 
 };
-
-
-Blockly.Block.updateTypes = function(block){
-
-  block.initArrows();
-  var j = 0;
-  for(var i = 0; i < block.inputList.length; i++){
-    var inp = block.inputList[i];
-    if(inp.connection && !inp.connection.isConnected()){
-//      inp.setTypeExpr(flattened[j]);
-      j++;
-    }
-    else if (inp.connection){
-      var targBlock = inp.connection.targetBlock();
-      var type = Blockly.Block.inferType(targBlock);
-      var outType = Type.getOutput(type);
-      var curType = inp.connection.typeExpr;
-      Blockly.Connection.UnifyT(block, curType, outType);
-    }
-  }
-  if(i == block.inputList.length){ 
-    var exp = block.getExpr();
-    if(block.outputConnection.isConnected()){
-      var outType = block.outputConnection.targetConnection.typeExpr;
-      var curType = block.outputConnection.typeExpr;
-      Blockly.Connection.UnifyT(block, outType, curType);
-      Blockly.Block.updateTypes(block.outputConnection.targetBlock());
-    }
-   
-  } 
-
-};
-
-Blockly.Block.updateOpenTypes = function(block){
-  var type = Blockly.Block.inferType(block);  
-  if(!type){
-    console.log("No type, can't continue here");
-    return;
-  }
-  if(type) console.log(type.toString());
-  var i = 0;
-  while(type.isFunction()){
-    console.log(type.getFirst().toString());
-
-    while(block.inputList[i] && block.inputList[i].type != Blockly.INPUT_VALUE){
-      console.log("Skipping to next input, this one is a dummy");
-      i++;
-    }
-    if(!block.inputList[i]){
-      console.log("No input list! arg");
-      return;
-    }
-    if(block.inputList[i].connection && block.inputList[i].connection.isConnected()){
-      i++;
-      continue;
-    }
-    var inp = block.inputList[i];     
-
-    var tp = Type.getOutput(type.getFirst());
-    console.log('Setting ' + inp.name + ' to ' + tp.toString());
-    inp.connection.setTypeExpr(tp);
-
-
-    type = type.getSecond();
-    i++;
-  }
-  block.inputList.forEach(function(inp){
-    if(inp.connection && inp.connection.isConnected()){
-      console.log('Unifying on ' + inp.name);
-      var targTp = Blockly.Block.inferTypeMono(inp.connection.targetBlock());
-      var localTp = inp.connection.typeExpr;
-      Blockly.Connection.UnifyT(block, targTp, localTp);
-    }
-  });
-  block.setOutputTypeExpr(type);
-  // Output type here
-}
-
 
 
 /**
@@ -1748,6 +1646,29 @@ Blockly.Block.prototype.getAllFieldVars = function(){
   return fieldVars;
 };
 
+
+Blockly.Block.prototype.getOutType = function(){
+  var inp = 0;
+  var uncon = [];
+  this.inputList.forEach(function(inp){
+   if( inp.type == Blockly.INPUT_VALUE && inp.connection.typeExpr && !inp.connection.isConnected() )
+     uncon.push(inp.connection.typeExpr);
+  });
+
+  uncon.push(this.outType);
+
+  return Type.fromList(uncon);
+}
+
+
+Blockly.Block.prototype.setOutType = function(){
+
+  if(this.outputConnection){ // We are at the output
+    var t = this.getOutType();
+    this.outputConnection.typeExpr = t;
+  }
+}
+
 Blockly.Block.prototype.applySubst = function(subst){
   this.inputList.forEach(function(inp){
     if(inp.type == Blockly.INPUT_VALUE){
@@ -1757,10 +1678,11 @@ Blockly.Block.prototype.applySubst = function(subst){
       }
     }
   });
-  if(this.outputConnection){
-    var t = Type.apply(subst, this.outputConnection.typeExpr);
-    this.outputConnection.typeExpr = t;
+  if(this.outType){
+    var t = Type.apply(subst, this.outType);
+    this.outType = t;
   }
+  this.setOutType();
 
   var fieldVars = this.getAllFieldVars();
   fieldVars.forEach(function(f){
@@ -1775,7 +1697,10 @@ Blockly.Block.prototype.getSubstitutions = function(){
     if(inp.type == Blockly.INPUT_VALUE){
       if(inp.connection && inp.connection.isConnected()){
         var local = inp.connection.typeExpr;
-        var targ = inp.connection.targetConnection.typeExpr;
+        var targ = inp.connection.targetBlock().getOutType();
+        console.log(local);
+        console.log(inp.connection.targetBlock());
+        console.log(targ);
 
         if(!local){
           // HACK TODO !!

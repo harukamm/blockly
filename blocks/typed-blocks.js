@@ -26,21 +26,25 @@ goog.provide('Blockly.Blocks.typedBlocks');
 goog.require('Blockly.Blocks');
 
 
-Blockly.Blocks['logic_boolean_typed'] = {
-  /**
-   * Block for boolean data type: true and false.
-   * @this Blockly.Block
-   */
+Blockly.Blocks['logic_boolean_true'] = {
   init: function() {
-    var BOOLEANS =
-        [[Blockly.Msg.LOGIC_BOOLEAN_TRUE, 'TRUE'],
-         [Blockly.Msg.LOGIC_BOOLEAN_FALSE, 'FALSE']];
-    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
     this.setColour(210);
     this.setOutput(true);
     // Sorin
     this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown(BOOLEANS), 'BOOL');
+        .appendField("True", 'BOOL');
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+    this.setAsLiteral('Bool');
+  }
+};
+
+Blockly.Blocks['logic_boolean_false'] = {
+  init: function() {
+    this.setColour(210);
+    this.setOutput(true);
+    // Sorin
+    this.appendDummyInput()
+        .appendField("False", 'BOOL');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
     this.setAsLiteral('Bool');
   }

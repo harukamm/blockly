@@ -1055,9 +1055,9 @@ Blockly.BlockSvg.typeVarShapes_ = {
       });
     },
     height: function(self) {
-      var h = 22;
+      var h = 0;
       var children = Type.flatten(self);
-      for(var i = 0; i < children.length-1; i++)
+      for(var i = 0; i < children.length; i++)
       {
         var t = children[i];
         var h_ = Blockly.BlockSvg.getTypeExprHeight(t);
