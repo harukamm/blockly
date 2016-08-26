@@ -89,6 +89,44 @@ Blockly.Blocks['test_mouse'] = {
   }
 };
 
+Blockly.Blocks['test_func0'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendValueInput('TEST')
+        .setTypeExpr(Type.Var('Number'));
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setOutputTypeExpr(Type.fromList([Type.Var('a'), Type.Var('b'), Type.Lit('Number')]));
+  }
+};
+
+Blockly.Blocks['test_func1'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendValueInput('TEST')
+        .setTypeExpr(Type.Var('Number'));
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setOutputTypeExpr(Type.fromList([Type.Var('b'), Type.Lit('Picture')]));
+  }
+};
+
+Blockly.Blocks['test_func2'] = {
+  init: function() {
+    this.setColour(210);
+    this.appendValueInput('TEST')
+        .setTypeExpr(Type.Var('Number'));
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setOutputTypeExpr(Type.fromList([Type.Lit('Number'), Type.Lit('Picture')]));
+    console.log('hehe: ' + this.outputConnection.typeExpr.toString());
+  }
+};
+
+
+
+
+
 Blockly.Blocks['circTest'] = {
   init: function() {
     this.setColour(160);

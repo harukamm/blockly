@@ -732,65 +732,65 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   
   if(!otherConnection.typeExpr)
     return true;
-  if(otherConnection.typeExpr.isFunction())
-  {
-     var otherTp = otherConnection.typeExpr; // The function argument
+  // if(otherConnection.typeExpr.isFunction())
+  // {
+  //    var otherTp = otherConnection.typeExpr; // The function argument
 
-     var thisTp = this.typeExpr; // The connecting block to be a function
+  //    var thisTp = this.typeExpr; // The connecting block to be a function
 
-     console.log(otherTp.toString());
-     console.log(this.sourceBlock_);
-     console.log(thisTp.toString());
-   
-     var conned = 0;
-     var ghosts = 0;
-     var totalCons = 0;
-     var thisArrows = [];
-     for (var i = 0, input; input = this.sourceBlock_.inputList[i]; i++) {
-       if(!input.name)
-         continue;
-       if(input.name=='')
-         continue;
-       if(!input.connection)
-         continue;
-       if(input.connection.isConnected())
-         conned++;
-       if(input.connection.isConnected() && input.connection.targetBlock().isShadow())
-         ghosts++;
-       if(!input.connection.isConnected() || input.connection.targetBlock().isShadow()){
-         console.log('adding: ' + input.connection.typeExpr.toString());
-         thisArrows.push(input.connection.typeExpr);
-       }
-       totalCons++;
-     }
+  //    console.log(otherTp.toString());
+  //    console.log(this.sourceBlock_);
+  //    console.log(thisTp.toString());
+  //  
+  //    var conned = 0;
+  //    var ghosts = 0;
+  //    var totalCons = 0;
+  //    var thisArrows = [];
+  //    for (var i = 0, input; input = this.sourceBlock_.inputList[i]; i++) {
+  //      if(!input.name)
+  //        continue;
+  //      if(input.name=='')
+  //        continue;
+  //      if(!input.connection)
+  //        continue;
+  //      if(input.connection.isConnected())
+  //        conned++;
+  //      if(input.connection.isConnected() && input.connection.targetBlock().isShadow())
+  //        ghosts++;
+  //      if(!input.connection.isConnected() || input.connection.targetBlock().isShadow()){
+  //        console.log('adding: ' + input.connection.typeExpr.toString());
+  //        thisArrows.push(input.connection.typeExpr);
+  //      }
+  //      totalCons++;
+  //    }
 
-     console.log('adding: ' + this.sourceBlock_.outputConnection.typeExpr.toString());
-     thisArrows.push(this.sourceBlock_.outputConnection.typeExpr);
-     if(ghosts==totalCons || conned == 0){} // ghost connections are allowed, we will remove them later
-     else
-       return false; // We don't want partially applied functions
+  //    console.log('adding: ' + this.sourceBlock_.outputConnection.typeExpr.toString());
+  //    thisArrows.push(this.sourceBlock_.outputConnection.typeExpr);
+  //    if(ghosts==totalCons || conned == 0){} // ghost connections are allowed, we will remove them later
+  //    else
+  //      return false; // We don't want partially applied functions
 
-    
-     var dup = Type.fromList(thisArrows.map(t => t));
+  //   
+  //    var dup = Type.fromList(thisArrows.map(t => t));
 
-     var s = Type.mgu(otherTp, dup );
-     if(s){
-        return true;
-     }
-     else return false;
+  //    var s = Type.mgu(otherTp, dup );
+  //    if(s){
+  //       return true;
+  //    }
+  //    else return false;
 
-     var s = null;
-     try {
-       s= Type.mgu(thisTp, otherTp);
-     }catch (e){}
-     if(s){
-       return true;
-     }
-     else{
-       return false;
-     }
+  //    var s = null;
+  //    try {
+  //      s= Type.mgu(thisTp, otherTp);
+  //    }catch (e){}
+  //    if(s){
+  //      return true;
+  //    }
+  //    else{
+  //      return false;
+  //    }
 
-  }
+  // }
 
   var thisPrefix = this.sourceBlock_.type.substring(0,4);
   var otherPrefix = otherConnection.sourceBlock_.type.substring(0,4)

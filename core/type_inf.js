@@ -236,3 +236,91 @@ Blockly.TypeInf.testDom = function(){
 
 
 }
+
+
+
+
+
+
+
+
+// Test HM
+
+Blockly.TypeInf.inferType = function(block){
+  var exp = Blockly.TypeInf.getExpr(block);
+  console.log(exp.toString());
+  
+  // Get the environment
+  var dic = Blockly.TypeInf.builtinTypes;
+  var env = {};
+  for (var functionName in dic) {
+    if (dic.hasOwnProperty(functionName)) {
+      var s = new Scheme(Type.ftv(dic[functionName]), dic[functionName] );
+      env[functionName] = s;
+    }
+  }
+
+  try{
+    var type = Exp.typeInference(env, exp);
+    block.setWarningText(null);
+    return type;
+  }
+  catch(e){
+    block.setWarningText("Types do not match");
+    return null;
+  }
+}
+
+
+Blockly.TypeInf.unificationTest = function(workspace){
+  var blocks = workspace.getTopBlocks();
+  blocks.forEach(function(block){
+    var type = Blockly.TypeInf.inferType(block);
+    console.log(type.toString());
+  });
+};
+
+Blockly.TypeInf.unificationTest2 = function(){
+  Blockly.TypeInf.unificationTest(Blockly.getMainWorkspace());
+
+};
+
+
+Blockly.TypeInf.getExpr = function(block){
+  if(block.functionName == "Literal"){
+    return Exp.Lit(block.arrows.getLiteralName());
+  }
+  else{ // Assume for now its a function
+    var i = 0;
+    var prefix = 'tp_' 
+    var exps = [];
+    var vars = [];
+    block.inputList.forEach(function(input){
+    if(input.type == Blockly.INPUT_VALUE)
+      if(input.connection && input.connection.targetBlock()){
+        var targExp = Blockly.TypeInf.getExpr(input.connection.targetBlock());
+        exps.push(targExp);
+      }
+      else{
+        var varName = prefix  + "_" + i;
+        vars.push(varName);
+        exps.push(Exp.Var(varName));
+        i++;
+      }
+    });
+
+
+    var arrows = Blockly.TypeInf.builtinTypes[block.functionName]; 
+    var functionName = block.functionName;
+
+    var e5 = Exp.AppFunc(exps, Exp.Var(block.functionName))
+    if(vars.length == 0){
+      return e5
+    }
+    else{
+      var e6 = Exp.AbsFunc(vars, e5);
+      return e6;
+    }
+    return e6;
+  }
+};

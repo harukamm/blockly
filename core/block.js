@@ -1704,82 +1704,6 @@ Blockly.Block.inferTypeMono = function(block){
     return Type.getOutput(tp);
 }
 
-
-
-
-Blockly.Block.inferType = function(block){
-  var exp = block.getExpr();
-  
-  // Get the environment
-  var dic = Blockly.TypeInf.builtinTypes;
-  var env = {};
-  for (var functionName in dic) {
-    if (dic.hasOwnProperty(functionName)) {
-      var s = new Scheme([functionName], dic[functionName] );
-      env[functionName] = s;
-    }
-  }
-
-  try{
-    var type = Exp.typeInference(env, exp);
-    block.setWarningText(null);
-    return type;
-  }
-  catch(e){
-    block.setWarningText("Types do not match");
-    return null;
-  }
-}
-
-
-Blockly.Block.unificationTest = function(workspace){
-  var blocks = workspace.getTopBlocks();
-  blocks.forEach(function(block){
-    var type = Blockly.Block.inferType(block);
-    console.log(type.toString());
-  });
-}
-
-
-Blockly.Block.prototype.getExpr = function(){
-  if(this.functionName == "Literal"){
-    return Exp.Lit(this.arrows.getLiteralName());
-  }
-  else{ // Assume for now its a function
-    var i = 0;
-    var prefix = 'tp_' ;//+ this.id.substring(0,4);
-    var exps = [];
-    var vars = [];
-    this.inputList.forEach(function(input){
-    if(input.type == Blockly.INPUT_VALUE)
-      if(input.connection && input.connection.targetBlock()){
-        var targExp = input.connection.targetBlock().getExpr(true);
-        exps.push(targExp);
-      }
-      else{
-        var varName = prefix  + "_" + i;
-        vars.push(varName);
-        exps.push(Exp.Var(varName));
-        i++;
-      }
-    });
-
-
-    var arrows = Blockly.TypeInf.builtinTypes[this.functionName]; 
-    var functionName = this.functionName;
-
-    var e5 = Exp.AppFunc(exps, Exp.Var(this.functionName))
-    if(vars.length == 0){
-      return e5
-    }
-    else{
-      var e6 = Exp.AbsFunc(vars, e5);
-      return e6;
-    }
-    return e6;
-  }
-}
-
 // For things such as vars_ or args_
 Blockly.Block.prototype.resetAdditional = function(){
   if(this.varTypes_){
@@ -1853,7 +1777,7 @@ Blockly.Block.prototype.getSubstitutions = function(){
         var local = inp.connection.typeExpr;
         var targ = inp.connection.targetConnection.typeExpr;
 
-        if(!local || local.isFunction()){
+        if(!local){
           // HACK TODO !!
         }
         else{
