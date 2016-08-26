@@ -410,7 +410,7 @@ Blockly.Blocks['expr_constructor'] = {
 
 Blockly.Blocks['expr_case'] = {
   init: function() {
-    this.setColour(190);
+    this.setColour(180);
     this.a = Type.generateTypeVar('a');
     this.appendValueInput('INPUT')
         .appendField(new Blockly.FieldLabel('Case of', 'blocklyTextEmph'))
@@ -582,7 +582,7 @@ Blockly.Blocks['pair_first_typed'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.setColour(210);
+    this.setColour(180);
     this.appendValueInput('PAIR')
         .appendField(new Blockly.FieldLabel("firstOfPair","blocklyTextEmph") );
     this.setOutput(true);
@@ -598,7 +598,7 @@ Blockly.Blocks['pair_second_typed'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.setColour(210);
+    this.setColour(180);
     this.appendValueInput('PAIR')
         .appendField(new Blockly.FieldLabel("secondOfPair","blocklyTextEmph") );
     this.setOutput(true);
