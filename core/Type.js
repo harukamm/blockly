@@ -449,9 +449,9 @@
   ELet = function(varName, exp1, exp2){
     this.varName = varName; 
     this.exp1 = exp1;
-    this.exp2 = exp2
+    this.exp2 = exp2;
   };
-  ELet.prototype.toString = function(){ return "let " + this.varName + " = " + this.exp1.toString() + " in " + this.exp2.toString(); };
+  ELet.prototype.toString = function(){ return "let " + this.varName + " = " + this.exp1.toString() + "\n in " + this.exp2.toString(); };
 
   /**
    * @constructor
