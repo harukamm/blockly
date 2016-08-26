@@ -547,8 +547,17 @@ Blockly.Blocks['vars_local'] = {
       return parenttp;
 
     var localtp = this.outputConnection.targetConnection.typeExpr;
-    var s = Type.mgu(localtp, parenttp);
-    return Type.apply(s,localtp);
+
+    try{
+      var s = Type.mgu(localtp, parenttp);
+      var res = Type.apply(s,localtp);
+    }
+    catch(e){
+      console.log(e);
+      if(localtp) return localtp;
+      return parenttp;
+    }
+  
   },
 
   mutationToDom: function() {
@@ -558,7 +567,7 @@ Blockly.Blocks['vars_local'] = {
     container.setAttribute('parentId', this.parentId);
     container.setAttribute('localId', this.localId);
 
-    var tp = this.getType();
+    var tp = this.outputConnection.typeExpr;
     var typeDom = Blockly.TypeInf.toDom(tp);
     container.appendChild(typeDom);
 
