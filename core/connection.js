@@ -52,6 +52,7 @@ Blockly.Connection = function(source, type) {
     this.hidden_ = !this.db_;
   }
   this.originalType_ = null;
+  this.visible_ = true;
 };
 
 /**

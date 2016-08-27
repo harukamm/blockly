@@ -236,6 +236,8 @@ Blockly.Block.prototype.preConnect = function(parentConnection){
         orphanBlock = null;
       }
       if(input.type == Blockly.INPUT_VALUE){
+        if(input.connection)
+          input.connection.visible_ = false;
         input.resetType = Blockly.INPUT_VALUE;
         input.type = Blockly.DUMMY_INPUT;
       }
@@ -298,8 +300,11 @@ Blockly.Block.prototype.getOutputType = function(){
 
 Blockly.Block.updateConnectionTypes = function(block, type){
   for(var inp = 0; inp < block.inputList.length; inp++){
-    if(block.inputList[inp].resetType)
+    if(block.inputList[inp].resetType){
       block.inputList[inp].type = block.inputList[inp].resetType;
+      if (block.inputList[inp].connection)
+        block.inputList[inp].connection.visible_ = true;
+    }
   }
 
   var inp = 0;

@@ -512,7 +512,6 @@ Blockly.Blocks['vars_local'] = {
   domToMutation: function(xmlElement) {  
     var name = xmlElement.getAttribute('name');
     this.parentId = xmlElement.getAttribute('parentid'); // Name of parent function
-    console.log('setting parent id of localvar to ' + this.parentId);
     this.localId = Number(xmlElement.getAttribute('localid')); // Name of parent function
     this.setFieldValue(name, 'NAME');
 
@@ -521,6 +520,8 @@ Blockly.Blocks['vars_local'] = {
     this.dom_ = typeDom;
     this.arrows = type;
     this.initArrows();
+
+    console.log('loading type as ' + type.toString());
   },
 
   initArrows: function(){
@@ -568,12 +569,10 @@ Blockly.Blocks['vars_local'] = {
     container.setAttribute('parentid', this.parentId);
     container.setAttribute('localid', this.localId);
 
-    var tp = this.outputConnection.typeExpr;
+    var tp = this.arrows;
     var typeDom = Blockly.TypeInf.toDom(tp);
     container.appendChild(typeDom);
 
-    console.log('saving localvar as ');
-    console.log(container);
     return container;
   },
 
