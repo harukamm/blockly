@@ -749,6 +749,20 @@ Blockly.Blocks['procedures_callreturn'] = {
 
 
   preConnect: function(parentConnection){
+    if(Blockly.TypeInf.useHindley && parentConnection.typeExpr.isFunction() ){
+      console.log('Using hindley hack here');
+      this.outputConnection.typeExpr = this.arrows;
+
+      console.log('hiding inputs');
+      for(var i = 1; i < this.inputList.length; i++){
+        console.log(i);
+        this.inputList[i].resetType = Blockly.INPUT_VALUE;
+        this.inputList[i].connection.visible_ = false;
+        this.inputList[i].type = Blockly.DUMMY_INPUT;
+      }
+      this.render();
+      return;
+    }
 
     if(!parentConnection.typeExpr.isFunction()){
       for(var i = 1; i < this.arguments_.length+1; i++){

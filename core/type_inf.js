@@ -253,7 +253,8 @@ Blockly.TypeInf.testDom = function(){
  */
 Blockly.TypeInf.hmComponent = function(block){
 
-  Blockly.TypeInf.resetComponent(block);
+  // Blockly.TypeInf.resetComponent(block);
+  
   var father = Blockly.TypeInf.getGrandParent(block);  
 
   if(father.nextConnection || father.previousConnection || 
@@ -301,8 +302,13 @@ Blockly.TypeInf.hmComponent = function(block){
   // HACK to manually set outputs !
   blocks.forEach(function(b){
     if(b.outputConnection && b.outputConnection.isConnected()){
-      var s = Type.mgu(b.outputConnection.typeExpr, b.outputConnection.targetConnection.typeExpr);
-      b.outputConnection.typeExpr = Type.apply(s, b.outputConnection.typeExpr);
+      if(b.type == "procedures_callreturn"){ // An even uglier hack
+        b.outputConnection.typeExpr = b.outputConnection.targetConnection.typeExpr;
+      }
+      else{
+        var s = Type.mgu(b.outputConnection.typeExpr, b.outputConnection.targetConnection.typeExpr);
+        b.outputConnection.typeExpr = Type.apply(s, b.outputConnection.typeExpr);
+      }
     }
 
   });
@@ -413,6 +419,8 @@ Blockly.TypeInf.typeInference = function(block){
 
   env['undef'] = new Scheme(['z'],Type.Var('z'));
   env['[]'] = new Scheme(['a'],Type.Lit('list',[Type.Var('a')]) );
+  // Add constructors
+  // Add definitions
 
   
   var e = block.getExpr();
