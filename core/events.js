@@ -799,23 +799,40 @@ Blockly.Events.disableOrphans = function(event) {
       event.type == Blockly.Events.CREATE) {
     Blockly.Events.disable();
     var workspace = Blockly.Workspace.getById(event.workspaceId);
+
+    // Re-enable all blocks downwards
     var block = workspace.getBlockById(event.blockId);
-    if (block) {
-      if (block.getParent() && !block.getParent().disabled) {
-        do {
-          block.setDisabled(false);
-          block.setWarningText(null);
-          block = block.getNextBlock();
-        } while (block);
-      } else if ((block.outputConnection || block.previousConnection) &&
-                 Blockly.dragMode_ == Blockly.DRAG_NONE) {
-        do {
-          block.setDisabled(true);
-          block.setWarningText("Block is disconnected and isolated from the main program");
-          block = block.getNextBlock();
-        } while (block);
+    if(block){
+      var father = Blockly.TypeInf.getGrandParent(block);
+      if(father){
+        var shouldEnable = !father.outputConnection || Blockly.dragMode_ != Blockly.DRAG_NONE;
+        console.log(shouldEnable);
+        console.log(father.type);
+        Blockly.Events.reEnableSubBlocks(father, shouldEnable);
+        if(!shouldEnable){
+          father.setWarningText("This block is disabled because it is isolated from the main program.");
+        }
+        else{
+          father.setWarningText(null);
+        }
       }
     }
+
     Blockly.Events.enable();
   }
 };
+
+Blockly.Events.reEnableSubBlocks = function(block, status_){
+  if(status_){
+    block.setDisabled(false);
+    block.setWarningText(null);
+  }
+  else{
+    block.setDisabled(true);
+    // block.setWarningText("Block is disconnected and isolated from the main program");
+  }
+
+  var blocks = Blockly.Block.getConnectedBlocks(block); 
+  blocks.forEach(b => Blockly.Events.reEnableSubBlocks(b,status_));
+  
+}

@@ -254,7 +254,16 @@ Blockly.Block.prototype.anyInputConnected = function(){
       return true;
   });
   return false;
-}
+};
+
+Blockly.Block.getConnectedBlocks = function(block){
+  var blocks = [];
+  block.inputList.forEach(function(inp){
+    if(inp.connection && inp.connection.isConnected())
+      blocks.push(inp.connection.targetBlock());
+  });
+  return blocks;
+};
 
 Blockly.Block.prototype.initArrows = function(instantiate){
   if( !this.arrows && this.functionName.length > 0){
