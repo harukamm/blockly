@@ -225,10 +225,12 @@
       throw "Types do not match";
     if (t.isTypeVar()){
       var n = t.getTypeVar();
-      if(s.has(n))
-        return s.get(n);
-      else
-        return t;
+      while(s.has(n) && t.isTypeVar()){
+        t = s.get(n);
+        if(t.isTypeVar())
+          n = t.getTypeVar();
+      }
+      return t;
     }
     else if (t.isFunction()){
       return Type.Func(Type.apply(s,t.getFirst()), Type.apply(s, t.getSecond()));
