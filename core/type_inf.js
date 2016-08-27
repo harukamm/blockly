@@ -107,7 +107,7 @@ Blockly.TypeInf.connectComponent = function(block){
 }
 
 
-Blockly.TypeInf.useHindley = false;
+Blockly.TypeInf.useHindley = true;
 Blockly.TypeInf.unifyComponent = function(){return !Blockly.TypeInf.useHindley ? Blockly.TypeInf.mguComponent : Blockly.TypeInf.hmComponent};
 
 Blockly.TypeInf.disconnectComponent = function(parentBlock, childBlock){
@@ -261,30 +261,57 @@ Blockly.TypeInf.hmComponent = function(block){
   if(father.type.startsWith("type"))
     return; // Skip type blocks, they are monomorphic anyway
 
-  console.log(father.type);
   var subs;
 
+  var blocks = Blockly.TypeInf.getComponent(father);
+  // blocks.forEach(b => {if (b.outputConnection) console.log("W:" + b.type + ' has ' + b.outputConnection.typeExpr); });
   try{
     subs = Blockly.TypeInf.typeInference(father);
+    // console.log(subs.toObject());
   } 
   catch(e){
     console.log('Critical error');
+    console.log(e);
   }
-  var blocks = Blockly.TypeInf.getComponent(father);
-  blocks.forEach(function(b){
-    if(b.newType){
-      var tp = Type.apply(subs,b.newType);
-      if(b.outputConnection){
-        var s = Type.mgu(b.outputConnection.typeExpr, tp);
-        b.applySubst(s);
-        b.render();
-      }
-    }
-  });
+
+  // blocks.forEach(function(b){
+  //   b.inputList.forEach(function(inp){
+  //     if(inp.type == Blockly.INPUT_VALUE){
+  //       if(inp.connection && inp.connection.newType)
+  //         inp.connection.typeExpr = inp.connection.newType;
+  //     }
+  //   });
+  //   if(b.outputConnection && b.outputConnection.newType)
+  //     b.outputConnection.typeExpr = b.outputConnection.newType;
+  // });
 
   //Manually unify some top level blocks
-  var s = father.getSubstitutions();
-  father.applySubst(s);
+  //var s = father.getSubstitutions();
+  //father.applySubst(s);
+
+  //var s = block.getSubstitutions();
+  //block.applySubst(s);
+  
+  // Redraw
+
+  // blocks.forEach(b => {if (b.outputConnection) console.log("K:" + b.type + ' has ' + b.outputConnection.typeExpr); });
+
+  blocks.forEach(b => b.applySubst(subs));
+
+  // HACK to manually set outputs !
+  blocks.forEach(function(b){
+    if(b.outputConnection && b.outputConnection.isConnected()){
+      var s = Type.mgu(b.outputConnection.typeExpr, b.outputConnection.targetConnection.typeExpr);
+      b.outputConnection.typeExpr = Type.apply(s, b.outputConnection.typeExpr);
+    }
+
+  });
+
+
+  blocks.forEach(b => b.render());
+  blocks.forEach(b => b.redrawAdditional());
+
+
 };
 
 Blockly.TypeInf.unificationTest2 = function(){
@@ -312,8 +339,7 @@ Blockly.TypeInf.ti = function(te, exp){
         var sigma = env.get(n); // sigma : Scheme
         var t = Scheme.instantiate(sigma);
         if(exp.tag)
-          exp.tag.newType = t;
-
+          exp.tag.typeExpr = t;
         return {sub: nullSubst , tp:t};
       }
       else{
@@ -322,7 +348,7 @@ Blockly.TypeInf.ti = function(te, exp){
     }
     else if(exp.isLiteral()){
       if(exp.tag)
-        exp.tag.newType = Type.Lit(exp.getLiteral());
+        exp.tag.typeExpr = Type.Lit(exp.getLiteral());
       return {sub: nullSubst , tp : Type.Lit(exp.getLiteral())}; // Expand here
     }
     else if(exp.isAbs()){
@@ -347,9 +373,14 @@ Blockly.TypeInf.ti = function(te, exp){
       var k1 = Blockly.TypeInf.ti(te, e1); var s1 = k1['sub']; var t1= k1['tp'];
       var k2 = Blockly.TypeInf.ti(TypeEnv.apply(s1,te), e2); var s2 = k2['sub']; var t2 = k2['tp'];
       var s3 = Type.mgu(Type.apply(s2,t1), Type.Func(t2,tv));
-      if(exp.tag)
-        exp.tag.newType = Type.apply(s3,tv);
-      return {sub : Type.composeSubst(s3,Type.composeSubst(s2,s1)), tp : Type.apply(s3,tv)};
+      
+      var newType = Type.apply(s3, tv);
+      if(exp.tag){
+        // console.log('changing ' + exp.tag.typeExpr.toString() + ' to ' + newType.toString() + ' on ' + exp.tag.sourceBlock_.type);
+        exp.tag.typeExpr = newType;
+      }
+
+      return {sub : Type.composeSubst(s3,Type.composeSubst(s2,s1)), tp : newType};
     }
     else if (exp.isLet()){
       var x = exp.getLetVarName();
@@ -388,7 +419,6 @@ Blockly.TypeInf.typeInference = function(block){
   var k = Blockly.TypeInf.ti(new TypeEnv(env), e);
 
   var s = k['sub']; var t = k['tp'];
-
 
   return s
 }

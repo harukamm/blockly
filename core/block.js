@@ -1725,29 +1725,30 @@ Blockly.Block.prototype.getAllFieldVars = function(){
 Blockly.Block.prototype.getExpr = function(){
   if(this.arrows && this.arrows.isLiteral()){
     var exp = Exp.Lit(this.arrows.getLiteralName());
-    exp.tag = this;
-    return   exp
+    exp.tag = this.outputConnection;
+    return exp;
   }
   else if (!this.arrows){ // Assume for now its a function
     var i = 0;
     var exps = [];
     this.inputList.forEach(function(input){
     if(input.type == Blockly.INPUT_VALUE)
+      var inpExp;
       if(input.connection && input.connection.targetBlock()){
-        var targExp = input.connection.targetBlock().getExpr();
-        exps.push(targExp);
+        inpExp = input.connection.targetBlock().getExpr();
       }
       else{
-        exps.push(Exp.Var('undef'));
+        inpExp = Exp.Var('undef');
         i++;
       }
+      inpExp.tag = input.connection;
+      exps.push(inpExp);
     });
 
     var arrows = Blockly.TypeInf.builtinTypes[this.functionName]; 
 
     var e5 = Exp.AppFunc(exps, Exp.Var(this.functionName));
-    e5.tag = this;
-
+    e5.tag = this.outputConnection;
     return e5;
   }
   else
@@ -1772,6 +1773,7 @@ Blockly.Block.prototype.applySubst = function(subst){
   if(this.outputConnection){ // HACK to accomodate function types
     try{
       var t = Type.apply(subst, this.outputConnection.typeExpr);
+      // console.log('setting ' + this.type + ' from ' + this.outputConnection.typeExpr.toString() + ' output to ' + t.toString());
       this.outputConnection.typeExpr = t;
     }
     catch(e){
