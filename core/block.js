@@ -1729,20 +1729,23 @@ Blockly.Block.prototype.getExpr = function(){
     return exp;
   }
   else if (!this.arrows){ // Assume for now its a function
+
     var i = 0;
     var exps = [];
     this.inputList.forEach(function(input){
-    if(input.type == Blockly.INPUT_VALUE)
-      var inpExp;
-      if(input.connection && input.connection.targetBlock()){
-        inpExp = input.connection.targetBlock().getExpr();
+      if(input.type == Blockly.INPUT_VALUE){
+        var inpExp;
+        if(input.connection && input.connection.targetBlock()){
+          inpExp = input.connection.targetBlock().getExpr();
+        }
+        else{
+          inpExp = Exp.Var('undef');
+          i++;
+        }
+
+        inpExp.tag = input.connection;
+        exps.push(inpExp);
       }
-      else{
-        inpExp = Exp.Var('undef');
-        i++;
-      }
-      inpExp.tag = input.connection;
-      exps.push(inpExp);
     });
 
     var arrows = Blockly.TypeInf.builtinTypes[this.functionName]; 
