@@ -138,6 +138,13 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
   var parentConnection = this;
   var parentBlock = parentConnection.getSourceBlock();
   var childBlock = childConnection.getSourceBlock();
+
+  // Fire preconnection, to mutate block if necessary before actual connection
+  //if(parentBlock.preConnect)
+  //  parentBlock.preConnect(childConnection);
+  if(childBlock.preConnect)
+    childBlock.preConnect(parentConnection);
+
   // Disconnect any existing parent on the child connection.
   if (childConnection.isConnected()) {
     childConnection.disconnect();
@@ -724,78 +731,16 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   // Stefan
   /* Check if polymorphic types match */
 
-  
-
   var isStatement = otherConnection.type == Blockly.NEXT_STATEMENT || otherConnection.type == Blockly.PREVIOUS_CONNECTION;
   if(isStatement)
     return true; // Stefan, Temp Fix
   
-  if(!otherConnection.typeExpr)
-    return true;
-  // if(otherConnection.typeExpr.isFunction())
-  // {
-  //    var otherTp = otherConnection.typeExpr; // The function argument
-
-  //    var thisTp = this.typeExpr; // The connecting block to be a function
-
-  //    console.log(otherTp.toString());
-  //    console.log(thisTp.toString());
-  //  
-  //    var conned = 0;
-  //    var ghosts = 0;
-  //    var totalCons = 0;
-  //    var thisArrows = [];
-  //    for (var i = 0, input; input = this.sourceBlock_.inputList[i]; i++) {
-  //      if(!input.name)
-  //        continue;
-  //      if(input.name=='')
-  //        continue;
-  //      if(!input.connection)
-  //        continue;
-  //      if(input.connection.isConnected())
-  //        conned++;
-  //      if(input.connection.isConnected() && input.connection.targetBlock().isShadow())
-  //        ghosts++;
-  //      if(!input.connection.isConnected() || input.connection.targetBlock().isShadow()){
-  //        console.log('adding: ' + input.connection.typeExpr.toString());
-  //        thisArrows.push(input.connection.typeExpr);
-  //      }
-  //      totalCons++;
-  //    }
-
-  //    console.log('adding: ' + this.sourceBlock_.outputConnection.typeExpr.toString());
-  //    thisArrows.push(this.sourceBlock_.outputConnection.typeExpr);
-  //    if(ghosts==totalCons || conned == 0){} // ghost connections are allowed, we will remove them later
-  //    else
-  //      return false; // We don't want partially applied functions
-
-  //   
-  //    var dup = Type.fromList(thisArrows.map(t => t));
-
-  //    var s = Type.mgu(otherTp, dup );
-  //    if(s){
-  //       return true;
-  //    }
-  //    else return false;
-
-  //    var s = null;
-  //    try {
-  //      s= Type.mgu(thisTp, otherTp);
-  //    }catch (e){}
-  //    if(s){
-  //      return true;
-  //    }
-  //    else{
-  //      return false;
-  //    }
-
-  // }
-
   var thisPrefix = this.sourceBlock_.type.substring(0,4);
   var otherPrefix = otherConnection.sourceBlock_.type.substring(0,4)
   if( otherPrefix == 'type' || thisPrefix == 'type') // One of them is a type 
     return otherPrefix == thisPrefix; // Type blocks may only be connected to type blocks
 
+  // These must be in scope
   if(this.sourceBlock_.type == 'vars_local' || otherConnection.sourceBlock == 'vars_local')
   {
     var varCon, otherCon;
@@ -817,38 +762,51 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
       return false;
     // else continue
   }
-  var unifyResult = true;
-  if (this.typeExpr && otherConnection.typeExpr) {
-    try{
-      unifyResult = Type.mgu(this.typeExpr, otherConnection.typeExpr);
-    }
-    catch(e){
-      console.log(e);
-      return false;
-    }
-    return unifyResult;
-  }
-  // STEFAN, TODO CHANGE IF TYPES DONT MATCH ANYMORE
-  else if (!this.typeExpr && otherConnection.typeExpr) {
-//    return false;
-  }
-  else if (this.typeExpr && !otherConnection.typeExpr) {
-//    return false;
+
+  var funcRes = false;
+
+  if(otherConnection.typeExpr.isFunction()){
+    var r = Blockly.Connection.checkTypes(otherConnection.typeExpr, this.sourceBlock_.getDefaultType() );
+    funcRes = r && !this.sourceBlock_.anyInputConnected();
   }
 
-  if (!this.check_ || !otherConnection.check_) {
-    // One or both sides are promiscuous enough that anything will fit.
-    return true;
-  }
-  // Find any intersection in the check lists.
-  for (var i = 0; i < this.check_.length; i++) {
-    if (otherConnection.check_.indexOf(this.check_[i]) != -1) {
-      return true;
-    }
-  }
-  // No intersection.
-  return false;
+
+  var res = Blockly.Connection.checkTypes(this.typeExpr, otherConnection.typeExpr);
+
+  return res || funcRes;
+
 };
+
+Blockly.Connection.checkTypes = function(srcType, targType){
+
+  if(!targType || !srcType)
+    return true;
+
+
+  var unifyResult = true;
+
+  try{
+    unifyResult = Type.mgu(srcType, targType);
+  }
+  catch(e){
+    console.log(e);
+    return false;
+  }
+
+  // May potentially be used as literal type if function is applied
+  // if(srcType.isFunction() && !targType.isFunction()){
+  //   console.log("1checking for " + Type.getOutput(srcType).toString() + " to match with " + targType.toString() ); 
+  //   var res = Blockly.Connection.checkTypes( Type.getOutput(srcType), targType);
+  //   return res || unifyResult;
+  // }
+  // if(targType.isFunction() && !srcType.isFunction()){
+  //   console.log("2checking for " + Type.getOutput(targType).toString() + " to match with " + srcType.toString() ); 
+  //   var res = Blockly.Connection.checkTypes( Type.getOutput(targType), srcType);
+  //   return res || unifyResult;
+  // }
+
+  return unifyResult;
+}
 
 /**
  * Change a connection's compatibility.

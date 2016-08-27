@@ -583,13 +583,8 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       this.render();
     }
   },
-  /**
-   * Modify this block to have the correct number of arguments.
-   * @private
-   * @this Blockly.Block
-   */
-  updateShape_: function() {
 
+  modifyShape_: function(){
     for (var i = 0; i < this.arguments_.length; i++) {
       var field = this.getField('ARGNAME' + i);
       if (field) {
@@ -629,11 +624,16 @@ Blockly.Blocks['procedures_callnoreturn'] = {
     tps.push(tp);
 
     this.arrows = Type.fromList(tps);
+  },
+  /**
+   * Modify this block to have the correct number of arguments.
+   * @private
+   * @this Blockly.Block
+   */
+  updateShape_: function() {
+    this.modifyShape_();
     this.initArrows();
-
-
     this.render();
-
   },
 
 
@@ -744,42 +744,43 @@ Blockly.Blocks['procedures_callreturn'] = {
   domToMutation: Blockly.Blocks['procedures_callnoreturn'].domToMutation,
   renameVar: Blockly.Blocks['procedures_callnoreturn'].renameVar,
   customContextMenu: Blockly.Blocks['procedures_callnoreturn'].customContextMenu,
+  modifyShape_: Blockly.Blocks['procedures_callnoreturn'].modifyShape_,
 
-  preConnect: function(){
-    console.log('preConnect');
+  preConnect: function(parentConnection){
 
-    var anyCon = false;
-    this.inputList.forEach(function(inp){
-      if(inp.type == Blockly.INPUT_VALUE && inp.connection && inp.connection.isConnected()) 
-        anyCon = true;
-    });
-    
-    
-    if(!anyCon){
-      this.outputConnection.typeExpr = this.arrows;
-    }
-    else{
+    if(!parentConnection.typeExpr.isFunction()){
+      for(var i = 1; i < this.arguments_.length+1; i++){
+        this.inputList[i].type = this.inputList[i].type;
+      }
       this.outputConnection.typeExpr = Type.getOutput(this.arrows);
     }
-    this.render();
-  },
-
-  initArrows: function(){
-    console.log('initArrows');
-    var anyCon = false;
-    this.inputList.forEach(function(inp){
-      if(inp.type == Blockly.INPUT_VALUE && inp.connection && inp.connection.isConnected()) 
-        anyCon = true;
-    });
-
-    var type;
-    type = Type.instantiate(this.arrows);
-    Blockly.Block.updateConnectionTypes(this, type);
-    if(!anyCon){
+    else{ // Make it a function
+      //this.inputList = [this.inputList[0]];
+      for(var i = 1; i < this.inputList.length; i++){
+        this.inputList[i].resetType = Blockly.INPUT_VALUE;
+        this.inputList[i].type = Blockly.DUMMY_INPUT;
+      }
       this.outputConnection.typeExpr = this.arrows;
     }
+
     this.render();
   },
+
+  // initArrows: function(){
+  //   console.log('initArrows');
+
+
+  //   for(var i = 0; i < this.arguments_.length; i++){
+  //     if(this.getInput('ARG' + i))
+  //       this.removeInput('ARG' + i);
+  //   }
+
+  //   this.modifyShape_();
+  //   var type;
+  //   type = Type.instantiate(this.arrows);
+  //   Blockly.Block.updateConnectionTypes(this, type);
+  //   this.render();
+  // },
 };
 
 Blockly.Blocks['procedures_ifreturn'] = {

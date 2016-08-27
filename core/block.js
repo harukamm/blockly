@@ -205,6 +205,57 @@ Blockly.Block.prototype.setAsLiteralT = function(tp){
 // Uses same typeExpr, though _POLY_ get turned into a
 // Blockly.TypeVar.getUnusedTypeVar()
 
+Blockly.Block.prototype.getDefaultType = function(){
+
+  if( !this.arrows && this.functionName.length > 0){
+    var type = Blockly.TypeInf.builtinTypes[this.functionName];
+    if(!type)
+      throw "Builtin type for '" + this.functionName + "' was not found";
+    return type;
+  }
+  else{
+    if(!this.arrows){
+      return null; 
+    }
+    return this.arrows;
+  }
+};
+
+
+Blockly.Block.prototype.preConnect = function(parentConnection){
+  if(!parentConnection.typeExpr || !this.outputConnection.typeExpr)
+    return;
+  if(parentConnection.typeExpr.isFunction()){
+    // Need to drop all ghost blocks here
+    this.inputList.forEach(function(input){
+      var orphanBlock = input.connection.targetBlock();
+      if(orphanBlock && orphanBlock.isShadow())
+      {
+        input.connection.shadowDom_ = null;
+        orphanBlock.dispose();
+        orphanBlock = null;
+      }
+      if(input.type == Blockly.INPUT_VALUE){
+        input.resetType = Blockly.INPUT_VALUE;
+        input.type = Blockly.DUMMY_INPUT;
+      }
+        //input.setVisible(false);
+    });
+
+    this.outputConnection.typeExpr = this.getDefaultType();
+    this.render();
+  }
+},
+
+
+Blockly.Block.prototype.anyInputConnected = function(){
+  this.inputList.forEach(function(inp){
+    if(inp.connection && inp.connection.isConnected() && !inp.connection.targetBlock().isShadow  )
+      return true;
+  });
+  return false;
+}
+
 Blockly.Block.prototype.initArrows = function(instantiate){
   if( !this.arrows && this.functionName.length > 0){
     var type = Type.instantiate(Blockly.TypeInf.builtinTypes[this.functionName]);
@@ -237,12 +288,19 @@ Blockly.Block.prototype.getOutputType = function(){
 
 
 Blockly.Block.updateConnectionTypes = function(block, type){
+  for(var inp = 0; inp < block.inputList.length; inp++){
+    if(block.inputList[inp].resetType)
+      block.inputList[inp].type = block.inputList[inp].resetType;
+  }
+
   var inp = 0;
   var it = type;
+
   while(it.isFunction()){
 
     if(!block.inputList[inp]) // Too far, can't proceed.
       return;
+
     while(block.inputList[inp].type != Blockly.INPUT_VALUE){
       inp++; // Skip dummy and statement inputs
       if(inp>=block.inputList.length) {console.log("yelp"); return; }// Something went wrong
