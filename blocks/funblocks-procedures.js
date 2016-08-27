@@ -509,10 +509,11 @@ Blockly.Blocks['vars_local'] = {
   },
 
 
-  domToMutation: function(xmlElement) {  // TODO, this needs work, what in the case of a list expr or case block? 
+  domToMutation: function(xmlElement) {  
     var name = xmlElement.getAttribute('name');
-    this.parentId = xmlElement.getAttribute('parentId'); // Name of parent function
-    this.localId = Number(xmlElement.getAttribute('localId')); // Name of parent function
+    this.parentId = xmlElement.getAttribute('parentid'); // Name of parent function
+    console.log('setting parent id of localvar to ' + this.parentId);
+    this.localId = Number(xmlElement.getAttribute('localid')); // Name of parent function
     this.setFieldValue(name, 'NAME');
 
     var typeDom = xmlElement.childNodes[0];
@@ -563,14 +564,16 @@ Blockly.Blocks['vars_local'] = {
   mutationToDom: function() {
     var container = document.createElement('mutation');
     container.setAttribute('name', this.getFieldValue('NAME'));
-    if(this.parent_)
-    container.setAttribute('parentId', this.parentId);
-    container.setAttribute('localId', this.localId);
+
+    container.setAttribute('parentid', this.parentId);
+    container.setAttribute('localid', this.localId);
 
     var tp = this.outputConnection.typeExpr;
     var typeDom = Blockly.TypeInf.toDom(tp);
     container.appendChild(typeDom);
 
+    console.log('saving localvar as ');
+    console.log(container);
     return container;
   },
 
