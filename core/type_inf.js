@@ -421,8 +421,8 @@ Blockly.TypeInf.typeInference = function(block){
   env['[]'] = new Scheme(['a'],Type.Lit('list',[Type.Var('a')]) );
   // Add constructors
   Blockly.TypeInf.addConstructors(env);
-
   // Add definitions
+  Blockly.TypeInf.addFunctions(env);
 
   
   var e = block.getExpr();
@@ -432,6 +432,20 @@ Blockly.TypeInf.typeInference = function(block){
   var s = k['sub']; var t = k['tp'];
 
   return s
+}
+
+
+// Figure out dependency graph later
+Blockly.TypeInf.addFunctions = function(env){
+  var blocks = Blockly.getMainWorkspace().getTopBlocks();
+  blocks.forEach(function(block){
+    if(block.type == "procedures_letFunc"){
+      var name = block.getFieldValue('NAME');
+      var scheme = new Scheme(['z'],Type.Var('z')); 
+      env[name] = scheme;
+      console.log('Adding ' + name + ' as a function');
+    }
+  });
 }
 
 // This can be optimized !!

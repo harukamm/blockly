@@ -795,6 +795,7 @@ Blockly.Blocks['procedures_callreturn'] = {
     console.log('getting expr on callreturn ' + this.getFieldValue('NAME'));
 
     var exps = [];
+    var name = this.getFieldValue('NAME');
 
     this.inputList.forEach(function(inp){
       if(inp.connection && inp.connection.isConnected()){
@@ -806,7 +807,7 @@ Blockly.Blocks['procedures_callreturn'] = {
 
     // Use as a function
     if(exps.length == 0 && this.arguments_.length > 0){
-      var exp = Exp.AbsFunc(this.arguments_, Exp.Var('undef'));
+      var exp = Exp.AbsFunc(this.arguments_, Exp.Var(name));
       exp.tag = this.outputConnection;
       return exp; 
     }
@@ -814,9 +815,9 @@ Blockly.Blocks['procedures_callreturn'] = {
 
     var func;
     if(exps.length > 0)
-      func = Exp.AppFunc(exps, Exp.Var('undef'));
+      func = Exp.AppFunc(exps, Exp.Var(name));
     else
-      func = Exp.Var('undef');
+      func = Exp.Var(name);
 
     func.tag = this.outputConnection;
     console.log(func.toString());
