@@ -420,6 +420,8 @@ Blockly.TypeInf.typeInference = function(block){
   env['undef'] = new Scheme(['z'],Type.Var('z'));
   env['[]'] = new Scheme(['a'],Type.Lit('list',[Type.Var('a')]) );
   // Add constructors
+  Blockly.TypeInf.addConstructors(env);
+
   // Add definitions
 
   
@@ -432,3 +434,33 @@ Blockly.TypeInf.typeInference = function(block){
   return s
 }
 
+// This can be optimized !!
+Blockly.TypeInf.addConstructors = function(env){
+  var workspace = Blockly.getMainWorkspace();
+
+  var blocks = Blockly.getMainWorkspace().getAllBlocks(false);
+  blocks.forEach(function(block){
+    if(block.type == 'type_product')
+    {
+      var parentBlock = block.outputConnection.targetBlock();
+      var userTypeName = parentBlock.getFieldValue('NAME');
+
+      var name = block.getFieldValue('CONSTRUCTOR');
+      var arrows = [];
+      
+      for(var i =0; i < block.itemCount_; i++){
+        var typeBlock = block.getInputTargetBlock('TP' + i);
+        if(!typeBlock) continue;
+        arrows.push(typeBlock.getType());
+      }
+
+      arrows.push(Type.Lit(userTypeName));
+      arrows = Type.fromList(arrows);
+      var foralls = Type.ftv(arrows); // No kinds, so the only allowed one is going to be a list - [a]
+      var sch = new Scheme(Type.ftv(arrows), arrows);
+      env[name] = sch; // Finally we add the constructor !
+      console.log('Adding global, ' + name + ' : ' + arrows.toString());
+    }
+  });
+
+}
