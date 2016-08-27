@@ -180,7 +180,8 @@ Blockly.Blocks['tp_create_with_container_variants'] = {
     this.appendStatementInput('STACK');
     this.setTooltip('Contains a list of variants which make up the sum type');
     this.contextMenu = false;
-  }
+  },
+  getExpr: null
 };
 
 Blockly.Blocks['tp_create_with_container_product'] = {
@@ -191,7 +192,8 @@ Blockly.Blocks['tp_create_with_container_product'] = {
     this.appendStatementInput('STACK');
     this.setTooltip('Contains a list of fields that make up the product type');
     this.contextMenu = false;
-  }
+  },
+  getExpr: null
 };
 
 Blockly.Blocks['tp_create_with_field'] = {
@@ -207,7 +209,8 @@ Blockly.Blocks['tp_create_with_field'] = {
     this.setNextStatement(true);
     this.setTooltip('A data type');
     this.contextMenu = false;
-  }
+  },
+  getExpr: null
 };
 
 Blockly.Blocks['tp_create_with_variant'] = {
@@ -223,7 +226,8 @@ Blockly.Blocks['tp_create_with_variant'] = {
     this.setNextStatement(true);
     this.setTooltip('A data type');
     this.contextMenu = false;
-  }
+  },
+  getExpr: null
 };
 
 /* 
@@ -334,7 +338,7 @@ Blockly.Blocks['type_sum'] = {
       itemBlock = itemBlock.nextConnection &&
           itemBlock.nextConnection.targetBlock();
     }
-    tps.push("Sum");
+    tps.push(Type.Lit("Sum") );
     this.arrows = Type.fromList(tps);
     this.initArrows();
     this.renderMoveConnections_();
