@@ -806,8 +806,6 @@ Blockly.Events.disableOrphans = function(event) {
       var father = Blockly.TypeInf.getGrandParent(block);
       if(father){
         var shouldEnable = !father.outputConnection || Blockly.dragMode_ != Blockly.DRAG_NONE;
-        console.log(shouldEnable);
-        console.log(father.type);
         Blockly.Events.reEnableSubBlocks(father, shouldEnable);
         if(!shouldEnable){
           father.setWarningText("This block is disabled because it is isolated from the main program.");
