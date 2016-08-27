@@ -789,7 +789,9 @@ Blockly.Connection.checkTypes = function(srcType, targType){
     unifyResult = Type.mgu(srcType, targType);
   }
   catch(e){
-    console.log(e);
+    // console.log(e);
+    // console.log(srcType.toString());
+    // console.log(targType.toString());
     return false;
   }
 

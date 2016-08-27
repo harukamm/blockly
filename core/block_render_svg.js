@@ -1046,6 +1046,8 @@ Blockly.BlockSvg.typeVarShapes_ = {
     down: function (self, steps, updown) {
       var children = Type.flatten(self);
       children.forEach(function(c){
+
+        steps.push('l 0,1 -4,2 4,2');
         Blockly.BlockSvg.renderTypeExpr(c, steps, updown);
       });
     },
@@ -1053,6 +1055,7 @@ Blockly.BlockSvg.typeVarShapes_ = {
       var children = Type.flatten(self).reverse();
       children.forEach(function(c){
         Blockly.BlockSvg.renderTypeExpr(c, steps, updown);
+        steps.push('l -4,-2 4,-2 0,-1');
       });
     },
     height: function(self) {
@@ -1062,7 +1065,7 @@ Blockly.BlockSvg.typeVarShapes_ = {
       {
         var t = children[i];
         var h_ = Blockly.BlockSvg.getTypeExprHeight(t);
-        h+=h_;
+        h+=h_+5;
       }
       return h; 
     },
