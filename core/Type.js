@@ -330,15 +330,19 @@
   }
 
     // Global state
-  var tiSupply = 0;
+  Type.tiSupply = 0;
+
+  Type.resetSupply = function(){
+    Type.tiSupply = 0;
+  }
 
   /**
    * @param {string} prefix
    * @return {Type}
    */
   Type.generateTypeVar = function(prefix){
-    var tv = Type.Var(prefix + tiSupply);
-    tiSupply++;
+    var tv = Type.Var(prefix + Type.tiSupply);
+    Type.tiSupply++;
     return tv;
   }
 
@@ -733,7 +737,7 @@
    */
   Exp.typeInference = function(env, e){
     // Reset state
-    tiSupply = 0;
+    Type.resetSupply();
 
     var k = Exp.ti(new TypeEnv(env), e);
 
