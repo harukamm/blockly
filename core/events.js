@@ -794,6 +794,7 @@ Blockly.Events.Ui.prototype.fromJson = function(json) {
  * users don't try to reenable disabled orphan blocks.
  * @param {!Blockly.Events.Abstract} event Custom data for event.
  */
+Blockly.Events.orphanWarning = "This block is disabled because it is isolated from the main program.";
 Blockly.Events.disableOrphans = function(event) {
   if (event.type == Blockly.Events.MOVE ||
       event.type == Blockly.Events.CREATE) {
@@ -808,9 +809,9 @@ Blockly.Events.disableOrphans = function(event) {
         var shouldEnable = !father.outputConnection || Blockly.dragMode_ != Blockly.DRAG_NONE;
         Blockly.Events.reEnableSubBlocks(father, shouldEnable);
         if(!shouldEnable){
-          father.setWarningText("This block is disabled because it is isolated from the main program.");
+          father.setWarningText(Blockly.Events.orphanWarning);
         }
-        else{
+        else if (father.warning && father.warning.getText() === Blockly.Events.orphanWarning){
           father.setWarningText(null);
         }
       }
@@ -823,7 +824,9 @@ Blockly.Events.disableOrphans = function(event) {
 Blockly.Events.reEnableSubBlocks = function(block, status_){
   if(status_){
     block.setDisabled(false);
-    block.setWarningText(null);
+    if(block.warning && block.warning.getText() === Blockly.Events.orphanWarning){
+      block.setWarningText(null);
+    }
   }
   else{
     block.setDisabled(true);

@@ -304,6 +304,18 @@ Blockly.Workspace.prototype.getBlockById = function(id) {
   return this.blockDB_[id] || null;
 };
 
+
+Blockly.Workspace.prototype.isWarning = function(){
+  var blocks = this.getAllBlocks();
+
+  for(var i = 0; i < blocks.length; i++){
+    var block = blocks[i];
+    if(block.warning)
+      return block.warning.getText();
+  }
+  return '';
+}
+
 // Stefan
 /**
  * Is the given block a top block >.
