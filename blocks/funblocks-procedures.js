@@ -53,16 +53,20 @@ Blockly.Blocks['procedures_letFunc'] = {
 
   getExpr: function(){
     if(this.getInput("RETURN").connection.isConnected()){
-      var exp = this.getInput("RETURN").connection.targetBlock().getExpr();
+      var eqExp = this.getInput("RETURN").connection.targetBlock().getExpr();
+      eqExp.tag = this.getInput("RETURN").connection;
+      var exp = eqExp;
       if (this.arguments_.length > 0){
-        exp = Exp.AbsFunc(this.arguments_, this.getInput("RETURN").connection.targetBlock().getExpr());
-        exp.tag = this;
-        return exp;
+        exp = Exp.AbsFunc(this.arguments_, eqExp); 
       }
       return exp; 
     }
-    else
-      return Exp.Var("undef");
+    else{
+      var exp = Exp.Var("undef");
+      exp.tag = this.getInput("RETURN").connection;
+      console.log(exp.toString());
+      return exp;
+    }
   },
 
   setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,

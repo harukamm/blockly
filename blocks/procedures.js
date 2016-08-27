@@ -746,6 +746,8 @@ Blockly.Blocks['procedures_callreturn'] = {
   customContextMenu: Blockly.Blocks['procedures_callnoreturn'].customContextMenu,
   modifyShape_: Blockly.Blocks['procedures_callnoreturn'].modifyShape_,
 
+
+
   preConnect: function(parentConnection){
 
     if(!parentConnection.typeExpr.isFunction()){
@@ -766,6 +768,46 @@ Blockly.Blocks['procedures_callreturn'] = {
 
     this.render();
   },
+
+  foldr: function (fn, ult, xs) {
+    var result = ult;
+      for (var i = xs.length - 1; i !== -1; i--) {
+        result = fn(xs[i], result);
+      }
+    return result;
+  },
+
+  getExpr: function(){
+    console.log('getting expr on callreturn ' + this.getFieldValue('NAME'));
+
+    var exps = [];
+
+    this.inputList.forEach(function(inp){
+      if(inp.connection && inp.connection.isConnected()){
+        var e = inp.connection.targetBlock().getExpr();
+        e.tag = inp.connection;
+        exps.push(e);
+      }
+    });
+
+    // Use as a function
+    if(exps.length == 0 && this.arguments_.length > 0){
+      var exp = Exp.AbsFunc(this.arguments_, Exp.Var('undef'));
+      exp.tag = this.outputConnection;
+      return exp; 
+    }
+
+
+    var func;
+    if(exps.length > 0)
+      func = Exp.AppFunc(exps, Exp.Var('undef'));
+    else
+      func = Exp.Var('undef');
+
+    func.tag = this.outputConnection;
+    console.log(func.toString());
+    return func;
+  }
 
   // initArrows: function(){
   //   console.log('initArrows');
