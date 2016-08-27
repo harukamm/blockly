@@ -416,6 +416,7 @@ Blockly.TypeInf.typeInference = function(block){
 
   
   var e = block.getExpr();
+  console.log(e.toString());
   var k = Blockly.TypeInf.ti(new TypeEnv(env), e);
 
   var s = k['sub']; var t = k['tp'];

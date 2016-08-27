@@ -222,7 +222,7 @@
    */
   Type.apply = function(s, t){
     if (s==false)
-      throw "Types do not match";
+      throw "Types do not match, when trying to type " + t.toString();
     if (t.isTypeVar()){
       var n = t.getTypeVar();
       while(s.has(n) && t.isTypeVar()){
@@ -855,4 +855,4 @@ Type.testPlay = function(){
 
 }
 
-Type.testPlay();
+// Type.testPlay();
