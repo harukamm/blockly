@@ -177,7 +177,7 @@
    */
   Type.fromList = function(ls){
     if(! (ls[0] instanceof Type ))
-      throw 'Can only use fromList on Types';
+      throw 'Can only use fromList on Types: ' + ls + ' which is ' + typeof(ls);
     if(ls.length == 1)
       return ls[0];
 
