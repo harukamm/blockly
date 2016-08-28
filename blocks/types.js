@@ -377,6 +377,29 @@ Blockly.Blocks['expr_constructor'] = {
     this.itemCount_ = 2;
   },
 
+  getExpr: function(){
+    var exps = [];
+    for(var i = 1; i < this.inputList.length; i++){
+      var inp = this.inputList[i];
+      if(inp.connection.isConnected()){
+        var exp = inp.connection.targetBlock().getExpr();
+        exp.tag = inp.connection;
+        exps.push(exp);
+      }
+      else{
+        var exp = Exp.Var('undef');
+        exp.tag = inp.connection;
+        exps.push(exp);
+      }
+    }
+   
+    var name = this.getFieldValue('NAME');
+    var func = Exp.AppFunc(exps, Exp.Var(name));
+    func.tag = this.outputConnection;
+    return func;
+
+  },
+
   mutationToDom: function() {
     var container = document.createElement('mutation');
     container.setAttribute('items', this.itemCount_);
