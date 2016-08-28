@@ -55,9 +55,13 @@ Blockly.Blocks['procedures_letFunc'] = {
     if(this.getInput("RETURN").connection.isConnected()){
       var eqExp = this.getInput("RETURN").connection.targetBlock().getExpr();
       eqExp.tag = this.getInput("RETURN").connection;
+
+      var cp = [];
+      this.arguments_.forEach(a => cp.push(a));
+
       var exp = eqExp;
       if (this.arguments_.length > 0){
-        exp = Exp.AbsFunc(this.arguments_, eqExp); 
+        exp = Exp.AbsFunc(cp, eqExp); 
       }
       return exp; 
     }
@@ -144,8 +148,12 @@ Blockly.Blocks['procedures_letFunc'] = {
         this.argTypes_.push(Type.generateTypeVar('var'));
       }
     }
+    // console.log(this.arguments_);
     this.updateParams_();
-    Blockly.Procedures.mutateCallers(this);
+    // if(this.arguments_.length == 0)
+    //  throw "Scar";
+    // console.log(this.arguments_);
+    // Blockly.Procedures.mutateCallers(this);
 
     // Show or hide the statement input.
     this.setStatements_(xmlElement.getAttribute('statements') !== 'false');

@@ -131,6 +131,9 @@ Blockly.Blocks['procedures_defnoreturn'] = {
    * @this Blockly.Block
    */
   mutationToDom: function(opt_paramIds) {
+    // console.log('saving defnoreturn');
+    // console.log(this.arguments_);
+
     var container = document.createElement('mutation');
     if (opt_paramIds) {
       container.setAttribute('name', this.getFieldValue('NAME'));
@@ -144,10 +147,9 @@ Blockly.Blocks['procedures_defnoreturn'] = {
       container.appendChild(parameter);
     }
 
-    // Save whether the statement input is visible.
-    if (!this.hasStatements_) {
-      container.setAttribute('statements', 'false');
-    }
+    this.setStatements_(false);
+    // console.log(container);
+
     return container;
   },
   /**
@@ -165,8 +167,7 @@ Blockly.Blocks['procedures_defnoreturn'] = {
     this.updateParams_();
     Blockly.Procedures.mutateCallers(this);
 
-    // Show or hide the statement input.
-    this.setStatements_(xmlElement.getAttribute('statements') !== 'false');
+    this.setStatements_(false);
   },
   /**
    * Populate the mutator's dialog with this block's components.
@@ -586,19 +587,18 @@ Blockly.Blocks['procedures_callnoreturn'] = {
 
   modifyShape_: function(){
     for (var i = 0; i < this.arguments_.length; i++) {
-      var field = this.getField('ARGNAME' + i);
-      if (field) {
+      var inp = this.getInput('ARG' + i);
+      if (inp) {
         // Ensure argument name is up to date.
         // The argument name field is deterministic based on the mutation,
         // no need to fire a change event.
         Blockly.Events.disable();
-        field.setValue(this.arguments_[i]);
         Blockly.Events.enable();
       } else {
         // Add new input.
-        field = new Blockly.FieldLabel(this.arguments_[i]);
         var input = this.appendValueInput('ARG' + i)
-            .setAlign(Blockly.ALIGN_RIGHT);
+            .setAlign(Blockly.ALIGN_RIGHT)
+            .setTypeExpr(Type.generateTypeVar('cb'));
 //            .appendField(field, 'ARGNAME' + i);
         input.init();
       }
@@ -651,6 +651,8 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       parameter.setAttribute('name', this.arguments_[i]);
       container.appendChild(parameter);
     }
+    //console.log('saving');
+    //console.log(container);
     return container;
   },
   /**
@@ -659,6 +661,8 @@ Blockly.Blocks['procedures_callnoreturn'] = {
    * @this Blockly.Block
    */
   domToMutation: function(xmlElement) {
+    //console.log('loading');
+    //console.log(xmlElement);
     var name = xmlElement.getAttribute('name');
     this.renameProcedure(this.getProcedureCall(), name);
     var args = [];
@@ -669,6 +673,8 @@ Blockly.Blocks['procedures_callnoreturn'] = {
         paramIds.push(childNode.getAttribute('paramId'));
       }
     }
+    //if(args.length == 0)
+    //  throw "Mufasa";
     this.setProcedureParameters_(args, paramIds);
   },
   /**
@@ -749,6 +755,8 @@ Blockly.Blocks['procedures_callreturn'] = {
 
 
   preConnect: function(parentConnection){
+    return;
+    if(!Blockly.TypeInf.isEnabled) return; // Don't do anything when we are loading
     if(Blockly.TypeInf.useHindley && parentConnection.typeExpr.isFunction() ){
       console.log('Using hindley hack here');
       this.outputConnection.typeExpr = this.arrows;
