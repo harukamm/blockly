@@ -171,6 +171,7 @@ Blockly.Workspace.prototype.getAllBlocks = function() {
  * Dispose of all blocks in workspace.
  */
 Blockly.Workspace.prototype.clear = function() {
+  Type.resetSupply();
   Blockly.TypeInf.isEnabled = false;
   var existingGroup = Blockly.Events.getGroup();
   if (!existingGroup) {
