@@ -735,6 +735,9 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   // Stefan
   /* Check if polymorphic types match */
 
+  if(!otherConnection.visible_ || !this.visible_)
+    return;
+
   var isStatement = otherConnection.type == Blockly.NEXT_STATEMENT || otherConnection.type == Blockly.PREVIOUS_CONNECTION;
   if(isStatement)
     return true; // Stefan, Temp Fix
