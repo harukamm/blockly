@@ -704,8 +704,8 @@ Blockly.Blocks['pair_second_typed'] = {
         .appendField(new Blockly.FieldLabel("secondOfPair","blocklyTextEmph") );
     this.setOutput(true);
 
-    Blockly.TypeInf.defineFunction("fst", Type.fromList([Type.Lit("pair", [Type.Var("a"), Type.Var("b")]), Type.Var("a")]));
-    this.setAsFunction("fst");
+    Blockly.TypeInf.defineFunction("snd", Type.fromList([Type.Lit("pair", [Type.Var("a"), Type.Var("b")]), Type.Var("b")]));
+    this.setAsFunction("snd");
   }
 };
 
