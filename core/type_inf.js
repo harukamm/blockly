@@ -270,7 +270,6 @@ Blockly.TypeInf.hmComponent = function(block){
   var subs;
 
   var blocks = Blockly.TypeInf.getComponent(father);
-  console.log('preconning');
   blocks.forEach(b => {if(b.outputConnection && b.outputConnection.isConnected()) b.preConnect(b.outputConnection.targetConnection) } );
 
 
@@ -287,7 +286,6 @@ Blockly.TypeInf.hmComponent = function(block){
     console.log('Critical error');
     console.log(father.getExpr().toString());
     console.log(e);
-    throw "Wake me up";
     return;
   }
 
@@ -439,10 +437,12 @@ Blockly.TypeInf.typeInference = function(block){
   Blockly.TypeInf.addConstructors(env);
   // Add definitions
   Blockly.TypeInf.addFunctions(env);
+  // Add globally defined environment
+  Blockly.TypeInf.addUserDefined(env);
+
 
   
   var e = block.getExpr();
-  console.log(e.toString());
   var k = Blockly.TypeInf.ti(new TypeEnv(env), e);
 
   var s = k['sub']; var t = k['tp'];
@@ -463,11 +463,27 @@ Blockly.TypeInf.addFunctions = function(env){
   });
 }
 
+Blockly.TypeInf.addUserDefined = function(env){
+  var dic = Blockly.TypeInf.userDefinedEnviro;
+  for (var key in dic) {
+    if (dic.hasOwnProperty(key)) {
+      env[key] = dic[key];
+    }
+  }
+};
+
 // This can be optimized !!
+Blockly.TypeInf.userDefinedEnviro = [];
+Blockly.TypeInf.addUserDefinedConstructor = function(name, type){
+  var foralls = Type.ftv(type); // No kinds, so the only allowed one is going to be a list - [a]
+  var sch = new Scheme(foralls, type);
+  Blockly.TypeInf.userDefinedEnviro[name] = sch; 
+};
+
 Blockly.TypeInf.addConstructors = function(env){
   var workspace = Blockly.getMainWorkspace();
 
-  var blocks = Blockly.getMainWorkspace().getAllBlocks(false);
+  var blocks = Blockly.getMainWorkspace().getAllBlocks(false); // We only really need to iterate over top level sum blocks
   blocks.forEach(function(block){
     if(block.type == 'type_product')
     {
@@ -486,10 +502,8 @@ Blockly.TypeInf.addConstructors = function(env){
       arrows.push(Type.Lit(userTypeName));
       arrows = Type.fromList(arrows);
       var foralls = Type.ftv(arrows); // No kinds, so the only allowed one is going to be a list - [a]
-      var sch = new Scheme(Type.ftv(arrows), arrows);
+      var sch = new Scheme(foralls, arrows);
       env[name] = sch; // Finally we add the constructor !
-      console.log('Adding global, ' + name + ' : ' + arrows.toString());
     }
   });
-
 }
