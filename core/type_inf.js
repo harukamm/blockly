@@ -265,6 +265,12 @@ Blockly.TypeInf.hmComponent = function(block){
   var subs;
 
   var blocks = Blockly.TypeInf.getComponent(father);
+
+
+  if(blocks.length == 1 && block.type == 'vars_local') // skip on disconnected vars_local
+    return;
+
+
   // blocks.forEach(b => {if (b.outputConnection) console.log("W:" + b.type + ' has ' + b.outputConnection.typeExpr); });
   try{
     subs = Blockly.TypeInf.typeInference(father);
