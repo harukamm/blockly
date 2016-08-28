@@ -102,15 +102,20 @@ Blockly.TypeInf.mguComponent = function(block){
 
 
 Blockly.TypeInf.connectComponent = function(block){
+  if(!Blockly.TypeInf.isEnabled)
+    return;
   // Blockly.TypeInf.getComponent(block).forEach(b => {if(b.preConnect) b.preConnect()} );
   Blockly.TypeInf.unifyComponent()(block);
 }
 
 
+Blockly.TypeInf.isEnabled = true;
 Blockly.TypeInf.useHindley = true;
 Blockly.TypeInf.unifyComponent = function(){return !Blockly.TypeInf.useHindley ? Blockly.TypeInf.mguComponent : Blockly.TypeInf.hmComponent};
 
 Blockly.TypeInf.disconnectComponent = function(parentBlock, childBlock){
+  if(!Blockly.TypeInf.isEnabled)
+    return;
   Blockly.TypeInf.resetComponent(childBlock);
   Blockly.TypeInf.resetComponent(parentBlock);
   // Now we have two components
@@ -278,7 +283,10 @@ Blockly.TypeInf.hmComponent = function(block){
   } 
   catch(e){
     console.log('Critical error');
+    console.log(father.getExpr().toString());
     console.log(e);
+    throw "Wake me up";
+    return;
   }
 
   // blocks.forEach(function(b){

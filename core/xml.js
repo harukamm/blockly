@@ -272,6 +272,8 @@ Blockly.Xml.textToDom = function(text) {
  */
 Blockly.Xml.domToWorkspace = function(xml, workspace) {
   Type.resetSupply();
+  Blockly.TypeInf.isEnabled = false; 
+
   if (xml instanceof Blockly.Workspace) {
     var swap = xml;
     xml = workspace;
@@ -318,6 +320,8 @@ Blockly.Xml.domToWorkspace = function(xml, workspace) {
   // Do full unification pass
   var bs = workspace.getTopBlocks();
   bs.forEach(b => Blockly.TypeInf.unifyComponent()(b));
+
+  Blockly.TypeInf.isEnabled = true; 
 };
 
 /**
