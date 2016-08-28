@@ -270,6 +270,8 @@ Blockly.TypeInf.hmComponent = function(block){
   var subs;
 
   var blocks = Blockly.TypeInf.getComponent(father);
+  console.log('preconning');
+  blocks.forEach(b => {if(b.outputConnection && b.outputConnection.isConnected()) b.preConnect(b.outputConnection.targetConnection) } );
 
 
   if(blocks.length == 1 && block.type == 'vars_local') // skip on disconnected vars_local
@@ -457,7 +459,6 @@ Blockly.TypeInf.addFunctions = function(env){
       var name = block.getFieldValue('NAME');
       var scheme = new Scheme(['z'],Type.Var('z')); 
       env[name] = scheme;
-      console.log('Adding ' + name + ' as a function');
     }
   });
 }
