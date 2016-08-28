@@ -321,6 +321,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     this.allowRename = true;
   },
   onTypeChange: function(){ // Reset the types of this block and it's callers
+      return;
       // this.initArrows(); // this is already done in connection.js -
       // disconnect()
       // TODO - updateParams creates a new fieldvarinput.

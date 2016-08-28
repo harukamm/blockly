@@ -755,7 +755,6 @@ Blockly.Blocks['procedures_callreturn'] = {
 
 
   preConnect: function(parentConnection){
-    return;
     if(!Blockly.TypeInf.isEnabled) return; // Don't do anything when we are loading
     if(Blockly.TypeInf.useHindley && parentConnection.typeExpr.isFunction() ){
       console.log('Using hindley hack here');

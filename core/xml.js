@@ -317,9 +317,15 @@ Blockly.Xml.domToWorkspace = function(xml, workspace) {
   }
   Blockly.Field.stopCache();
 
+  // Fix block modes, if they have any
+  Blockly.TypeInf.isEnabled = true; 
+  workspace.getAllBlocks().forEach(b => {if(b.outputConnection && b.outputConnection.isConnected()) b.preConnect(b.outputConnection.targetConnection) } );
+  Blockly.TypeInf.isEnabled = false;
+
   // Do full unification pass
   var bs = workspace.getTopBlocks();
   bs.forEach(b => Blockly.TypeInf.unifyComponent()(b));
+
 
   Blockly.TypeInf.isEnabled = true; 
 };

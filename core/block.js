@@ -223,17 +223,20 @@ Blockly.Block.prototype.getDefaultType = function(){
 
 
 Blockly.Block.prototype.preConnect = function(parentConnection){
+  if(!Blockly.TypeInf.isEnabled) return; // Don't do anything when we are loading
   if(!parentConnection.typeExpr || !this.outputConnection.typeExpr)
     return;
   if(parentConnection.typeExpr.isFunction()){
     // Need to drop all ghost blocks here
     this.inputList.forEach(function(input){
-      var orphanBlock = input.connection.targetBlock();
-      if(orphanBlock && orphanBlock.isShadow())
-      {
-        input.connection.shadowDom_ = null;
-        orphanBlock.dispose();
-        orphanBlock = null;
+      if(input.connection){
+        var orphanBlock = input.connection.targetBlock();
+        if(orphanBlock && orphanBlock.isShadow())
+        {
+          input.connection.shadowDom_ = null;
+          orphanBlock.dispose();
+          orphanBlock = null;
+        }
       }
       if(input.type == Blockly.INPUT_VALUE){
         if(input.connection)
