@@ -511,7 +511,8 @@
    * Create an anonymous function with the given variables
    * @return {Exp}
    */
-  Exp.AbsFunc = function(varNames, exp){
+  Exp.AbsFunc = function(varNames_, exp){
+    var varNames = varNames_.slice(0);
     if(!exp)
       throw 'Expression must be defined';
     if(!varNames || varNames.length == 0)
