@@ -313,6 +313,13 @@ Blockly.TypeInf.hmComponent = function(block){
 
   blocks.forEach(b => b.applySubst(subs));
 
+
+  // Handle top level function special case
+  if(father.type == 'procedures_letFunc'){
+    father.updateTypes(Type.apply(subs, father.typeExpr));
+  }
+
+
   // HACK to manually set outputs !
   blocks.forEach(function(b){
     if(b.outputConnection && b.outputConnection.isConnected()){
@@ -324,8 +331,8 @@ Blockly.TypeInf.hmComponent = function(block){
         b.outputConnection.typeExpr = Type.apply(s, b.outputConnection.typeExpr);
       }
     }
-
   });
+  
 
 
   blocks.forEach(b => b.render());
@@ -383,6 +390,9 @@ Blockly.TypeInf.ti = function(te, exp){
       //console.log(t1);
       //console.log(new Type(Type.apply(s1,tv), t1) );
       var res = Type.Func(Type.apply(s1,tv), t1);
+      if(exp.tag){
+        exp.tag.typeExpr = res;
+      }
       return {sub : s1, tp : res};
     }
     else if(exp.isApp()){
@@ -396,10 +406,8 @@ Blockly.TypeInf.ti = function(te, exp){
       
       var newType = Type.apply(s3, tv);
       if(exp.tag){
-        // console.log('changing ' + exp.tag.typeExpr.toString() + ' to ' + newType.toString() + ' on ' + exp.tag.sourceBlock_.type);
         exp.tag.typeExpr = newType;
       }
-
       return {sub : Type.composeSubst(s3,Type.composeSubst(s2,s1)), tp : newType};
     }
     else if (exp.isLet()){

@@ -51,6 +51,32 @@ Blockly.Blocks['procedures_letFunc'] = {
     this.arrows = Type.Func(Type.Var("a"), Type.Var("func") ); // Top level hack
   },
 
+  initArrows: function(){
+    this.getInput("RETURN").connection.typeExpr = Type.generateTypeVar('funcret');
+  },
+
+  updateTypes: function(tp){
+    this.argTypes_ = [];
+    while(tp.isFunction()){
+      this.argTypes_.push(tp.getFirst());
+      tp = tp.getSecond();
+    }
+
+    if(this.getInput("RETURN").connection.isConnected()) // Whats the point otherwise ?
+      this.getInput("RETURN").connection.typeExpr = tp;
+
+    var inp = this.getInput("HEADER");
+
+    var i = 0;
+    for(var f = 0; f < inp.fieldRow.length; f++){
+      var fieldvar = inp.fieldRow[f];
+      if(fieldvar instanceof Blockly.FieldLocalVar){
+        fieldvar.typeExpr = this.argTypes_[i++];
+      }
+    }
+    
+  },
+
   getExpr: function(){
     if(this.getInput("RETURN").connection.isConnected()){
       var targCon = this.getInput("RETURN").connection;
@@ -65,6 +91,7 @@ Blockly.Blocks['procedures_letFunc'] = {
       if (this.arguments_.length > 0){
         exp = Exp.AbsFunc(cp, eqExp); 
       }
+      exp.tag = this;
       return exp; 
     }
     else{
