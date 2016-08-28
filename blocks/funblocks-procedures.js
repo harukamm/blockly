@@ -358,10 +358,10 @@ Blockly.Blocks['procedures_mutatorcontainer_nostatements'] = {
    */
   init: function() {
     this.appendDummyInput()
-        .appendField(Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE);
+        .appendField('Parameters');
     this.appendStatementInput('STACK');
     this.setColour(Blockly.Blocks.procedures.HUE);
-    this.setTooltip(Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP);
+    this.setTooltip('Add input parameters to the function');
     this.contextMenu = false;
   },
 
@@ -396,7 +396,7 @@ Blockly.Blocks['procedures_mutatorarg_auto'] = {
   init: function() {
 
     this.appendDummyInput()
-        .appendField(Blockly.Msg.PROCEDURES_MUTATORARG_TITLE)
+        .appendField('parameter: ')
         .appendField(new Blockly.FieldTextInput('x', this.validator_), 'NAME');
     this.setPreviousStatement(true);
     this.setNextStatement(true);
