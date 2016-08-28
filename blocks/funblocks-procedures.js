@@ -53,8 +53,10 @@ Blockly.Blocks['procedures_letFunc'] = {
 
   getExpr: function(){
     if(this.getInput("RETURN").connection.isConnected()){
-      var eqExp = this.getInput("RETURN").connection.targetBlock().getExpr();
-      eqExp.tag = this.getInput("RETURN").connection;
+      var targCon = this.getInput("RETURN").connection;
+      var targBlock = this.getInput("RETURN").connection.targetBlock();
+      var eqExp = targBlock.getExpr();
+      eqExp.tag = targCon;
 
       var cp = [];
       this.arguments_.forEach(a => cp.push(a));
@@ -68,7 +70,6 @@ Blockly.Blocks['procedures_letFunc'] = {
     else{
       var exp = Exp.Var("undef");
       exp.tag = this.getInput("RETURN").connection;
-      console.log(exp.toString());
       return exp;
     }
   },
@@ -533,8 +534,6 @@ Blockly.Blocks['vars_local'] = {
     this.dom_ = typeDom;
     this.arrows = type;
     this.initArrows();
-
-    console.log('loading type as ' + type.toString());
   },
 
   initArrows: function(){
