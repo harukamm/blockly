@@ -279,6 +279,8 @@ Blockly.TypeInf.hmComponent = function(block){
 
   // blocks.forEach(b => {if (b.outputConnection) console.log("W:" + b.type + ' has ' + b.outputConnection.typeExpr); });
   try{
+    if(father.warning && father.warning.getText() === 'This program contains type errors')
+      father.setWarningText(null);
     subs = Blockly.TypeInf.typeInference(father);
     // console.log(subs.toObject());
   } 
@@ -286,6 +288,7 @@ Blockly.TypeInf.hmComponent = function(block){
     console.log('Critical error');
     console.log(father.getExpr().toString());
     console.log(e);
+    father.setWarningText('This program contains type errors');
     return;
   }
 
