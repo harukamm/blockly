@@ -1792,7 +1792,7 @@ Blockly.Block.prototype.applySubst = function(subst){
   var fieldVars = this.getAllFieldVars();
   fieldVars.forEach(function(f){
    // console.log("Assigning " + f.getValue() + " from " + f.type.toString() + " to " + Type.apply(subst, f.type));
-    f.type = Type.apply(subst, f.typeExpr);
+    f.typeExpr = Type.apply(subst, f.typeExpr);
   });
 };
 
