@@ -455,6 +455,55 @@ Blockly.Blocks['expr_case'] = {
 
     this.arrows = Type.fromList([Type.Lit("Maybe"), this.a, this.a, this.a ]);
 
+
+    Blockly.TypeInf.defineFunction("#", Type.fromList([Type.Var('a'),Type.Var('a'),Type.Var('a')]));
+    Blockly.TypeInf.defineFunction("ev", Type.fromList([Type.Var('e'),Type.Var('a'),Type.Var('a')]));
+
+  },
+
+  foldr1 : function(fn, xs) {
+    var result = xs[xs.length - 1];
+      for (var i = xs.length - 2; i > -1; i--) {
+        result = fn(xs[i], result);
+      }
+    return result;
+  },
+
+  getExpr: function(){
+
+    var topExp = Exp.Lit(this.getFieldValue('NAME'));
+
+    var exps = [];
+    for(var i = 1; i < this.inputList.length; i++){
+      var inp = this.inputList[i];
+      if(inp.connection.isConnected()){
+        var exp = inp.connection.targetBlock().getExpr();
+        exp.tag = inp.connection;
+
+        // Add variable to scope 
+        for(var j = 1; j < inp.fieldRow.length; j++){
+          if(inp.fieldRow[j].getValue() == '' || inp.fieldRow[j].getValue() == ' ') continue; // Skip spaces
+
+          var tp = inp.fieldRow[j].getType();
+          exp = Exp.Let(inp.fieldRow[j].getValue(), Exp.Lit(tp), exp);
+        }
+
+        exps.push(exp);
+      }
+      else{
+        var exp = Exp.Var('undef');
+        exp.tag = inp.connection;
+        exps.push(exp);
+      }
+    }
+
+    var func = (a,b) => Exp.AppFunc([a,b],Exp.Var("#"));
+    var combined = this.foldr1(func,exps);
+
+    var mainExp = Exp.AppFunc([topExp, combined], Exp.Var('ev'));
+    mainExp.tag = this.outputConnection;
+    return mainExp;
+    
   },
 
   getInputConstructor: function(index){
