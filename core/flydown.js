@@ -19,7 +19,6 @@ goog.provide('Blockly.Flydown');
 goog.require('Blockly.Flyout');
 goog.require('Blockly.Block');
 goog.require('Blockly.Comment');
-goog.require('Blockly.FieldVarInput');
 /**
  * Class for a flydown.
  * @constructor

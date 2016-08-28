@@ -1703,7 +1703,7 @@ Blockly.Block.prototype.redrawAdditional = function(){
     for (var l = 0; l < inp.fieldRow.length; l++)
     {
       var f = inp.fieldRow[l];
-      if(f instanceof Blockly.FieldVarInput){
+      if(f instanceof Blockly.FieldLocalVar){
         f.render_();
       }
     }
@@ -1716,7 +1716,7 @@ Blockly.Block.prototype.getAllFieldVars = function(){
     for (var l = 0; l < inp.fieldRow.length; l++)
     {
       var f = inp.fieldRow[l];
-      if(f instanceof Blockly.FieldVarInput){
+      if(f instanceof Blockly.FieldLocalVar){
         fieldVars.push(f);
       }
     }
