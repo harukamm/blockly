@@ -370,8 +370,8 @@ Blockly.TypeInf.ti = function(te, exp){
     }
     else if(exp.isLiteral()){
       if(exp.tag)
-        exp.tag.typeExpr = Type.Lit(exp.getLiteral());
-      return {sub: nullSubst , tp : Type.Lit(exp.getLiteral())}; // Expand here
+        exp.tag.typeExpr = exp.getLiteral();
+      return {sub: nullSubst , tp : exp.getLiteral()}; // Expand here
     }
     else if(exp.isAbs()){
       var n = exp.getAbsVarName();

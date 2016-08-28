@@ -427,10 +427,10 @@
   /**
    * @constructor
    */
-  ELit = function(lit){
-    this.lit = lit
+  ELit = function(type){
+    this.type = type
   };
-  ELit.prototype.toString = function(){ return this.lit; };
+  ELit.prototype.toString = function(){ return "{" +  this.type.toString() + "}" ; };
   /**
    * @constructor
    */
@@ -479,6 +479,8 @@
    * @return {Exp}
    */
   Exp.Lit = function(lit){
+    if(typeof lit === 'string')
+      return new Exp(new ELit(Type.Lit(lit)));
     return new Exp(new ELit(lit));
   }
   /**
@@ -538,7 +540,7 @@
   Exp.prototype.isLiteral = function(){return this.exp instanceof ELit;};
   Exp.prototype.getLiteral = function(){
     if(!this.isLiteral()) throw "Not a literal expression !";
-    return this.exp.lit;
+    return this.exp.type;
   }
 
   Exp.prototype.isApp = function(){return this.exp instanceof EApp;};
@@ -693,7 +695,7 @@
       }
     }
     else if(exp.isLiteral()){
-      return {sub: nullSubst , tp : Type.Lit(exp.getLiteral())}; // Expand here
+      return {sub: nullSubst , tp : exp.getLiteral() }; // Expand here
     }
     else if(exp.isAbs()){
       var n = exp.getAbsVarName();
