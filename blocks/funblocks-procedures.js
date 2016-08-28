@@ -113,7 +113,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     if(this.arguments_.length > 0)
       header.appendField(' ');
     for (var i = 0; i < this.arguments_.length; i++) {
-      var field = new Blockly.FieldVarInput(this.arguments_[i],this.argTypes_[i]);
+      var field = new Blockly.FieldLocalVar(this.arguments_[i],this.argTypes_[i]);
       header.appendField(field);
     }
     this.inputList = this.inputList.concat(bodyInput);
@@ -131,8 +131,8 @@ Blockly.Blocks['procedures_letFunc'] = {
 
     for(var f = 0; f < inp.fieldRow.length; f++){
       var fieldvar = inp.fieldRow[f];
-      if(fieldvar instanceof Blockly.FieldVarInput){
-        tps.push(fieldvar.type);
+      if(fieldvar instanceof Blockly.FieldLocalVar){
+        tps.push(fieldvar.typeExpr);
       }
     }
 
@@ -294,10 +294,9 @@ Blockly.Blocks['procedures_letFunc'] = {
 
     for(var f = 0; f < inp.fieldRow.length; f++){
       var fieldvar = inp.fieldRow[f];
-      if(fieldvar instanceof Blockly.FieldVarInput){
+      if(fieldvar instanceof Blockly.FieldLocalVar){
         var tp = thisBlock.argTypes_[i++];
-        //console.log('Resetting ' + fieldvar.getValue() + ' to ' + tp.toString());
-        fieldvar.type = tp;
+        fieldvar.typeExpr = tp;
       }
     }
   },
@@ -321,78 +320,6 @@ Blockly.Blocks['procedures_letFunc'] = {
     this.setFieldValue(newName /**/, 'NAME');
     this.allowRename = true;
   },
-  onTypeChange: function(){ // Reset the types of this block and it's callers
-      return;
-      // this.initArrows(); // this is already done in connection.js -
-      // disconnect()
-      // TODO - updateParams creates a new fieldvarinput.
-      //        * Ensure that local_vars point to the new field
-      //        * Store type info in argTypes_ and sync
-      //        * Loop through all local_vars, set the argType_ (and field typeExpr) to the
-      //          local_var that is monomorphic
-      this.reconnectInputs();
-      var workspace = Blockly.getMainWorkspace();
-      var name = this.getFieldValue("NAME");
-      var callers = Blockly.Procedures.getCallers(name, workspace);
-
-      // var tp = this.getInput("RETURN").connection.getTypeExpr();
-      // var isMono = true;
-      // for(var k = 0; k < callers.length; k++){// First pass, if a child is connected, reinvoke the connection to set the types properly
-      //   var block = callers[k];
-      //   if(block.outputConnection.isConnected()){
-      //     var conn = block.outputConnection.targetConnection;
-      //     block.outputConnection.connect__(conn); // Recon
-      //     isMono = false;
-      //     break;
-      //   }
-      // }
-      // if(isMono){ // Then we need to make all callers polymorphic
-      //   for(var k = 0; k < callers.length; k++){
-      //     var block = callers[k];
-      //     block.setOutputTypeExpr(tp);
-      //     block.render();
-      //   }
-      // }
-
-
-      // Update local_vars
-      var thisBlock = this;
-      this.arguments_.forEach(function(varName){
-      var callers = [];  // That correspond to the current variable. TODO make more effective !!
-      Blockly.getMainWorkspace().getAllBlocks().forEach(function(block){
-        if(block.type == "vars_local"){
-          var owner = block.parentBlock__;
-          if(owner == thisBlock && block.getFieldValue("NAME") == varName){
-            callers.push(block);
-          }
-        }
-      });
-
-
-      var isMono = true;
-      for(var k = 0; k < callers.length; k++){// First pass, if a child is connected, reinvoke the connection to set the types properly
-        var block = callers[k];
-        if(block.outputConnection.isConnected()){
-          var conn = block.outputConnection.targetConnection;
-          try{block.outputConnection.connect__(conn);}catch(e){} // Recon
-          isMono = false;
-          break;
-        }
-      }
-      if(isMono){ // Then we need to make all callers polymorphic
-        for(var k = 0; k < callers.length; k++){
-          var block = callers[k];
-          block.render();
-        }
-      }
-
-
-      });
-
-      this.updateParams_();
-      this.resetCallers();
-      this.render();
-  }
 
 };
 

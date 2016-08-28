@@ -39,7 +39,7 @@ goog.require('Blockly.FieldDropdown');
 goog.require('Type');
 goog.require('Blockly.FieldImage');
 goog.require('Blockly.FieldTextInput');
-goog.require('Blockly.FieldVarInput');
+goog.require('Blockly.FieldLocalVar');
 goog.require('Blockly.FieldNumber');
 goog.require('Blockly.Flydown');
 goog.require('Blockly.FieldFlydown');

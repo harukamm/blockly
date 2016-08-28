@@ -464,7 +464,7 @@ Blockly.Blocks['expr_case'] = {
     this.appendValueInput('INPUT')
         .appendField(new Blockly.FieldLabel('Case of', 'blocklyTextEmph'))
         .appendField(new Blockly.FieldLabel('Maybe', 'blocklyTextEmph'), 'NAME');
-    var f = new Blockly.FieldVarInput('a');
+    var f = new Blockly.FieldLocalVar('a');
     f.type = 'Number';
     this.appendValueInput('CS0')
         .appendField('Just')
@@ -607,7 +607,7 @@ Blockly.Blocks['expr_case'] = {
           if(typeNode.nodeName.toLowerCase() != 'type') continue;
           var tp = Blockly.TypeInf.fromDom(typeNode);
           input.appendField(' ');
-          input.appendField(new Blockly.FieldVarInput(String.fromCharCode(97 + j),tp));
+          input.appendField(new Blockly.FieldLocalVar(String.fromCharCode(97 + j),tp));
         }
       }
       tps.push(this.a);

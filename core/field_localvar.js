@@ -24,7 +24,7 @@
  */
 'use strict';
 
-goog.provide('Blockly.FieldVarInput');
+goog.provide('Blockly.FieldLocalVar');
 
 goog.require('Blockly.Field');
 goog.require('Blockly.Msg');
@@ -43,27 +43,27 @@ goog.require('goog.userAgent');
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldVarInput = function(text,type) {
-  Blockly.FieldVarInput.superClass_.constructor.call(this, text,
+Blockly.FieldLocalVar = function(text,typeExpr) {
+  Blockly.FieldLocalVar.superClass_.constructor.call(this, text,
       null);
   
-  this.type = type;
+  this.typeExpr = typeExpr;
   this.size_.height += 4;
 };
-goog.inherits(Blockly.FieldVarInput, Blockly.Field);
+goog.inherits(Blockly.FieldLocalVar, Blockly.Field);
 
 
-Blockly.FieldVarInput.prototype.updateEditable = function() {
+Blockly.FieldLocalVar.prototype.updateEditable = function() {
   Blockly.addClass_(/** @type {!Element} */ (this.fieldGroup_),
                       'blocklyFieldVarInput');
 
 };
 
-Blockly.FieldVarInput.prototype.getType = function(){
-  return this.type; // It is a typeExpr here
+Blockly.FieldLocalVar.prototype.getType = function(){
+  return this.typeExpr; 
 }
 
-Blockly.FieldVarInput.prototype.getPath = function(width)
+Blockly.FieldLocalVar.prototype.getPath = function(width)
 {
   var width_ = width+4;
   
@@ -94,7 +94,7 @@ Blockly.FieldVarInput.prototype.getPath = function(width)
   return inlineSteps.join(' ');
 };
 
-Blockly.FieldVarInput.prototype.init = function() {
+Blockly.FieldLocalVar.prototype.init = function() {
   if (this.fieldGroup_) {
     // Field has already been initialized once.
     return;
@@ -106,7 +106,7 @@ Blockly.FieldVarInput.prototype.init = function() {
   }
 
   this.borderRect_ = Blockly.createSvgElement('path',
-       {'class': 'blocklyFieldVarInput',
+       {'class': 'blocklyFieldLocalVar',
        'd': this.getPath(this.size_.width)},
        this.fieldGroup_);
 
@@ -126,7 +126,7 @@ Blockly.FieldVarInput.prototype.init = function() {
   this.updateTextNode_();
 };
 
-Blockly.FieldVarInput.prototype.render_ = function() {
+Blockly.FieldLocalVar.prototype.render_ = function() {
   if (this.visible_ && this.textElement_) {
     var key = this.textElement_.textContent + '\n' +
         this.textElement_.className.baseVal;
@@ -153,7 +153,7 @@ Blockly.FieldVarInput.prototype.render_ = function() {
   this.size_.width = width;
 };
 
-Blockly.FieldVarInput.prototype.render_ = function() {
+Blockly.FieldLocalVar.prototype.render_ = function() {
   if (this.visible_ && this.textElement_) {
     var key = this.textElement_.textContent + '\n' +
         this.textElement_.className.baseVal;
@@ -185,14 +185,14 @@ Blockly.FieldVarInput.prototype.render_ = function() {
 /**
  * Point size of text.  Should match blocklyText's font-size in CSS.
  */
-Blockly.FieldVarInput.FONTSIZE = 11;
+Blockly.FieldLocalVar.FONTSIZE = 11;
 
 /**
  * Close the input widget if this input is being deleted.
  */
-Blockly.FieldVarInput.prototype.dispose = function() {
+Blockly.FieldLocalVar.prototype.dispose = function() {
   Blockly.WidgetDiv.hideIfOwner(this);
-  Blockly.FieldVarInput.superClass_.dispose.call(this);
+  Blockly.FieldLocalVar.superClass_.dispose.call(this);
 };
 
 /**
@@ -200,16 +200,16 @@ Blockly.FieldVarInput.prototype.dispose = function() {
  * @param {?string} text New text.
  * @override
  */
-Blockly.FieldVarInput.prototype.setValue = function(text) {
+Blockly.FieldLocalVar.prototype.setValue = function(text) {
   if (text === null) {
     return;  // No change if null.
   }
   Blockly.Field.prototype.setValue.call(this, text);
 };
 
-Blockly.FieldVarInput.prototype.showEditor_ = function(){};
+Blockly.FieldLocalVar.prototype.showEditor_ = function(){};
 
-Blockly.FieldVarInput.prototype.onMouseDown_ = function(e){
+Blockly.FieldLocalVar.prototype.onMouseDown_ = function(e){
   if(e.button!=0)
     return; // Only proceed on left click
 
