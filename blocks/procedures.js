@@ -757,12 +757,9 @@ Blockly.Blocks['procedures_callreturn'] = {
   preConnect: function(parentConnection){
     if(!Blockly.TypeInf.isEnabled) return; // Don't do anything when we are loading
     if(Blockly.TypeInf.useHindley && parentConnection.typeExpr.isFunction() ){
-      console.log('Using hindley hack here');
       this.outputConnection.typeExpr = this.arrows;
 
-      console.log('hiding inputs');
       for(var i = 1; i < this.inputList.length; i++){
-        console.log(i);
         this.inputList[i].resetType = Blockly.INPUT_VALUE;
         this.inputList[i].connection.visible_ = false;
         this.inputList[i].type = Blockly.DUMMY_INPUT;
@@ -799,7 +796,6 @@ Blockly.Blocks['procedures_callreturn'] = {
   },
 
   getExpr: function(){
-    console.log('getting expr on callreturn ' + this.getFieldValue('NAME'));
 
     var exps = [];
     var name = this.getFieldValue('NAME');
@@ -827,7 +823,6 @@ Blockly.Blocks['procedures_callreturn'] = {
       func = Exp.Var(name);
 
     func.tag = this.outputConnection;
-    console.log(func.toString());
     return func;
   }
 
