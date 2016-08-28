@@ -122,6 +122,10 @@ Blockly.TypeInf.disconnectComponent = function(parentBlock, childBlock){
   // Unify here !
   Blockly.TypeInf.unifyComponent()(childBlock);
   Blockly.TypeInf.unifyComponent()(parentBlock);
+
+  // Display message that its missing an input !
+  Blockly.Events.warnOnInputs(parentBlock);
+  Blockly.Events.warnOnInputs(childBlock);
 };
 
 Blockly.TypeInf.getComponent = function(block){

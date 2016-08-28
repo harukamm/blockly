@@ -795,6 +795,7 @@ Blockly.Events.Ui.prototype.fromJson = function(json) {
  * @param {!Blockly.Events.Abstract} event Custom data for event.
  */
 Blockly.Events.orphanWarning = "This block is disabled because it is isolated from the main program.";
+Blockly.Events.disconnectedWarning = "There's a block missing";
 Blockly.Events.disableOrphans = function(event) {
   if (event.type == Blockly.Events.MOVE ||
       event.type == Blockly.Events.CREATE) {
@@ -820,6 +821,47 @@ Blockly.Events.disableOrphans = function(event) {
     Blockly.Events.enable();
   }
 };
+
+Blockly.Events.warnOnDisconnectedInputs = function(event) {
+    Blockly.Events.disable();
+    if(event.blockId){
+      var workspace = Blockly.Workspace.getById(event.workspaceId);
+      var block = workspace.getBlockById(event.blockId);
+      if(block){
+        Blockly.Events.warnOnInputs(block);
+        if(block.outputConnection && block.outputConnection.isConnected())
+          Blockly.Events.warnOnInputs(block.outputConnection.targetBlock());
+      }
+    }
+    Blockly.Events.enable();
+};
+
+
+Blockly.Events.warnOnInputs = function(block){
+  var conned = true;
+  if(!block)
+    return;
+
+  for(var i = 0; i < block.inputList.length; i++){
+    var inp = block.inputList[i];
+    if(inp.type == Blockly.INPUT_VALUE && inp.connection && inp.connection.visible_){
+      if(!inp.connection.isConnected()){
+        conned = false;
+        break;
+      }
+    }
+  }
+  if(!conned){
+    var prevWarning = block.warning && block.warning.getText().length > 0;
+    block.setWarningText(Blockly.Events.disconnectedWarning); 
+    if(!prevWarning)
+      block.render();
+  }
+  else{
+    if(block.warning && block.warning.getText() === Blockly.Events.disconnectedWarning)
+      block.setWarningText(null);
+  }
+}
 
 Blockly.Events.reEnableSubBlocks = function(block, status_){
   if(status_){
