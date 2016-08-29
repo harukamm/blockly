@@ -1173,7 +1173,7 @@ Blockly.BlockSvg.typeVarShapes_ = {
     blockColour: Blockly.BlockSvg.TEXT_COLOUR
   },
 
-  Bool : {
+  Truth : {
     down: 'l 0,5 -8,7.5 8,7.5',
     up: 'l -8,-7.5 8,-7.5 0,-5',
     height: 20,
