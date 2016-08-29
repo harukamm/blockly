@@ -314,9 +314,9 @@ Blockly.Workspace.prototype.isWarning = function(){
   for(var i = 0; i < blocks.length; i++){
     var block = blocks[i];
     if(block.warning && !block.disabled)
-      return block.warning.getText();
+      return [block, block.warning.getText()];
   }
-  return '';
+  return [null, ''];
 }
 
 // Stefan
