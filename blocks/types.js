@@ -238,6 +238,7 @@ Blockly.Blocks['type_sum'] = {
   init: function() {
     this.setColour(160);
     this.appendDummyInput()
+        .appendField(new Blockly.FieldLabel('data', 'blocklyTextEmph'))
         .appendField(new Blockly.FieldTextInput('UserType',Blockly.UserTypes.renameType), 'NAME');
     this.appendValueInput('PROD0')
         .appendField('|')
@@ -430,13 +431,24 @@ Blockly.Blocks['expr_constructor'] = {
     this.setFieldValue(name, 'NAME');
 
     var tps = [];
+    if(xmlElement.childNodes.length > 0){
+      this.appendDummyInput()
+          .appendField('(');
+    }
     for (var i = 0, childNode; childNode = xmlElement.childNodes[i]; i++) {
       if (childNode.nodeName.toLowerCase() == 'type') {
 
         var typeExpr = Blockly.TypeInf.fromDom(childNode);
         var input = this.appendValueInput('TP' + i);
+        if(i != xmlElement.childNodes.length - 1)
+          this.appendDummyInput()
+              .appendField(',');
         tps.push(typeExpr);
       }
+    }
+    if(xmlElement.childNodes.length > 0){
+      this.appendDummyInput()
+          .appendField(')');
     }
     tps.push(Type.Lit(xmlElement.getAttribute('output')));
     this.arrows = Type.fromList(tps);
