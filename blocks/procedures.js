@@ -772,9 +772,11 @@ Blockly.Blocks['procedures_callreturn'] = {
       this.outputConnection.typeExpr = this.arrows;
 
       for(var i = 1; i < this.inputList.length; i++){
-        this.inputList[i].resetType = Blockly.INPUT_VALUE;
-        this.inputList[i].connection.visible_ = false;
-        this.inputList[i].type = Blockly.DUMMY_INPUT;
+        if(this.inputList[i].type == Blockly.INPUT_VALUE){
+          this.inputList[i].resetType = Blockly.INPUT_VALUE;
+          this.inputList[i].connection.visible_ = false;
+          this.inputList[i].type = Blockly.DUMMY_INPUT;
+        }
       }
       this.render();
       return;
