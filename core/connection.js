@@ -744,8 +744,8 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   
   var thisPrefix = this.sourceBlock_.type.substring(0,4);
   var otherPrefix = otherConnection.sourceBlock_.type.substring(0,4)
-  if( otherPrefix == 'type' || thisPrefix == 'type') // One of them is a type 
-    return otherPrefix == thisPrefix; // Type blocks may only be connected to type blocks
+  if( this.typeExpr && otherConnection.typeExpr && (otherPrefix == 'type' || thisPrefix == 'type') ) // One of them is a type 
+    return otherConnection.typeExpr.getLiteralName() === this.typeExpr.getLiteralName(); // Type blocks may only be connected to type blocks
 
   // These must be in scope
   if(this.sourceBlock_.type == 'vars_local' || otherConnection.sourceBlock == 'vars_local')
