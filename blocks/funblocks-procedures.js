@@ -39,7 +39,9 @@ Blockly.Blocks['procedures_letFunc'] = {
     this.appendDummyInput("HEADER")
         .appendField("")
         .appendField(nameField, 'NAME');
-    this.appendValueInput('RETURN');
+    this.appendValueInput('RETURN')
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField('=');
     this.setMutator(new Blockly.Mutator(['procedures_mutatorarg_auto']));
     this.setColour(Blockly.Blocks.procedures.HUE);
     this.setTooltip(Blockly.Msg.PROCEDURES_DEFRETURN_TOOLTIP);
@@ -138,11 +140,15 @@ Blockly.Blocks['procedures_letFunc'] = {
                //      .appendField("Let")
                      .appendField(nameField, 'NAME');
     if(this.arguments_.length > 0)
-      header.appendField(' ');
+      header.appendField(' ( ');
     for (var i = 0; i < this.arguments_.length; i++) {
       var field = new Blockly.FieldLocalVar(this.arguments_[i],this.argTypes_[i]);
       header.appendField(field);
+      if(i != this.arguments_.length - 1)
+        header.appendField(', ');
     }
+    if(this.arguments_.length > 0)
+      header.appendField(')');
     this.inputList = this.inputList.concat(bodyInput);
  
 
