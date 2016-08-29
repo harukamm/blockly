@@ -238,7 +238,7 @@ Blockly.Blocks['type_sum'] = {
   init: function() {
     this.setColour(160);
     this.appendDummyInput()
-        .appendField(new Blockly.FieldLabel('data', 'blocklyTextEmph'))
+        .appendField(new Blockly.FieldLabel('data ', 'blocklyTextEmph'))
         .appendField(new Blockly.FieldTextInput('UserType',Blockly.UserTypes.renameType), 'NAME');
     this.appendValueInput('PROD0')
         .appendField('|')
