@@ -382,15 +382,17 @@ Blockly.Blocks['expr_constructor'] = {
     var exps = [];
     for(var i = 1; i < this.inputList.length; i++){
       var inp = this.inputList[i];
-      if(inp.connection.isConnected()){
-        var exp = inp.connection.targetBlock().getExpr();
-        exp.tag = inp.connection;
-        exps.push(exp);
-      }
-      else{
-        var exp = Exp.Var('undef');
-        exp.tag = inp.connection;
-        exps.push(exp);
+      if(inp.type == Blockly.INPUT_VALUE){
+        if(inp.connection.isConnected()){
+          var exp = inp.connection.targetBlock().getExpr();
+          exp.tag = inp.connection;
+          exps.push(exp);
+        }
+        else{
+          var exp = Exp.Var('undef');
+          exp.tag = inp.connection;
+          exps.push(exp);
+        }
       }
     }
    
@@ -511,25 +513,27 @@ Blockly.Blocks['expr_case'] = {
     var exps = [];
     for(var i = 1; i < this.inputList.length; i++){
       var inp = this.inputList[i];
-      if(inp.connection.isConnected()){
-        var exp = inp.connection.targetBlock().getExpr();
-        exp.tag = inp.connection;
+      if(inp.type = Blockly.INPUT_VALUE){
+        if(inp.connection.isConnected()){
+          var exp = inp.connection.targetBlock().getExpr();
+          exp.tag = inp.connection;
 
-        // Add variable to scope 
-        for(var j = 1; j < inp.fieldRow.length; j++){
-          if(inp.fieldRow[j].getValue() == '' || inp.fieldRow[j].getValue() == ' ') continue; // Skip spaces
+          // Add variable to scope 
+          for(var j = 1; j < inp.fieldRow.length; j++){
+            if(! (inp.fieldRow[j] instanceof Blockly.FieldLocalVar) ) continue; // Skip spaces
 
-          var tp = inp.fieldRow[j].getType();
-          exp = Exp.Let(inp.fieldRow[j].getValue(), Exp.Lit(tp), exp);
+            var tp = inp.fieldRow[j].getType();
+            exp = Exp.Let(inp.fieldRow[j].getValue(), Exp.Lit(tp), exp);
+          }
+
+          exps.push(exp);
         }
-
-        exps.push(exp);
-      }
-      else{
-        var exp = Exp.Var('undef');
-        exp.tag = inp.connection;
-        exps.push(exp);
-      }
+        else{
+          var exp = Exp.Var('undef');
+          exp.tag = inp.connection;
+          exps.push(exp);
+        }
+    }
     }
 
     var func = (a,b) => Exp.AppFunc([a,b],Exp.Var("#"));
@@ -554,7 +558,7 @@ Blockly.Blocks['expr_case'] = {
     var inp = this.getInput('CS' + index);
     
     for(var j = 1; j < inp.fieldRow.length; j++){
-      if(inp.fieldRow[j].getValue() == '' || inp.fieldRow[j].getValue() == ' ') continue; // Skip spaces
+      if(! (inp.fieldRow[j] instanceof Blockly.FieldLocalVar) ) continue; // Skip spaces
 
       vars.push(inp.fieldRow[j].getValue());
     }
@@ -583,7 +587,7 @@ Blockly.Blocks['expr_case'] = {
       var constructorName = inp.fieldRow[0].getValue();
       var its = 0;
       for(var j = 1; j < inp.fieldRow.length; j++){
-        if(inp.fieldRow[j].getValue() == '' || inp.fieldRow[j].getValue() == ' ') continue; // Skip spaces
+        if( !  (inp.fieldRow[j] instanceof Blockly.FieldLocalVar) ) continue; // Skip spaces
         var tp = inp.fieldRow[j].getType();
         its++;
 
@@ -615,12 +619,17 @@ Blockly.Blocks['expr_case'] = {
 
         input.appendField(constructorName);
         
+        if(productNode.childNodes.length > 0)
+          input.appendField('(');
         for(var j = 0, typeNode; typeNode = productNode.childNodes[j]; j++){
           if(typeNode.nodeName.toLowerCase() != 'type') continue;
           var tp = Blockly.TypeInf.fromDom(typeNode);
-          input.appendField(' ');
           input.appendField(new Blockly.FieldLocalVar(String.fromCharCode(97 + j),tp));
+          if(j != productNode.childNodes.length-1)
+            input.appendField(',');
         }
+        if(productNode.childNodes.length > 0)
+          input.appendField(')');
       }
       tps.push(this.a);
     }
@@ -649,7 +658,7 @@ Blockly.Blocks['expr_case'] = {
 
       var exc = [];
       for(var j = 1; j < inp.fieldRow.length; j++){
-        if(inp.fieldRow[j].getValue() == '' || inp.fieldRow[j].getValue() == ' ') 
+        if(! (inp.fieldRow[j] instanceof Blockly.FieldLocalVar) )
            continue; // Skip spaces
 
         var name = inp.fieldRow[j].getValue();
