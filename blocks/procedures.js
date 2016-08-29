@@ -586,6 +586,10 @@ Blockly.Blocks['procedures_callnoreturn'] = {
   },
 
   modifyShape_: function(){
+    if(this.arguments_.length > 0){
+      this.appendDummyInput()
+          .appendField('(');
+    }
     for (var i = 0; i < this.arguments_.length; i++) {
       var inp = this.getInput('ARG' + i);
       if (inp) {
@@ -597,11 +601,19 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       } else {
         // Add new input.
         var input = this.appendValueInput('ARG' + i)
-            .setAlign(Blockly.ALIGN_RIGHT)
+            .setAlign(Blockly.ALIGN_LEFT)
             .setTypeExpr(Type.generateTypeVar('cb'));
+        if(i != this.arguments_.length - 1){
+          this.appendDummyInput()
+              .appendField(',');
+        }
 //            .appendField(field, 'ARGNAME' + i);
         input.init();
       }
+    }
+    if(this.arguments_.length > 0){
+      this.appendDummyInput()
+          .appendField(')');
     }
     // Remove deleted inputs.
     while (this.getInput('ARG' + i)) {
