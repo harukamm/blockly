@@ -451,11 +451,12 @@ Blockly.TypeInf.typeInference = function(block){
   // Add constructors
   Blockly.TypeInf.addConstructors(env);
   // Add definitions
-  Blockly.TypeInf.addFunctions(env);
+  Blockly.TypeInf.addBareFunctions(env);
   // Add globally defined environment
   Blockly.TypeInf.addUserDefined(env);
-
-
+  // Add functions with their inferred types, this is done last so that other
+  // functions are already in scope
+  Blockly.TypeInf.addFledgedFunctions(env);
   
   var e = block.getExpr();
   var k = Blockly.TypeInf.ti(new TypeEnv(env), e);
@@ -465,14 +466,36 @@ Blockly.TypeInf.typeInference = function(block){
   return s
 }
 
+/**
+ * Returns the type of a block given env, is used for functions
+ */
+Blockly.TypeInf.typeInference_ = function(block, env){
+  var e = block.getExpr();
+  var k = Blockly.TypeInf.ti(new TypeEnv(env), e);
+  return k['tp'];
+}
 
-// Figure out dependency graph later
-Blockly.TypeInf.addFunctions = function(env){
+// Adds functions as polymorphic
+Blockly.TypeInf.addBareFunctions = function(env){
   var blocks = Blockly.getMainWorkspace().getTopBlocks();
   blocks.forEach(function(block){
     if(block.type == "procedures_letFunc"){
       var name = block.getFieldValue('NAME');
       var scheme = new Scheme(['z'],Type.Var('z')); 
+      env[name] = scheme;
+    }
+  });
+};
+
+// Sets the correct type
+// Todo, maybe do functions with high edge degree first
+Blockly.TypeInf.addFledgedFunctions = function(env){
+  var blocks = Blockly.getMainWorkspace().getTopBlocks();
+  blocks.forEach(function(block){
+    if(block.type == "procedures_letFunc"){
+      var tp = Blockly.TypeInf.typeInference_(block, env);
+      var name = block.getFieldValue('NAME');
+      var scheme = new Scheme(Type.ftv(tp), tp);
       env[name] = scheme;
     }
   });
