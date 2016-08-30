@@ -449,6 +449,16 @@ Blockly.Blocks['procedures_mutatorarg_auto'] = {
 
   validator_: function(name) {
 
+    var srcBlck = this.sourceBlock_;
+    var curArgs = [];
+    this.sourceBlock_.workspace.getAllBlocks().forEach(function(b){
+      if(b && b != srcBlck){
+        var val = b.getFieldValue('NAME');
+        if(val)
+          curArgs.push(val);
+      }
+    });
+
     var exc = [];
     var blocks = Blockly.getMainWorkspace().getTopBlocks();
     blocks.forEach(function(b){
@@ -462,8 +472,13 @@ Blockly.Blocks['procedures_mutatorarg_auto'] = {
     if(/[^a-z_]/.test( name[0] ) )
       name = 'x1';
 
+    if(name == '')
+      return null;
     if(exc.indexOf(name) >= 0)
       return null; 
+    if(curArgs.indexOf(name) >= 0)
+      return null;
+
 
     return name;
   }
