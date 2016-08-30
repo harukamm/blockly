@@ -228,6 +228,7 @@ Blockly.Block.prototype.preConnect = function(parentConnection){
     return;
   if(parentConnection.typeExpr.isFunction()){
     // Need to drop all ghost blocks here
+    var i = 0;
     this.inputList.forEach(function(input){
       if(input.connection){
         var orphanBlock = input.connection.targetBlock();
@@ -244,7 +245,8 @@ Blockly.Block.prototype.preConnect = function(parentConnection){
         input.resetType = Blockly.INPUT_VALUE;
         input.type = Blockly.DUMMY_INPUT;
       }
-        //input.setVisible(false);
+      if(i++ > 0 )
+        input.setVisible(false);
     });
 
     this.outputConnection.typeExpr = this.getDefaultType();
@@ -254,10 +256,16 @@ Blockly.Block.prototype.preConnect = function(parentConnection){
 
 
 Blockly.Block.prototype.anyInputConnected = function(){
-  this.inputList.forEach(function(inp){
-    if(inp.connection && inp.connection.isConnected() && !inp.connection.targetBlock().isShadow  )
-      return true;
-  });
+
+  for(var i = 0; i < this.inputList.length; i++){
+    var inp = this.inputList[i];
+    if(inp.connection && inp.connection.isConnected()){
+      var shad = inp.connection.targetBlock().isShadow()
+      if(!shad){
+        return true;
+      }
+    }
+  }
   return false;
 };
 
@@ -303,6 +311,7 @@ Blockly.Block.prototype.getOutputType = function(){
 
 Blockly.Block.updateConnectionTypes = function(block, type){
   for(var inp = 0; inp < block.inputList.length; inp++){
+    block.inputList[inp].setVisible(true);
     if(block.inputList[inp].resetType){
       block.inputList[inp].type = block.inputList[inp].resetType;
       if (block.inputList[inp].connection)

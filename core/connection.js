@@ -771,10 +771,15 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   }
 
   var funcRes = false;
-
   if(otherConnection.typeExpr && otherConnection.typeExpr.isFunction()){
     var r = Blockly.Connection.checkTypes(otherConnection.typeExpr, this.sourceBlock_.getDefaultType() );
-    funcRes = r && !this.sourceBlock_.anyInputConnected();
+    let anyCon = this.sourceBlock_.anyInputConnected();
+    if(anyCon){
+      funcRes = false;
+    }
+    else{
+      funcRes = r;
+    }
   }
 
 

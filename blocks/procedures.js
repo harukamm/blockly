@@ -752,6 +752,7 @@ Blockly.Blocks['procedures_callreturn'] = {
     this.arrows = Type.Var('a');
     this.updateShape_();
     this.setInputsInline(true);
+    this.mode = 0; // 0 for regular, 1 for function block
   },
   getProcedureCall: Blockly.Blocks['procedures_callnoreturn'].getProcedureCall,
   renameProcedure: Blockly.Blocks['procedures_callnoreturn'].renameProcedure,
@@ -765,22 +766,48 @@ Blockly.Blocks['procedures_callreturn'] = {
   modifyShape_: Blockly.Blocks['procedures_callnoreturn'].modifyShape_,
 
 
+  getMode: function(parentConnection){
+    if(!parentConnection)
+      return 0;
+    if(!Blockly.TypeInf.isEnabled)
+      return 0;
+
+    var cons = 0;
+    var anyCon = false;
+    for(var i = 0; i < this.inputList.length; i++){
+      var inp = this.inputList[i];
+      if(inp.connection && inp.connection.isConnected()){
+        anyCon = true;
+      }
+      if(inp.type == Blockly.INPUT_VALUE){
+        cons++;
+      }
+    }
+  
+    if(Blockly.TypeInf.useHindley && parentConnection.typeExpr.isFunction() && !anyCon){
+      return cons == Type.flatten(parentConnection.typeExpr).length - 1;
+    }
+
+    return 0; // All other cases `
+  },
 
   preConnect: function(parentConnection){
     if(!Blockly.TypeInf.isEnabled) return; // Don't do anything when we are loading
-    if(Blockly.TypeInf.useHindley && parentConnection.typeExpr.isFunction() ){
+    var mode = this.getMode(parentConnection);
+    if(mode == 1){
       this.outputConnection.typeExpr = this.arrows;
 
       for(var i = 1; i < this.inputList.length; i++){
+        this.inputList[i].setVisible(false);
         if(this.inputList[i].type == Blockly.INPUT_VALUE){
-          this.inputList[i].resetType = Blockly.INPUT_VALUE;
+          //this.inputList[i].resetType = Blockly.INPUT_VALUE;
           this.inputList[i].connection.visible_ = false;
-          this.inputList[i].type = Blockly.DUMMY_INPUT;
+          //this.inputList[i].type = Blockly.DUMMY_INPUT;
         }
       }
       this.render();
-      return;
     }
+    return;
 
     if(!parentConnection.typeExpr.isFunction()){
       for(var i = 1; i < this.arguments_.length+1; i++){
@@ -812,6 +839,8 @@ Blockly.Blocks['procedures_callreturn'] = {
   getExpr: function(){
 
     var exps = [];
+    var mode = this.getMode(this.outputConnection.targetConnection);
+
     var name = this.getFieldValue('NAME');
 
     this.inputList.forEach(function(inp){
@@ -823,38 +852,45 @@ Blockly.Blocks['procedures_callreturn'] = {
     });
 
     // Use as a function
-    if(exps.length == 0 && this.arguments_.length > 0){
+    if(mode == 1 && this.arguments_.length > 0){
       var exp = Exp.AbsFunc(this.arguments_, Exp.Var(name));
       exp.tag = this.outputConnection;
       return exp; 
     }
 
+    // Use as regular 
+    var exps = [];
+    this.inputList.forEach(function(input){
+      if(input.type == Blockly.INPUT_VALUE){
+        var inpExp;
+        if(input.connection && input.connection.targetBlock()){
+          inpExp = input.connection.targetBlock().getExpr();
+        }
+        else{
+          inpExp = Exp.Var('undef');
+        }
 
-    var func;
-    if(exps.length > 0)
-      func = Exp.AppFunc(exps, Exp.Var(name));
-    else
-      func = Exp.Var(name);
+        inpExp.tag = input.connection;
+        exps.push(inpExp);
+      }
+    });
+
+    var func = Exp.AppFunc(exps, Exp.Var(name));
 
     func.tag = this.outputConnection;
     return func;
-  }
+  },
 
-  // initArrows: function(){
-  //   console.log('initArrows');
+  initArrows: function(){
 
+    var type;
+    type = Type.instantiate(this.arrows);
 
-  //   for(var i = 0; i < this.arguments_.length; i++){
-  //     if(this.getInput('ARG' + i))
-  //       this.removeInput('ARG' + i);
-  //   }
+    Blockly.Block.updateConnectionTypes(this, type);
 
-  //   this.modifyShape_();
-  //   var type;
-  //   type = Type.instantiate(this.arrows);
-  //   Blockly.Block.updateConnectionTypes(this, type);
-  //   this.render();
-  // },
+    this.outputConnection.typeExpr = Type.getOutput(type);
+    this.render();
+  },
 };
 
 Blockly.Blocks['procedures_ifreturn'] = {
