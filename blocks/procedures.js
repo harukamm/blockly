@@ -783,9 +783,11 @@ Blockly.Blocks['procedures_callreturn'] = {
         cons++;
       }
     }
-  
-    if(Blockly.TypeInf.useHindley && parentConnection.typeExpr.isFunction() && !anyCon){
-      return cons == Type.flatten(parentConnection.typeExpr).length - 1;
+    if(parentConnection.typeExpr.isFunction() && !anyCon){
+      if(cons == Type.flatten(parentConnection.typeExpr).length - 1)
+        return 1;
+      else
+        return 0;
     }
 
     return 0; // All other cases `
@@ -795,7 +797,8 @@ Blockly.Blocks['procedures_callreturn'] = {
     if(!Blockly.TypeInf.isEnabled) return; // Don't do anything when we are loading
     var mode = this.getMode(parentConnection);
     if(mode == 1){
-      this.outputConnection.typeExpr = this.arrows;
+      //this.outputConnection.typeExpr = this.arrows;
+      this.outputConnection.typeExpr = parentConnection.typeExpr;
 
       for(var i = 1; i < this.inputList.length; i++){
         this.inputList[i].setVisible(false);
@@ -805,7 +808,7 @@ Blockly.Blocks['procedures_callreturn'] = {
           //this.inputList[i].type = Blockly.DUMMY_INPUT;
         }
       }
-      this.render();
+      // this.render();
     }
     return;
 
@@ -852,11 +855,11 @@ Blockly.Blocks['procedures_callreturn'] = {
     });
 
     // Use as a function
-    if(mode == 1 && this.arguments_.length > 0){
-      var exp = Exp.AbsFunc(this.arguments_, Exp.Var(name));
-      exp.tag = this.outputConnection;
-      return exp; 
-    }
+    // if(mode == 1 && this.arguments_.length > 0){
+    //   var exp = Exp.AbsFunc(this.arguments_, Exp.Var(name));
+    //   exp.tag = this.outputConnection;
+    //   return exp; 
+    // }
 
     // Use as regular 
     var exps = [];
@@ -875,21 +878,23 @@ Blockly.Blocks['procedures_callreturn'] = {
       }
     });
 
-    var func = Exp.AppFunc(exps, Exp.Var(name));
+    var func;
+    if(mode == 0 )
+      func = Exp.AppFunc(exps, Exp.Var(name));
+    else
+      func = Exp.Var(name);
 
     func.tag = this.outputConnection;
     return func;
   },
 
   initArrows: function(){
-
     var type;
     type = Type.instantiate(this.arrows);
 
     Blockly.Block.updateConnectionTypes(this, type);
 
     this.outputConnection.typeExpr = Type.getOutput(type);
-    this.render();
   },
 };
 

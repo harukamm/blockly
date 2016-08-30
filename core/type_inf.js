@@ -78,6 +78,8 @@ Blockly.TypeInf.getTypeVarColor = function(name) {
  * @param {Blockly.Block} block - A block that is part of the component
  */
 Blockly.TypeInf.mguComponent = function(block){
+  throw "obsolete";
+
   var blocks = Blockly.TypeInf.getComponent(block);
   // blocks.forEach(function(b){
   //    console.log(b.type);
@@ -101,32 +103,8 @@ Blockly.TypeInf.mguComponent = function(block){
 }
 
 
-Blockly.TypeInf.connectComponent = function(block){
-  if(!Blockly.TypeInf.isEnabled)
-    return;
-  // Blockly.TypeInf.getComponent(block).forEach(b => {if(b.preConnect) b.preConnect()} );
-  Blockly.TypeInf.unifyComponent()(block);
-}
-
-
 Blockly.TypeInf.isEnabled = true;
-Blockly.TypeInf.useHindley = true;
-Blockly.TypeInf.unifyComponent = function(){return !Blockly.TypeInf.useHindley ? Blockly.TypeInf.mguComponent : Blockly.TypeInf.hmComponent};
-
-Blockly.TypeInf.disconnectComponent = function(parentBlock, childBlock){
-  if(!Blockly.TypeInf.isEnabled)
-    return;
-  Blockly.TypeInf.resetComponent(childBlock);
-  Blockly.TypeInf.resetComponent(parentBlock);
-  // Now we have two components
-  // Unify here !
-  Blockly.TypeInf.unifyComponent()(childBlock);
-  Blockly.TypeInf.unifyComponent()(parentBlock);
-
-  // Display message that its missing an input !
-  Blockly.Events.warnOnInputs(parentBlock);
-  Blockly.Events.warnOnInputs(childBlock);
-};
+Blockly.TypeInf.unifyComponent = function(){throw "obsolete"};
 
 Blockly.TypeInf.getComponent = function(block){
   var father = Blockly.TypeInf.getGrandParent(block);  
@@ -135,14 +113,6 @@ Blockly.TypeInf.getComponent = function(block){
 
   return blocks;
 }
-
-Blockly.TypeInf.resetComponent = function(block){
-  var blocks = Blockly.TypeInf.getComponent(block);
-  blocks.forEach(function(b){
-    b.initArrows();
-    b.render();
-  });
-};
 
 Blockly.TypeInf.getGrandParent = function(block){
   if(!block.outputConnection)
@@ -252,83 +222,90 @@ Blockly.TypeInf.testDom = function(){
 }
 
 
-
-
-// Test HM
-
-/**
- * Applies hindley milner inference to the component containing block
- * Updates connections to match
- */
-Blockly.TypeInf.hmComponent = function(block){
-
-  // Blockly.TypeInf.resetComponent(block);
-  
-  var father = Blockly.TypeInf.getGrandParent(block);  
-
-  if(father.nextConnection || father.previousConnection || 
-      !father.getExpr) return; //ignore statement blocks
-  if(father.type.startsWith("type"))
-    return; // Skip type blocks, they are monomorphic anyway
-
-  var subs;
-
-  var blocks = Blockly.TypeInf.getComponent(father);
-  blocks.forEach(b => {if(b.outputConnection && b.outputConnection.isConnected()) b.preConnect(b.outputConnection.targetConnection) } );
-
-
-  if(blocks.length == 1 && block.type == 'vars_local') // skip on disconnected vars_local
+Blockly.TypeInf.inferWorkspace = function(workspace){
+  if(!workspace)
+    return;
+  if(workspace.isFlyout)
     return;
 
+  Blockly.Events.disable();
 
-  // blocks.forEach(b => {if (b.outputConnection) console.log("W:" + b.type + ' has ' + b.outputConnection.typeExpr); });
-  try{
-    if(father.warning && father.warning.getText() === 'This program contains type errors')
-      father.setWarningText(null);
-    subs = Blockly.TypeInf.typeInference(father);
-    // console.log(subs.toObject());
-  } 
-  catch(e){
-    console.log('Critical error');
-    console.log(father.getExpr().toString());
-    console.log(e);
-    father.setWarningText('This program contains type errors');
-    return;
+  // Setup the environment
+  var dic = Blockly.TypeInf.builtinTypes;
+  var env = {};
+  for (var functionName in dic) {
+    if (dic.hasOwnProperty(functionName)) {
+      var s = new Scheme(Type.ftv(dic[functionName]), dic[functionName] );
+      env[functionName] = s;
+    }
   }
 
-  // blocks.forEach(function(b){
-  //   b.inputList.forEach(function(inp){
-  //     if(inp.type == Blockly.INPUT_VALUE){
-  //       if(inp.connection && inp.connection.newType)
-  //         inp.connection.typeExpr = inp.connection.newType;
-  //     }
-  //   });
-  //   if(b.outputConnection && b.outputConnection.newType)
-  //     b.outputConnection.typeExpr = b.outputConnection.newType;
-  // });
+  // Add some used things
+  env['undef'] = new Scheme(['z'],Type.Var('z'));
+  env['[]'] = new Scheme(['a'],Type.Lit('list',[Type.Var('a')]) );
+  // Add constructors
+  Blockly.TypeInf.addConstructors(env);
+  // Add definitions
+  Blockly.TypeInf.addBareFunctions(env);
+  // Add globally defined environment
+  Blockly.TypeInf.addUserDefined(env);
+  // Add functions with their inferred types, this is done last so that other
+  // functions are already in scope
+  Blockly.TypeInf.addFledgedFunctions(env);
 
-  //Manually unify some top level blocks
-  //var s = father.getSubstitutions();
-  //father.applySubst(s);
+  var allBlocks = workspace.getAllBlocks();
+  allBlocks.forEach(function(b){
+    b.initArrows();
+    if(b.outputConnection && b.outputConnection.isConnected()) 
+      b.preConnect(b.outputConnection.targetConnection); 
+  });
 
-  //var s = block.getSubstitutions();
-  //block.applySubst(s);
-  
-  // Redraw
+  var topBlocks = workspace.getTopBlocks();
 
-  // blocks.forEach(b => {if (b.outputConnection) console.log("K:" + b.type + ' has ' + b.outputConnection.typeExpr); });
+  for(var i = 0; i < topBlocks.length; i++){
+    var block = topBlocks[i];
 
-  blocks.forEach(b => b.applySubst(subs));
+    // Some blocks we skip
 
+    if(block.nextConnection || block.previousConnection || !block.getExpr) 
+      continue; //ignore statement blocks
+    if(block.type.startsWith("type"))
+      continue; // Skip type blocks, they are monomorphic anyway
+    if(block.outputConnection)
+      continue; // Skip blocks that aren't really top level, e.g. a disconnected vars_local
+    if(block.disabled)
+      continue; // This one is obvious
 
-  // Handle top level function special case
-  if(father.type == 'procedures_letFunc'){
-    father.updateTypes(Type.apply(subs, father.typeExpr));
+    var subs;
+    try{
+      if(block.warning && block.warning.getText() === 'This program contains type errors')
+        block.setWarningText(null);
+      subs = Blockly.TypeInf.typeInference(block, env);
+    } 
+    catch(e){
+      console.log('Critical error');
+      console.log(env);
+      //console.log(block.getExpr().toString());
+      console.log(e);
+      block.setWarningText('This program contains type errors');
+      continue; // Skip this block for now
+    }
+
+    // Apply substitutions
+    var blocks = Blockly.TypeInf.getComponent(block);
+    blocks.forEach(b => b.applySubst(subs));
+
+    // Handle top level function special case
+    if(block.type == 'procedures_letFunc'){
+      block.updateTypes(Type.apply(subs, block.typeExpr));
+    }
   }
 
+  Blockly.TypeInf.redrawBlocks(allBlocks);
 
   // HACK to manually set outputs !
-  blocks.forEach(function(b){
+  // allBlocks.forEach(b => b.rendered = false);
+  allBlocks.forEach(function(b){
     if(b.outputConnection && b.outputConnection.isConnected()){
       if(b.type == "procedures_callreturn"){ // An even uglier hack
         b.outputConnection.typeExpr = b.outputConnection.targetConnection.typeExpr;
@@ -339,12 +316,22 @@ Blockly.TypeInf.hmComponent = function(block){
       }
     }
   });
+
+  Blockly.Events.enable();
   
+}
 
+Blockly.TypeInf.redrawBlocks = function(blocks){
+};
 
-  blocks.forEach(b => b.render());
-  blocks.forEach(b => b.redrawAdditional());
+// Test HM
 
+/**
+ * Applies hindley milner inference to the component containing block
+ * Updates connections to match
+ */
+Blockly.TypeInf.hmComponent = function(block){
+  throw "deprecated";
 
 };
 
@@ -431,43 +418,21 @@ Blockly.TypeInf.ti = function(te, exp){
     throw "Partial pattern match";
   }
 
-  /**
-   * @param {Object<string,Scheme>} env
-   * @param {Exp} e
-   */
-Blockly.TypeInf.typeInference = function(block){
-
-  var dic = Blockly.TypeInf.builtinTypes;
-  var env = {};
-  for (var functionName in dic) {
-    if (dic.hasOwnProperty(functionName)) {
-      var s = new Scheme(Type.ftv(dic[functionName]), dic[functionName] );
-      env[functionName] = s;
-    }
-  }
-
-  env['undef'] = new Scheme(['z'],Type.Var('z'));
-  env['[]'] = new Scheme(['a'],Type.Lit('list',[Type.Var('a')]) );
-  // Add constructors
-  Blockly.TypeInf.addConstructors(env);
-  // Add definitions
-  Blockly.TypeInf.addBareFunctions(env);
-  // Add globally defined environment
-  Blockly.TypeInf.addUserDefined(env);
-  // Add functions with their inferred types, this is done last so that other
-  // functions are already in scope
-  Blockly.TypeInf.addFledgedFunctions(env);
-  
+/**
+ * Returns the type of a block given env, is used for functions
+ * @param {Object<string,Scheme>} env
+ * @param {Exp} e
+ */
+Blockly.TypeInf.typeInference = function(block, env){
   var e = block.getExpr();
   var k = Blockly.TypeInf.ti(new TypeEnv(env), e);
-
-  var s = k['sub']; var t = k['tp'];
-
-  return s
+  return k['sub'];
 }
 
 /**
  * Returns the type of a block given env, is used for functions
+ * @param {Object<string,Scheme>} env
+ * @param {Exp} e
  */
 Blockly.TypeInf.typeInference_ = function(block, env){
   var e = block.getExpr();

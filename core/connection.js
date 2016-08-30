@@ -247,25 +247,11 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
   if (childBlock.rendered) {
     childBlock.updateDisabled();
   }
-  if (parentBlock.rendered && childBlock.rendered) {
-    if (parentConnection.type == Blockly.NEXT_STATEMENT ||
-        parentConnection.type == Blockly.PREVIOUS_STATEMENT) {
-      // Child block may need to square off its corners if it is in a stack.
-      // Rendering a child will render its parent.
-      childBlock.render();
-    } else {
-      // Child block does not change shape.  Rendering the parent node will
-      // move its connected children into position.
-      parentBlock.render();
-    }
-  }
-
-  //Blockly.Connection.Unify(parentConnection, childConnection);
   // Infer type
-  // Blockly.Connection.doUnification(parentBlock); 
   var isStatement = parentConnection.type == Blockly.NEXT_STATEMENT || parentConnection.type == Blockly.PREVIOUS_CONNECTION;
-  if(!isStatement)
-    Blockly.TypeInf.connectComponent(parentBlock);
+  if(!isStatement && Blockly.TypeInf.isEnabled)
+    Blockly.TypeInf.inferWorkspace(parentBlock.workspace);
+  parentBlock.render();
 };
 
 /**
@@ -562,47 +548,14 @@ Blockly.Connection.prototype.disconnect = function() {
   this.disconnectInternal_(parentBlock, childBlock);
   parentConnection.respawnShadow_();
 
-  // Stefan
-  // Anthony
-
-  // Stefan
-  // resets its types
-  var workspace = parentBlock.workspace;
-  Blockly.Events.disable();
-  // Reconstruct parent and child blocks to restore type variables 
-  if( workspace ) {  
-    // Reset the affected two blocks
-
-    // The child affects the parent more
-    // childBlock.initArrows();
-    
-    //childBlock.reconnectInputs();
-    if(childBlock.onTypeChange)
-      childBlock.onTypeChange();
-
-   // parentBlock.initArrows();
-    //parentBlock.reconnectInputs(childBlock); // Don't reconnect the child !
-    if(parentBlock.onTypeChange)
-      parentBlock.onTypeChange();
-   
-    //Blockly.Connection.reconnectUpward(parentBlock);
-
-    childBlock.render();
-    parentBlock.render();
-  }
-
-  // increase coupling :/
-  // need to disconnect local_vars that are contained, but have no path.
-  // Temporarily disable
-  // Blockly.Connection.disconnectVarsDown(childBlock);  
-
-  Blockly.Events.enable();
-  // Blocks have already been re-rendered in copyConnectionTypes_. Just need to update disabled status.
   if (childBlock.rendered) {
     childBlock.updateDisabled();
   }
  
-  Blockly.TypeInf.disconnectComponent(parentBlock, childBlock);
+  if(Blockly.TypeInf.isEnabled)
+    Blockly.TypeInf.inferWorkspace(parentBlock.workspace, parentBlock, childBlock);
+  childBlock.render();
+  parentBlock.render();
 };
 
 // TODO Maybe move refactor into vars_local function?

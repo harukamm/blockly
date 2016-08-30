@@ -250,7 +250,7 @@ Blockly.Block.prototype.preConnect = function(parentConnection){
     });
 
     this.outputConnection.typeExpr = this.getDefaultType();
-    this.render();
+    // this.render();
   }
 },
 
@@ -1706,19 +1706,6 @@ Blockly.Block.prototype.resetAdditional = function(){
   }
 };
 
-// Mostly used to redraw field vars
-Blockly.Block.prototype.redrawAdditional = function(){
-  this.inputList.forEach(function(inp){
-    for (var l = 0; l < inp.fieldRow.length; l++)
-    {
-      var f = inp.fieldRow[l];
-      if(f instanceof Blockly.FieldLocalVar){
-        f.render_();
-      }
-    }
-  });
-};
-
 Blockly.Block.prototype.getAllFieldVars = function(){
   var fieldVars = [];
   this.inputList.forEach(function(inp){
@@ -1775,13 +1762,8 @@ Blockly.Block.prototype.applySubst = function(subst){
   this.inputList.forEach(function(inp){
     if(inp.type == Blockly.INPUT_VALUE){
       if(inp.connection && inp.connection.typeExpr){
-        try{
         var t = Type.apply(subst, inp.connection.typeExpr);
         inp.connection.typeExpr = t;
-        }
-        catch(e){ // HACK to accomodate function types
-          console.log(e);
-        }
       }
     }
   });

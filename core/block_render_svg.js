@@ -276,6 +276,16 @@ Blockly.BlockSvg.prototype.render = function(opt_bubble) {
   if(!this.workspace) // TODO fix, why does this occur ?
     return;
 
+  this.inputList.forEach(function(inp){
+    for (var l = 0; l < inp.fieldRow.length; l++)
+    {
+      var f = inp.fieldRow[l];
+      if(f instanceof Blockly.FieldLocalVar){
+        f.render_();
+      }
+    }
+  });
+
   Blockly.Field.startCache();
   this.rendered = true;
 
@@ -307,6 +317,7 @@ Blockly.BlockSvg.prototype.render = function(opt_bubble) {
       Blockly.resizeSvgContents(this.workspace);
     }
   }
+
   Blockly.Field.stopCache();
 };
 
