@@ -853,9 +853,10 @@ Blockly.Events.warnOnInputs = function(block){
   }
   if(!conned){
     var prevWarning = block.warning && block.warning.getText().length > 0;
-    block.setWarningText(Blockly.Events.disconnectedWarning); 
-    if(!prevWarning)
+    if(!prevWarning){
+      block.setWarningText(Blockly.Events.disconnectedWarning); 
       block.render();
+    }
   }
   else{
     if(block.warning && block.warning.getText() === Blockly.Events.disconnectedWarning)
@@ -867,6 +868,7 @@ Blockly.Events.reEnableSubBlocks = function(block, status_){
   if(status_){
     block.setDisabled(false);
     if(block.warning && block.warning.getText() === Blockly.Events.orphanWarning){
+
       block.setWarningText(null);
     }
   }
