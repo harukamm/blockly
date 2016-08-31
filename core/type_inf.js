@@ -297,7 +297,8 @@ Blockly.TypeInf.inferWorkspace = function(workspace){
 
     // Handle top level function special case
     if(block.type == 'procedures_letFunc'){
-      block.updateTypes(Type.apply(subs, block.typeExpr));
+      if(block.typeExpr)
+        block.updateTypes(Type.apply(subs, block.typeExpr));
     }
   }
 
