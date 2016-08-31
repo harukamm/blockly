@@ -492,22 +492,24 @@ Blockly.TypeInf.addConstructors = function(env){
     if(block.type == 'type_product')
     {
       var parentBlock = block.outputConnection.targetBlock();
-      var userTypeName = parentBlock.getFieldValue('NAME');
+      if(parentBlock){
+        var userTypeName = parentBlock.getFieldValue('NAME');
 
-      var name = block.getFieldValue('CONSTRUCTOR');
-      var arrows = [];
-      
-      for(var i =0; i < block.itemCount_; i++){
-        var typeBlock = block.getInputTargetBlock('TP' + i);
-        if(!typeBlock) continue;
-        arrows.push(typeBlock.getType());
+        var name = block.getFieldValue('CONSTRUCTOR');
+        var arrows = [];
+        
+        for(var i =0; i < block.itemCount_; i++){
+          var typeBlock = block.getInputTargetBlock('TP' + i);
+          if(!typeBlock) continue;
+          arrows.push(typeBlock.getType());
+        }
+
+        arrows.push(Type.Lit(userTypeName));
+        arrows = Type.fromList(arrows);
+        var foralls = Type.ftv(arrows); // No kinds, so the only allowed one is going to be a list - [a]
+        var sch = new Scheme(foralls, arrows);
+        env[name] = sch; // Finally we add the constructor !
       }
-
-      arrows.push(Type.Lit(userTypeName));
-      arrows = Type.fromList(arrows);
-      var foralls = Type.ftv(arrows); // No kinds, so the only allowed one is going to be a list - [a]
-      var sch = new Scheme(foralls, arrows);
-      env[name] = sch; // Finally we add the constructor !
     }
   });
 }

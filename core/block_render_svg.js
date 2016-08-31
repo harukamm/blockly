@@ -730,9 +730,9 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
                            input.renderWidth);
           // Stefan
           // Sorin
-          if(!input.connection.typeExpr){
-            console.log("What is going on here");
-            console.log(input.sourceBlock_.type);
+          if(!input.connection.typeExpr){ // This may happen, I'm not sure if it actually significant
+            // console.log("What is going on here");
+            // console.log(input.sourceBlock_.type);
           }
           inlineSteps.push(Blockly.BlockSvg.getDownPath(input.connection));
           var tabHeight = Blockly.BlockSvg.getTypeExprHeight(input.connection.typeExpr);

@@ -68,10 +68,12 @@ Blockly.Blocks['type_user'] = {
 Blockly.Blocks['type_product'] = {
   init: function() {
     this.setColour(90);
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldTextInput('Constructor', Blockly.UserTypes.renameProduct), 'CONSTRUCTOR')
+    this.appendDummyInput('HEADER')
+        .appendField(new Blockly.FieldTextInput('Constructor', Blockly.UserTypes.renameProduct), 'CONSTRUCTOR');
     this.appendValueInput('TP0');
-    this.appendValueInput('TP1');
+    this.appendValueInput('TP1')
+        .appendField(',');
+    this.appendDummyInput()
     this.setOutput(true);
 
     this.arrows = Type.fromList([Type.Lit("Type"), Type.Lit("Type"), Type.Lit("Product")]);
@@ -81,6 +83,8 @@ Blockly.Blocks['type_product'] = {
     this.setTooltip('Add a term to an algabraic data type');
     this.itemCount_ = 2;
     this.allowRename = false;
+
+    this.addSyntaxSymbols();
   },
 
   fixName: function() {
@@ -101,10 +105,10 @@ Blockly.Blocks['type_product'] = {
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
     var tps = [];
 
-    if(this.itemCount_> 0){
-      this.appendDummyInput()
-          .appendField('(');
-    }
+    // if(this.itemCount_> 0){
+    //   this.appendDummyInput()
+    //       .appendField('(');
+    // }
 
     for (var x = 0; x < this.itemCount_; x++) {
       var input = this.appendValueInput('TP' + x);
@@ -113,11 +117,11 @@ Blockly.Blocks['type_product'] = {
         input.appendField(',');
     }
 
-    if(this.itemCount_ > 0){
-      this.appendDummyInput()
-          .appendField(')');
-    }
-
+    // if(this.itemCount_ > 0){
+    //   this.appendDummyInput()
+    //       .appendField(')');
+    // }
+    this.addSyntaxSymbols();
     tps.push(Type.Lit("Product"));
     this.arrows = Type.fromList(tps);
     this.initArrows();
@@ -142,12 +146,17 @@ Blockly.Blocks['type_product'] = {
         this.removeInput('TP' + x);
       }
     }
+
+
     this.itemCount_ = 0;
     // Rebuild the block's inputs.
     var itemBlock = containerBlock.getInputTargetBlock('STACK');
+
     var tps = [];
     while (itemBlock) {
       var input = this.appendValueInput('TP' + this.itemCount_);
+      if(this.itemCount_ != 0)
+        input.appendField(',');
       tps.push(Type.Lit("Type"));
       // Reconnect any child blocks.
       if (itemBlock.valueConnection_) {
@@ -157,11 +166,48 @@ Blockly.Blocks['type_product'] = {
       itemBlock = itemBlock.nextConnection &&
           itemBlock.nextConnection.targetBlock();
     }
+
+    this.addSyntaxSymbols();
+
     tps.push(Type.Lit("Product"));
     this.arrows = Type.fromList(tps);
     this.initArrows();
     this.renderMoveConnections_();
   },
+  addSyntaxSymbols: function(){
+    var func = function(inp){
+      return inp.type == Blockly.INPUT_VALUE || inp.name == 'HEADER';
+    };
+    var oldList = this.inputList.filter(func);
+    var vals = 0;
+    if(!this.workspace)
+      return;
+    this.inputList.forEach(function(inp){
+      if(func(inp)){
+        vals++;
+      }
+      else{
+        inp.dispose();
+      }
+    });
+    
+    if(vals>1){
+      this.inputList = [this.inputList[0]];
+      this.appendDummyInput()
+          .appendField('(');
+
+      this.inputList = this.inputList.concat( oldList.slice(1) );
+
+      this.appendDummyInput()
+          .appendField(')');
+
+    }
+    else{
+      this.inputList = [this.inputList[0]];
+    }
+    this.render();
+  },
+
   saveConnections: function(containerBlock) {
     var itemBlock = containerBlock.getInputTargetBlock('STACK');
     var x = 0;
