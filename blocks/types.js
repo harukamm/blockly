@@ -100,10 +100,24 @@ Blockly.Blocks['type_product'] = {
     }
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
     var tps = [];
+
+    if(this.itemCount_> 0){
+      this.appendDummyInput()
+          .appendField('(');
+    }
+
     for (var x = 0; x < this.itemCount_; x++) {
       var input = this.appendValueInput('TP' + x);
       tps.push(Type.Lit("Type"));
+      if(x != 0)
+        input.appendField(',');
     }
+
+    if(this.itemCount_ > 0){
+      this.appendDummyInput()
+          .appendField(')');
+    }
+
     tps.push(Type.Lit("Product"));
     this.arrows = Type.fromList(tps);
     this.initArrows();
