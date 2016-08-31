@@ -252,6 +252,7 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
   if(!isStatement && Blockly.TypeInf.isEnabled)
     Blockly.TypeInf.inferWorkspace(parentBlock.workspace);
   parentBlock.render();
+  childBlock.render();
 };
 
 /**
@@ -697,9 +698,19 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
   
   var thisPrefix = this.sourceBlock_.type.substring(0,4);
   var otherPrefix = otherConnection.sourceBlock_.type.substring(0,4)
-  if( this.typeExpr && otherConnection.typeExpr && (otherPrefix == 'type' || thisPrefix == 'type') ) // One of them is a type 
-    return otherConnection.typeExpr.getLiteralName() === this.typeExpr.getLiteralName(); // Type blocks may only be connected to type blocks
+  if( this.typeExpr && otherConnection.typeExpr && (otherPrefix == 'type' || thisPrefix == 'type') ){
+    if(!this.typeExpr.isLiteral()){
+      // console.log('this shouldnt be happening, type needs to be literal, but it is: ' + this.typeExpr.toString());
+      return false;
+    }
 
+    if(!otherConnection.typeExpr.isLiteral()){
+      // console.log('this shouldnt be happening, type needs to be literal, but it is: ' + otherConnection.typeExpr.toString());
+      return false;
+    }
+    // One of them is a type 
+    return otherConnection.typeExpr.getLiteralName() === this.typeExpr.getLiteralName(); // Type blocks may only be connected to type blocks
+  }
   // These must be in scope
   if(this.sourceBlock_.type == 'vars_local' || otherConnection.sourceBlock == 'vars_local')
   {
