@@ -85,7 +85,7 @@ Blockly.Blocks['test_mouse'] = {
     this.appendValueInput('TEST');
     this.setInputsInline(true);
     this.setOutput(true);
-    this.arrows = Type.fromList([Type.Lit("MouseButton"), Type.Lit("MouseButton")]);
+    this.arrows = Type.fromList([Type.Lit("Event"), Type.Lit("Event")]);
   }
 };
 
