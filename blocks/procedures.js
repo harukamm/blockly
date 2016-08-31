@@ -810,6 +810,7 @@ Blockly.Blocks['procedures_callreturn'] = {
       }
       // this.render();
     }
+
     return;
 
     if(!parentConnection.typeExpr.isFunction()){
@@ -895,6 +896,14 @@ Blockly.Blocks['procedures_callreturn'] = {
     Blockly.Block.updateConnectionTypes(this, type);
 
     this.outputConnection.typeExpr = Type.getOutput(type);
+
+    this.inputList.forEach(function(inp){
+      if(inp.connection){
+        inp.connection.visible_ = true;
+        inp.setVisible(true);
+      }
+    });
+
   },
 };
 
