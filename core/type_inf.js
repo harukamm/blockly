@@ -308,13 +308,21 @@ Blockly.TypeInf.inferWorkspace = function(workspace){
   // allBlocks.forEach(b => b.rendered = false);
   allBlocks.forEach(function(b){
     if(b.outputConnection && b.outputConnection.isConnected()){
-      if(b.type == "procedures_callreturn"){ // An even uglier hack
-        b.outputConnection.typeExpr = b.outputConnection.targetConnection.typeExpr;
-      }
-      else{
-        var s = Type.mgu(b.outputConnection.typeExpr, b.outputConnection.targetConnection.typeExpr);
-        b.outputConnection.typeExpr = Type.apply(s, b.outputConnection.typeExpr);
-      }
+
+      // The reasoning here is that connections should have matching types at
+      // this point
+      // Since, in getExpr we sometimes override the tag, some output
+      // connections aren't set. But we already know their type, they are the
+      // same as their targetConnections type
+      b.outputConnection.typeExpr = b.outputConnection.targetConnection.typeExpr;
+
+      // if(b.type == "procedures_callreturn"){ // An even uglier hack
+      //   b.outputConnection.typeExpr = b.outputConnection.targetConnection.typeExpr;
+      // }
+      // else{
+      //   var s = Type.mgu(b.outputConnection.typeExpr, b.outputConnection.targetConnection.typeExpr);
+      //   b.outputConnection.typeExpr = Type.apply(s, b.outputConnection.typeExpr);
+      // }
     }
   });
 
