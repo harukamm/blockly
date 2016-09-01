@@ -250,12 +250,7 @@ Blockly.Blocks['procedures_letFunc'] = {
         }
       }
     });
-
-
-    // update caller connections
-    var callers = Blockly.Procedures.getCallers(this.getFieldValue('NAME'), this.workspace);
-    callers.forEach(b => Blockly.TypeInf.unifyComponent()(b));
-
+    Blockly.TypeInf.inferWorkspace(this.workspace);
   },
 
   dispose: Blockly.Blocks['procedures_defnoreturn'].dispose,
