@@ -554,7 +554,8 @@ Blockly.Blocks['expr_case'] = {
 
 
     Blockly.TypeInf.defineFunction("#", Type.fromList([Type.Var('a'),Type.Var('a'),Type.Var('a')]));
-    Blockly.TypeInf.defineFunction("ev", Type.fromList([Type.Var('e'),Type.Var('a'),Type.Var('a')]));
+    Blockly.TypeInf.defineFunction("1ev", Type.fromList([Type.Var('e'),Type.Var('a'),Type.Var('a')]));
+    Blockly.TypeInf.defineFunction("1const", Type.fromList([Type.Var('a'),Type.Var('a'),Type.Var('a')]));
 
   },
 
@@ -569,6 +570,11 @@ Blockly.Blocks['expr_case'] = {
   getExpr: function(){
 
     var topExp = Exp.Lit(this.getFieldValue('NAME'));
+    if(this.getInput('INPUT').connection.isConnected()){
+      var topBlock = this.getInput('INPUT').connection.targetBlock().getExpr();
+      topExp = Exp.App(Exp.App(Exp.Var('1const'), topBlock), Exp.Lit(this.getFieldValue('NAME')) );
+      topExp.tag = this.getInput('INPUT').connection;
+    }
 
     var exps = [];
     for(var i = 1; i < this.inputList.length; i++){
@@ -599,7 +605,7 @@ Blockly.Blocks['expr_case'] = {
     var func = (a,b) => Exp.AppFunc([a,b],Exp.Var("#"));
     var combined = this.foldr1(func,exps);
 
-    var mainExp = Exp.AppFunc([topExp, combined], Exp.Var('ev'));
+    var mainExp = Exp.AppFunc([topExp, combined], Exp.Var('1ev'));
     mainExp.tag = this.outputConnection;
     return mainExp;
     
