@@ -296,6 +296,7 @@ Blockly.TypeInf.inferWorkspace = function(workspace){
     // Apply substitutions
     var blocks = Blockly.TypeInf.getComponent(block);
     blocks.forEach(b => b.applySubst(subs));
+    blocks.forEach(b => b.applySubst(subs));
 
     // Handle top level function special case
     if(block.type == 'procedures_letFunc'){
