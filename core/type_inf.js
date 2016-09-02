@@ -275,6 +275,8 @@ Blockly.TypeInf.inferWorkspace = function(workspace){
       continue; // Skip blocks that aren't really top level, e.g. a disconnected vars_local
     if(block.disabled)
       continue; // This one is obvious
+    if(block.type == "comment")
+      continue;
 
     var subs;
     try{
