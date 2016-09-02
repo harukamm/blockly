@@ -843,7 +843,7 @@ Blockly.Connection.prototype.hasTypeChange = function(){
   if(!this.typeExpr) // Something with no type cannot change
     return false;
 
-  return Type.equals(this.lastRendTypeExpr.toString(), this.typeExpr.toString());
+  return !Type.equals(this.lastRendTypeExpr, this.typeExpr);
 }
 
 
