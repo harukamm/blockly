@@ -79,7 +79,7 @@ Blockly.FieldLocalVar.prototype.hasTypeChange = function(){
   if(!this.typeExpr) // Something with no type cannot change
     return false;
 
-  return this.lastRendTypeExpr.toString() === this.typeExpr.toString(); 
+  return Type.equals(this.lastRendTypeExpr, this.typeExpr);
 }
 
 
@@ -153,13 +153,7 @@ Blockly.FieldLocalVar.prototype.render_ = function() {
     if (Blockly.Field.cacheWidths_ && Blockly.Field.cacheWidths_[key]) {
       var width = Blockly.Field.cacheWidths_[key];
     } else {
-      try {
-        var width = this.textElement_.getComputedTextLength();
-      } catch (e) {
-        // MSIE 11 is known to throw "Unexpected call to method or property
-        // access." if Blockly is hidden.
-        var width = this.textElement_.textContent.length * 8;
-      }
+      var width = this.textElement_.getComputedTextLength();
       if (Blockly.Field.cacheWidths_) {
         Blockly.Field.cacheWidths_[key] = width;
       }
