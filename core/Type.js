@@ -165,6 +165,11 @@ limitations under the License.
     return str;
   }
 
+  /**
+   * @param {Type} tp1
+   * @param {Type} tp2
+   * @return {Bool}
+   */
   Type.equals = function(tp1, tp2){
     if(tp1.isLiteral() && tp2.isLiteral()){
       if(tp1.getLiteralName() === tp2.getLiteralName()){
@@ -267,7 +272,7 @@ limitations under the License.
    * @return {Type}
    */
   Type.apply = function(s, t){
-    if (s==false)
+    if (s===false)
       throw "Types do not match, when trying to type " + t.toString();
     if (t.isTypeVar()){
       var n = t.getTypeVar();
@@ -358,7 +363,7 @@ limitations under the License.
    * @return {Object<string, Type>}
    */
   Type.varBind = function(u,t){
-    if (t.isTypeVar() && t.getTypeVar() == u)
+    if (t.isTypeVar() && t.getTypeVar() === u)
       return nullSubst;
     else if ( Type.ftv(t).has(u) )
       throw "occur check fails " + u + " vs " + t.toString();
