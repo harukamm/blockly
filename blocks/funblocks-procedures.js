@@ -567,6 +567,11 @@ Blockly.Blocks['vars_local'] = {
     return container;
   },
 
+
+  setNewTypeExpr: function(tp){
+    this.typeExpr = tp;
+  },
+
   onTypeChange: function(){
   },
 
