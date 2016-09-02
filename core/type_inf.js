@@ -466,10 +466,17 @@ Blockly.TypeInf.addFledgedFunctions = function(env){
   var blocks = Blockly.getMainWorkspace().getTopBlocks();
   blocks.forEach(function(block){
     if(block.type == "procedures_letFunc"){
-      var tp = Blockly.TypeInf.typeInference_(block, env);
-      var name = block.getFieldValue('NAME');
-      var scheme = new Scheme(Type.ftv(tp), tp);
-      env[name] = scheme;
+      try{
+        var tp = Blockly.TypeInf.typeInference_(block, env);
+        var name = block.getFieldValue('NAME');
+        var scheme = new Scheme(Type.ftv(tp), tp);
+        env[name] = scheme;
+      }
+      catch(e){
+        console.log('Error when inferring function ' + block.getFieldValue('NAME'));
+        console.log(e);
+        block.setWarningText('This may cause type errors in the rest of the program');
+      }
     }
   });
 }
