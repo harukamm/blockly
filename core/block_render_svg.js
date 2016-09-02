@@ -265,6 +265,45 @@ Blockly.BlockSvg.PROGRAM_COLOUR = 0;
 Blockly.BlockSvg.ABSTRACT_COLOUR = "#888888";
 
 
+/**
+ * Renders the block if some of its connections have not rendered the new type
+ */
+Blockly.BlockSvg.prototype.renderTypeChange = function(){
+  var shouldRender = false;
+  for(var i = 0; i < this.inputList.length; i++){
+    var inp = this.inputList[i];
+    if(inp.type == Blockly.INPUT_VALUE && inp.connection && inp.connection.hasTypeChange()){
+      shouldRender = true; 
+      break;
+    }
+    if(inp.type == Blockly.DUMMY_INPUT){
+      for(var j = 0; j < inp.fieldRow.length; j++){
+        var field = inp.fieldRow[j];
+        if(field instanceof Blockly.FieldLocalVar){
+          shouldRender = true;
+          break;
+        }
+      }
+    }
+  }
+  if(this.outputConnection && this.outputConnection.hasTypeChange()){
+    shouldRender = true;
+  }
+  console.log("should render: " +  this.type + " - " + shouldRender);
+  if(shouldRender){
+    this.render();
+    
+    this.inputList.forEach(function(inp){
+      if(inp.type == Blockly.INPUT_VALUE && inp.connection){
+       inp.connection.setTypeExprRendered();
+      }
+    });
+    if(this.outputConnection)
+      this.outputConnection.setTypeExprRendered();
+  }
+
+};
+
 
 /**
  * Render the block.

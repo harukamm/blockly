@@ -302,7 +302,6 @@ Blockly.TypeInf.inferWorkspace = function(workspace){
     }
   }
 
-  Blockly.TypeInf.redrawBlocks(allBlocks);
 
   // HACK to manually set outputs !
   // allBlocks.forEach(b => b.rendered = false);
@@ -314,23 +313,18 @@ Blockly.TypeInf.inferWorkspace = function(workspace){
       // Since, in getExpr we sometimes override the tag, some output
       // connections aren't set. But we already know their type, they are the
       // same as their targetConnections type
-      b.outputConnection.typeExpr = b.outputConnection.targetConnection.typeExpr;
-
-      // if(b.type == "procedures_callreturn"){ // An even uglier hack
-      //   b.outputConnection.typeExpr = b.outputConnection.targetConnection.typeExpr;
-      // }
-      // else{
-      //   var s = Type.mgu(b.outputConnection.typeExpr, b.outputConnection.targetConnection.typeExpr);
-      //   b.outputConnection.typeExpr = Type.apply(s, b.outputConnection.typeExpr);
-      // }
+      b.outputConnection.setNewTypeExpr(b.outputConnection.targetConnection.typeExpr);
     }
   });
+
+  Blockly.TypeInf.redrawBlocks(allBlocks);
 
   Blockly.Events.enable();
   
 }
 
 Blockly.TypeInf.redrawBlocks = function(blocks){
+  blocks.forEach(b => b.renderTypeChange()); 
 };
 
 // Test HM
@@ -369,7 +363,7 @@ Blockly.TypeInf.ti = function(te, exp){
         var sigma = env.get(n); // sigma : Scheme
         var t = Scheme.instantiate(sigma);
         if(exp.tag)
-          exp.tag.typeExpr = t;
+          exp.tag.setNewTypeExpr(t);
         return {sub: nullSubst , tp:t};
       }
       else{
@@ -394,7 +388,7 @@ Blockly.TypeInf.ti = function(te, exp){
       //console.log(new Type(Type.apply(s1,tv), t1) );
       var res = Type.Func(Type.apply(s1,tv), t1);
       if(exp.tag){
-        exp.tag.typeExpr = res;
+        exp.tag.setNewTypeExpr(res);
       }
       return {sub : s1, tp : res};
     }
@@ -409,7 +403,7 @@ Blockly.TypeInf.ti = function(te, exp){
       
       var newType = Type.apply(s3, tv);
       if(exp.tag){
-        exp.tag.typeExpr = newType;
+        exp.tag.setNewTypeExpr(newType);
       }
       return {sub : Type.composeSubst(s3,Type.composeSubst(s2,s1)), tp : newType};
     }
@@ -422,6 +416,9 @@ Blockly.TypeInf.ti = function(te, exp){
       var tn = TypeEnv.generalize(TypeEnv.apply(s1,ten),t1);
       var tenn = TypeEnv.insert(x,tn,ten); 
       var k2 = Blockly.TypeInf.ti(TypeEnv.apply(s1,tenn), e2); var s2 = k2['sub']; var t2 = k2['tp'];
+      // if (exp.tag){
+      //   exp.tag.setNewTypeExpr(t2);
+      // }
       return { sub : Type.composeSubst(s1,s2), tp : t2 };
     }
     throw "Partial pattern match";

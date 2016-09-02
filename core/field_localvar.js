@@ -48,6 +48,7 @@ Blockly.FieldLocalVar = function(text,typeExpr) {
       null);
   
   this.typeExpr = typeExpr;
+  this.lastRendTypeExpr = typeExpr;
   this.size_.height += 4;
 };
 goog.inherits(Blockly.FieldLocalVar, Blockly.Field);
@@ -62,6 +63,25 @@ Blockly.FieldLocalVar.prototype.updateEditable = function() {
 Blockly.FieldLocalVar.prototype.getType = function(){
   return this.typeExpr; 
 }
+
+Blockly.FieldLocalVar.prototype.setTypeExprRendered = function(){
+  this.lastRendTypeExpr = this.typeExpr;
+}
+
+Blockly.FieldLocalVar.prototype.setNewTypeExpr = function(tp){
+  this.lastRendTypeExpr = this.typeExpr;
+  this.typeExpr = tp;
+}
+
+Blockly.FieldLocalVar.prototype.hasTypeChange = function(){
+  if (!this.lastRendTypeExpr) // Means we haven't yet setNewTypeExpr
+    return true;
+  if(!this.typeExpr) // Something with no type cannot change
+    return false;
+
+  return this.lastRendTypeExpr.toString() === this.typeExpr.toString(); 
+}
+
 
 Blockly.FieldLocalVar.prototype.getPath = function(width)
 {

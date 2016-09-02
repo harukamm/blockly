@@ -332,13 +332,13 @@ Blockly.Block.updateConnectionTypes = function(block, type){
       if(inp>=block.inputList.length) {console.log("yelp"); return; }// Something went wrong
     }
 
-    block.inputList[inp].setTypeExpr(it.getFirst());
+    block.inputList[inp].connection.setNewTypeExpr(it.getFirst());
 
     it = it.getSecond();
     inp++;
   }
   if(block.outputConnection){
-    block.outputConnection.typeExpr = it;
+    block.outputConnection.setNewTypeExpr(it);
   }
 
 };
@@ -1763,7 +1763,7 @@ Blockly.Block.prototype.applySubst = function(subst){
     if(inp.type == Blockly.INPUT_VALUE){
       if(inp.connection && inp.connection.typeExpr){
         var t = Type.apply(subst, inp.connection.typeExpr);
-        inp.connection.typeExpr = t;
+        inp.connection.setNewTypeExpr(t);
       }
     }
   });
@@ -1771,11 +1771,11 @@ Blockly.Block.prototype.applySubst = function(subst){
     try{
       var t = Type.apply(subst, this.outputConnection.typeExpr);
       // console.log('setting ' + this.type + ' from ' + this.outputConnection.typeExpr.toString() + ' output to ' + t.toString());
-      this.outputConnection.typeExpr = t;
+      this.outputConnection.setNewTypeExpr(t);
     }
     catch(e){
       var a = Type.generateTypeVar('a'); 
-      this.outputConnection.typeExpr = Type.apply(subst,a);
+      this.outputConnection.setNewTypeExpr(Type.apply(subst,a));
       console.log(e);
     }
   }
@@ -1783,7 +1783,7 @@ Blockly.Block.prototype.applySubst = function(subst){
   var fieldVars = this.getAllFieldVars();
   fieldVars.forEach(function(f){
    // console.log("Assigning " + f.getValue() + " from " + f.type.toString() + " to " + Type.apply(subst, f.type));
-    f.typeExpr = Type.apply(subst, f.typeExpr);
+    f.setNewTypeExpr(Type.apply(subst, f.typeExpr));
   });
 };
 

@@ -251,8 +251,8 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
   var isStatement = parentConnection.type == Blockly.NEXT_STATEMENT || parentConnection.type == Blockly.PREVIOUS_CONNECTION;
   if(!isStatement && Blockly.TypeInf.isEnabled)
     Blockly.TypeInf.inferWorkspace(parentBlock.workspace);
-  parentBlock.render();
-  childBlock.render();
+  // parentBlock.render();
+  // childBlock.render();
 };
 
 /**
@@ -555,8 +555,8 @@ Blockly.Connection.prototype.disconnect = function() {
  
   if(Blockly.TypeInf.isEnabled)
     Blockly.TypeInf.inferWorkspace(parentBlock.workspace, parentBlock, childBlock);
-  childBlock.render();
-  parentBlock.render();
+  // childBlock.render();
+  // parentBlock.render();
 };
 
 // TODO Maybe move refactor into vars_local function?
@@ -825,6 +825,26 @@ Blockly.Connection.prototype.setTypeExpr = function(t) {
   return this;
 }
 
+// The last rendered type expr
+Blockly.Connection.prototype.lastRendTypeExpr = null; 
+
+Blockly.Connection.prototype.setTypeExprRendered = function(){
+  this.lastRendTypeExpr = this.typeExpr;
+}
+
+Blockly.Connection.prototype.setNewTypeExpr = function(tp){
+  // this.lastRendTypeExpr = this.typeExpr;
+  this.typeExpr = tp;
+}
+
+Blockly.Connection.prototype.hasTypeChange = function(){
+  if (!this.lastRendTypeExpr) // Means we haven't yet setNewTypeExpr
+    return true;
+  if(!this.typeExpr) // Something with no type cannot change
+    return false;
+
+  return Type.equals(this.lastRendTypeExpr.toString(), this.typeExpr.toString());
+}
 
 
 Blockly.Connection.prototype.getTypeExpr = function() {

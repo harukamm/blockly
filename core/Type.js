@@ -165,6 +165,32 @@ limitations under the License.
     return str;
   }
 
+  Type.equals = function(tp1, tp2){
+    if(tp1.isLiteral() && tp2.isLiteral()){
+      if(tp1.getLiteralName() === tp2.getLiteralName()){
+        var ch1 = tp1.getLiteralChildren();
+        var ch2 = tp2.getLiteralChildren();
+        if(ch1.length != ch2.length) return false;
+        for(var i = 0; i < ch1.length; i++){
+          if(! Type.equals(ch1[i], ch2[i]))
+            return false;
+        }
+        return true;
+      }
+      else
+        return false;
+
+    }
+    if(tp1.isFunction() && tp2.isFunction()){
+      return Type.equals(tp1.getFirst(), tp2.getFirst()) && Type.equals(tp1.getSecond(), tp2.getSecond());
+    }
+    if(tp1.isTypeVar() && tp2.isTypeVar()){
+      return tp1.getTypeVar() === tp2.getTypeVar();
+    }
+    
+    return false;
+  }
+
   /**
    * @param {Type} tp
    * @return {Array<Type>}

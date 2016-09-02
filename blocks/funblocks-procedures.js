@@ -54,7 +54,7 @@ Blockly.Blocks['procedures_letFunc'] = {
   },
 
   initArrows: function(){
-    this.getInput("RETURN").connection.typeExpr = Type.generateTypeVar('funcret');
+    this.getInput("RETURN").connection.setNewTypeExpr(Type.generateTypeVar('funcret'));
   },
 
   updateTypes: function(tp){
@@ -65,7 +65,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     }
 
     if(this.getInput("RETURN").connection.isConnected()) // Whats the point otherwise ?
-      this.getInput("RETURN").connection.typeExpr = tp;
+      this.getInput("RETURN").connection.setNewTypeExpr(tp);
 
     var inp = this.getInput("HEADER");
 
@@ -73,7 +73,7 @@ Blockly.Blocks['procedures_letFunc'] = {
     for(var f = 0; f < inp.fieldRow.length; f++){
       var fieldvar = inp.fieldRow[f];
       if(fieldvar instanceof Blockly.FieldLocalVar){
-        fieldvar.typeExpr = this.argTypes_[i++];
+        fieldvar.setNewTypeExpr(this.argTypes_[i++]);
       }
     }
     
@@ -101,6 +101,9 @@ Blockly.Blocks['procedures_letFunc'] = {
       exp.tag = this.getInput("RETURN").connection;
       return exp;
     }
+  },
+  setNewTypeExpr: function(tp){
+    this.typeExpr = tp;
   },
 
   setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
