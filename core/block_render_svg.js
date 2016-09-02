@@ -272,6 +272,8 @@ Blockly.BlockSvg.prototype.renderTypeChange = function(){
   var shouldRender = false;
   for(var i = 0; i < this.inputList.length; i++){
     var inp = this.inputList[i];
+    // if(inp.connection && inp.connection.lastRendTypeExpr)
+    //   console.log("D: " + inp.connection.lastRendTypeExpr.toString() + " ::: " + inp.connection.typeExpr.toString());
     if(inp.type == Blockly.INPUT_VALUE && inp.connection && inp.connection.hasTypeChange()){
       shouldRender = true; 
       break;
@@ -289,7 +291,7 @@ Blockly.BlockSvg.prototype.renderTypeChange = function(){
   if(this.outputConnection && this.outputConnection.hasTypeChange()){
     shouldRender = true;
   }
-  console.log("should render: " +  this.type + " - " + shouldRender);
+  // console.log("should render: " +  this.type + " - " + shouldRender);
   if(shouldRender){
     this.render();
     
