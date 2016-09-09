@@ -271,10 +271,12 @@ Blockly.TypeInf.inferWorkspace = function(workspace){
       continue; //ignore statement blocks
     if(block.type.startsWith("type"))
       continue; // Skip type blocks, they are monomorphic anyway
-    if(block.outputConnection)
-      continue; // Skip blocks that aren't really top level, e.g. a disconnected vars_local
-    if(block.disabled)
-      continue; // This one is obvious
+    if(block.type == 'vars_local')
+      continue; // Skip disconnected vars_local
+    // if(block.outputConnection)
+    //   continue; // Skip blocks that aren't really top level, e.g. a disconnected vars_local
+    // if(block.disabled)
+    //   continue; // This one is obvious
     if(block.type == "comment")
       continue;
 
