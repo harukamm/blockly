@@ -473,7 +473,7 @@ Blockly.Connection.prototype.renderTypeVarHighlights = function() {
   var x = this.x_ - xy.x;
   var y = this.y_ - xy.y;
 
-  if(!this.visible_)
+  if(!this.visible_ || this.sourceBlock_.collapsed_)
     return;
   var typeVarHighlights = Blockly.BlockSvg.typeVarHighlights(this.typeExpr);
 
