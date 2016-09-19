@@ -412,61 +412,6 @@ Blockly.Connection.prototype.renderTypeVarHighlights = function() {
     }
   }
 
-  // Stefan, TODO - Fix
-  //if(this.typeExpr && this.typeExpr.name == 'Function_'){
-
-  //  this.typeVarPaths_ = [];
-  //  var xy = this.sourceBlock_.getRelativeToSurfaceXY();
-  //  var x = this.x_ - xy.x;
-  //  var y = this.y_ - xy.y;
-  //  var typeVarHighlights = Blockly.BlockSvg.typeVarHighlights(this.typeExpr.children[this.typeExpr.children.length-1]);
-
-  //  for (var i = 0; i < typeVarHighlights.length; i++) {
-  //    var highlight = typeVarHighlights[i];
-  //    this.typeVarPaths_.push(
-  //      Blockly.createSvgElement(
-  //        'path', {
-  //          'class': 'blocklyTypeVarPath',
-  //          stroke: highlight.color,
-  //          d: highlight.path,
-  //          transform: 'translate(' + x + ', ' + y + ')'
-  //        },
-  //        this.sourceBlock_.getSvgRoot()));
-  //  }
-
-  //  xy = this.sourceBlock_.getRelativeToSurfaceXY();
-  //  x = this.x_ - xy.x + 43;
-  //  y = this.y_ - xy.y + 1;
-  //  var inps = [];
-  //  for(var i = 0; i < this.typeExpr.children.length - 1; i++){
-  //    inps.push(this.typeExpr.children[i]);
-  //  }
-  //  var thisBlock = this;
-  //  inps.forEach(function(tp){
-  //  var typeVarHighlights = Blockly.BlockSvg.typeVarHighlights(tp);
-
-  //  for (var i = 0; i < typeVarHighlights.length; i++) {
-  //      var highlight = typeVarHighlights[i];
-  //      thisBlock.typeVarPaths_.push(
-  //        Blockly.createSvgElement(
-  //          'path', {
-  //            'class': 'blocklyTypeVarPath',
-  //            stroke: highlight.color,
-  //            d: highlight.path,
-  //            transform: 'translate(' + x + ', ' + y + ')'
-  //          },
-  //          thisBlock.sourceBlock_.getSvgRoot()));
-  //    }
-  //    y += Blockly.BlockSvg.getTypeExprHeight(tp);
-  //  });
-
-
-
-
-
-  //  return;
-  //}
-
   
   this.typeVarPaths_ = [];
   var xy = this.sourceBlock_.getRelativeToSurfaceXY();
