@@ -131,6 +131,22 @@ Blockly.Procedures.findLegalName = function(name, block) {
 Blockly.Procedures.isLegalName = function(name, workspace, opt_exclude) {
   var blocks = workspace.getAllBlocks();
   // Iterate through every block and check the name.
+  
+
+  var reserved = Blockly.UserTypes.userReservedNames;
+  var dic = Blockly.TypeInf.builtinTypes;
+
+  var keys = [];
+  for (var key in dic) {
+    if (dic.hasOwnProperty(key)) {
+          keys.push(key);
+      }
+  }
+  reserved = reserved.concat(keys);
+
+  if(reserved.indexOf(name) >= 0)
+    return false;
+
   for (var i = 0; i < blocks.length; i++) {
     if (blocks[i] == opt_exclude) {
       continue;

@@ -31,6 +31,7 @@ goog.require('Blockly.Workspace');
 Blockly.UserTypes.builtinsStatic = [];
 //Generate blocks with these types
 Blockly.UserTypes.builtinsDynamic = [];
+Blockly.UserTypes.userReservedNames = []
 
 /**
  * Returns an xml list of blocks for the types flyout.
