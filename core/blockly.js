@@ -414,7 +414,8 @@ Blockly.hideChaff = function(opt_allowToolbox) {
     var workspace = Blockly.getMainWorkspace();
     if (workspace.toolbox_ &&
         workspace.toolbox_.flyout_ &&
-        workspace.toolbox_.flyout_.autoClose) {
+        workspace.toolbox_.flyout_.autoClose
+       ) {
       workspace.toolbox_.clearSelection();
     }
   }

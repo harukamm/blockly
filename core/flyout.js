@@ -177,10 +177,10 @@ Blockly.Flyout.prototype.init = function(targetWorkspace) {
 
   Array.prototype.push.apply(this.eventWrappers_,
       Blockly.bindEvent_(this.svgGroup_, 'wheel', this, this.wheel_));
-  if (!this.autoClose) {
+  // if (!this.autoClose) {
     this.filterWrapper_ = this.filterForCapacity_.bind(this);
     this.targetWorkspace_.addChangeListener(this.filterWrapper_);
-  }
+  //}
   // Dragging the flyout up and down.
   Array.prototype.push.apply(this.eventWrappers_,
       Blockly.bindEvent_(this.svgGroup_, 'mousedown', this, this.onMouseDown_));
@@ -691,17 +691,17 @@ Blockly.Flyout.prototype.clearOldBlocks_ = function() {
  * @private
  */
 Blockly.Flyout.prototype.addBlockListeners_ = function(root, block, rect) {
-  if (this.autoClose) {
-    this.listeners_.push(Blockly.bindEvent_(root, 'mousedown', null,
-        this.createBlockFunc_(block)));
-    this.listeners_.push(Blockly.bindEvent_(rect, 'mousedown', null,
-        this.createBlockFunc_(block)));
-  } else {
+  // if (this.autoClose) {
+  //  this.listeners_.push(Blockly.bindEvent_(root, 'mousedown', null,
+  //      this.createBlockFunc_(block)));
+  //  this.listeners_.push(Blockly.bindEvent_(rect, 'mousedown', null,
+  //      this.createBlockFunc_(block)));
+  //} else {
     this.listeners_.push(Blockly.bindEvent_(root, 'mousedown', null,
         this.blockMouseDown_(block)));
     this.listeners_.push(Blockly.bindEvent_(rect, 'mousedown', null,
         this.blockMouseDown_(block)));
-  }
+  //}
   this.listeners_.push(Blockly.bindEvent_(root, 'mouseover', block,
       block.addSelect));
   this.listeners_.push(Blockly.bindEvent_(root, 'mouseout', block,
@@ -722,7 +722,7 @@ Blockly.Flyout.prototype.blockMouseDown_ = function(block) {
   var flyout = this;
   return function(e) {
     Blockly.terminateDrag_();
-    Blockly.hideChaff();
+    // Blockly.hideChaff();
     if (Blockly.isRightButton(e)) {
       // Right-click.
       block.showContextMenu_(e);
@@ -864,11 +864,14 @@ Blockly.Flyout.prototype.createBlockFunc_ = function(originBlock) {
       Blockly.Events.setGroup(true);
       Blockly.Events.fire(new Blockly.Events.Create(block));
     }
-    if (flyout.autoClose) {
+    if(flyout.autoClose){
       flyout.hide();
-    } else {
-      flyout.filterForCapacity_();
     }
+    //if (flyout.autoClose) {
+      // flyout.hide();
+    //} else {
+      flyout.filterForCapacity_();
+    //}
     // Start a dragging operation on the new block.
     block.onMouseDown_(e);
     Blockly.dragMode_ = Blockly.DRAG_FREE;
