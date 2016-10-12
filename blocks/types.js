@@ -301,7 +301,7 @@ Blockly.Blocks['type_sum'] = {
         .appendField(new Blockly.FieldLabel('data ', 'blocklyTextEmph'))
         .appendField(new Blockly.FieldTextInput('UserType',Blockly.UserTypes.renameType), 'NAME');
     this.appendValueInput('PROD0')
-        .appendField('|')
+        .appendField('=')
         .setAlign(Blockly.ALIGN_RIGHT);
     this.setOutput(false);
     this.setMutator(new Blockly.Mutator(['tp_create_with_variant']));
@@ -353,7 +353,7 @@ Blockly.Blocks['type_sum'] = {
     var tps = [];
     for (var x = 0; x < this.itemCount_; x++) {
       var input = this.appendValueInput('PROD' + x)
-                      .appendField('|')
+                      .appendField( x == 0 ? '=' : '|')
                       .setAlign(Blockly.ALIGN_RIGHT);
       tps.push(Type.Lit("Product"));
     }
@@ -388,7 +388,7 @@ Blockly.Blocks['type_sum'] = {
     var tps = [];
     while (itemBlock) {
       var input = this.appendValueInput('PROD' + this.itemCount_)
-                      .appendField('|')
+                      .appendField( this.itemCount_ == 0 ? '=' : '|')
                       .setAlign(Blockly.ALIGN_RIGHT);
       tps.push(Type.Lit("Product"));
       // Reconnect any child blocks.
