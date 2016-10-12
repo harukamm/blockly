@@ -766,6 +766,8 @@ Blockly.Blocks['procedures_callreturn'] = {
   modifyShape_: Blockly.Blocks['procedures_callnoreturn'].modifyShape_,
 
 
+  // Determines whether the caller block should be in function mode (no inputs)
+  // or just in normal mode (with its usual inputs
   getMode: function(parentConnection){
     if(!parentConnection)
       return 0;
@@ -783,7 +785,7 @@ Blockly.Blocks['procedures_callreturn'] = {
         cons++;
       }
     }
-    if(parentConnection.typeExpr.isFunction() && !anyCon){
+    if(parentConnection.typeExpr && parentConnection.typeExpr.isFunction() && !anyCon){
       if(cons == Type.flatten(parentConnection.typeExpr).length - 1)
         return 1;
       else
